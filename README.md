@@ -11,5 +11,10 @@
 </h1>
 The services and libraries that drive the functionality of the Kestral platform.<br/>
 <br/>
+
+| Crate   | Path                         | Description     |
+| ------- | ---------------------------- | --------------- |
+| `wings` | [crates/wings](crates/wings) | REST API server |
+
 </div>
 <br/>
