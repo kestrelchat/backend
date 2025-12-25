@@ -1,0 +1,4 @@
+is_production = false
+
+[sentry]
+api = "https://?.ingest.?.sentry.io/?"

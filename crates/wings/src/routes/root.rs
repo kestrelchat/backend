@@ -15,7 +15,7 @@ fn openapi_json(spec: &State<String>) -> RawJson<String> {
 }
 
 /// Mount the routes for this group onto the given Rocket instance.
-pub fn mount_routes(rocket: Rocket<Build>) -> Rocket<Build> {
+pub fn mount_routes(_config: &kestrel_config::Config, rocket: Rocket<Build>) -> Rocket<Build> {
     // Generate routes and OpenAPI spec from annotated handlers
     let (generated_routes, openapi) = openapi_get_routes_spec![root];
 
