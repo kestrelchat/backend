@@ -7,6 +7,9 @@ Thumbs.db
 .venv/
 venv/
 
+# Config Files
+kestrel.toml
+
 # Rust / Cargo Build Artifacts
 target
 
