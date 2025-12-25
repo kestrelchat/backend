@@ -12,9 +12,10 @@
 The services and libraries that drive the functionality of the Kestral platform.<br/>
 <br/>
 
-| Crate   | Path                         | Description     |
-| ------- | ---------------------------- | --------------- |
-| `wings` | [crates/wings](crates/wings) | REST API server |
+| Crate         | Path                                     | Description     |
+| ------------- | ---------------------------------------- | --------------- |
+| `core/config` | [crates/core/config](crates/core/config) | Core Config     |
+| `wings`       | [crates/wings](crates/wings)             | REST API server |
 
 </div>
 <br/>
