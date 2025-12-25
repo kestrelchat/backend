@@ -1,6 +1,6 @@
 <div align="center">
 <h1>
-  Kestral Backend
+  Kestrel Backend
   
   [![Stars](https://img.shields.io/github/stars/kestralchat/backend?style=flat-square&logoColor=white)](https://github.com/kestralchat/backend/stargazers)
   [![Forks](https://img.shields.io/github/forks/kestralchat/backend?style=flat-square&logoColor=white)](https://github.com/kestralchat/backend/network/members)
