@@ -3,6 +3,7 @@ extern crate rocket_okapi;
 extern crate serde_json;
 
 pub mod routes;
+pub mod errors;
 
 use kestrel_config::config;
 use rocket::fairing::AdHoc;
@@ -106,9 +107,20 @@ pub async fn web() -> Rocket<Build> {
     };
 
     // Delegate application route mounting to the routes module, then
-    // attach the Swagger UI and configure server address/port.
+    // attach the Swagger UI, register JSON error catchers and configure server address/port.
     routes::mount(config, rocket)
         .mount("/swagger", swagger)
+        .register(
+            "/",
+            rocket::catchers![
+                errors::default_catcher,
+                errors::bad_request,
+                errors::unauthorized,
+                errors::forbidden,
+                errors::not_found,
+                errors::internal_error,
+            ],
+        )
         .configure(rocket::Config {
             address: bind_addr.into(),
             port: 8000,

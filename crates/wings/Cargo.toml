@@ -12,3 +12,4 @@ okapi = "0.7"
 serde_json = "1.0"
 kestrel-config = { path = "../core/config" }
 sentry = "0.46"
+ulid = "1"
