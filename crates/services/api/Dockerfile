@@ -5,6 +5,9 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
 
+ENV KESTREL_CONFIG=/var/kestrel/conf.toml
+COPY kestrel.toml $KESTREL_CONFIG
+
 RUN cargo build --release -p api
 
 FROM debian:trixie-slim

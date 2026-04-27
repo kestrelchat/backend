@@ -23,7 +23,7 @@ use std::path::Path;
 
 impl Config {
     pub fn load() -> Result<Self, ConfigError> {
-        let path = std::env::var("KESTREL_CONFIG").expect("KESTREL_CONFIG must be set");
+        let path = std::env::var("KESTREL_CONFIG").unwrap_or("/var/kestrel/conf.toml".to_string());
 
         if !Path::new(&path).exists() {
             return Err(ConfigError::NotFound);
