@@ -7,9 +7,9 @@ services:
       dockerfile: crates/services/gateway/Dockerfile
 
     volumes:
-      - ./kestrel.toml:/kestrel_dat/kestrel.toml:ro
+      - ./kestrel.toml:/var/kestrel/conf.toml:ro
     environment:
-      - KESTREL_CONFIG=/kestrel_dat/kestrel.toml
+      - KESTREL_CONFIG=/var/kestrel/conf.toml
 
     ports:
       - "5180:5180"
@@ -24,9 +24,9 @@ services:
       dockerfile: crates/services/api/Dockerfile
 
     volumes:
-      - ./kestrel.toml:/kestrel_dat/kestrel.toml:ro
+      - ./kestrel.toml:/var/kestrel/conf.toml:ro
     environment:
-      - KESTREL_CONFIG=/kestrel_dat/kestrel.toml
+      - KESTREL_CONFIG=/var/kestrel/conf.toml
 
     ports:
       - "5181:5181"
