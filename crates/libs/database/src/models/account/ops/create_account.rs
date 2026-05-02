@@ -34,7 +34,7 @@ pub async fn create_account(
         r#"
         INSERT INTO accounts (id, email, password, birthday, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, email, password, birthday, created_at, updated_at
+        RETURNING id, email, email_verified, password, birthday, created_at, updated_at
         "#,
     )
     .bind(id)

@@ -49,6 +49,7 @@ pub enum DatabaseError {
 
 impl DatabaseError {
     pub fn from_sqlx(err: SqlxError) -> Self {
+        //println!("DB ERROR: {:?}", err);
         if let SqlxError::Database(db_err) = &err {
             match db_err.code().as_deref() {
                 Some("23505") => {
