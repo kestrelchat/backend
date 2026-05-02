@@ -23,7 +23,10 @@ use config::Config;
 use database::{
     connection::Database,
     error::DatabaseError,
-    models::account::{AccountOps, AccountRepository},
+    models::{
+        account::{AccountOps, AccountRepository},
+        user::{UserOps, UserRepository},
+    },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
@@ -34,6 +37,7 @@ use crate::utils::errors::AppError;
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct RegisterRequest {
     email: String,
+    username: String,
     password: String,
     birthday: Option<NaiveDate>,
 }
@@ -77,12 +81,22 @@ pub async fn register(
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "accounts_email_key" => {
-                AppError::conflict("EMAIL_ALREADY_TAKEN")
+                AppError::conflict("EMAIL_TAKEN")
             }
             other => AppError::from(other),
         })?;
 
-    // TODO: CREATE USER + SEND VERIFICATION EMAIL
+    let _user = UserRepository
+        .create_user(db, account.id.clone(), req.username.as_str())
+        .await
+        .map_err(|e| match e {
+            DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
+                AppError::conflict("USERNAME_TAKEN")
+            }
+            other => AppError::from(other),
+        })?;
+
+    // TODO: SEND VERIFICATION EMAIL
 
     Ok(Json(RegisterResponse {
         id: account.id,

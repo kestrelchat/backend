@@ -14,5 +14,23 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod account;
-pub mod user;
+use crate::models::user::ops::create_user as db_create_user;
+use crate::{
+    connection::Database,
+    error::DatabaseError,
+    models::user::{User, ops::UserOps},
+};
+
+pub struct UserRepository;
+
+#[async_trait::async_trait]
+impl UserOps for UserRepository {
+    async fn create_user(
+        &self,
+        db: &Database,
+        id: String,
+        username: &str,
+    ) -> Result<User, DatabaseError> {
+        db_create_user(db, id, username).await
+    }
+}
