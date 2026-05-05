@@ -49,11 +49,13 @@ pub enum DatabaseError {
 
 impl DatabaseError {
     pub fn from_sqlx(err: SqlxError) -> Self {
-        //println!("DB ERROR: {:?}", err);
         if let SqlxError::Database(db_err) = &err {
             match db_err.code().as_deref() {
                 Some("23505") => {
-                    let constraint = db_err.constraint().unwrap_or("unknown").to_string();
+                    let constraint = db_err
+                        .constraint()
+                        .map(|c| c.to_string())
+                        .unwrap_or_else(|| "unknown".to_string());
                     return Self::UniqueViolation(constraint);
                 }
                 Some("23503") => return Self::ForeignKeyViolation,
