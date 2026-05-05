@@ -19,6 +19,8 @@
 pub mod routes;
 pub mod utils;
 
+use std::net::IpAddr;
+
 use config::Config as AppConfig;
 use database::connection::Database;
 use rocket::Config as RocketConfig;
@@ -33,24 +35,33 @@ use utils::errors::{
 extern crate rocket;
 extern crate rocket_okapi;
 
-#[launch]
-async fn rocket() -> _ {
-    let config = AppConfig::load().expect("Failed to load config");
+async fn web() -> Result<rocket::Rocket<rocket::Build>, Box<dyn std::error::Error>> {
+    let config = AppConfig::load().map_err(|e| format!("Failed to load config: {}", e))?;
+
+    let addr: IpAddr = config
+        .network
+        .host
+        .parse()
+        .map_err(|e: std::net::AddrParseError| format!("Invalid host address: {}", e))?;
 
     let rocket_config = RocketConfig {
-        address: config.network.host.parse().expect("valid bind address"),
+        address: addr,
         port: config.network.ports.api,
         ..RocketConfig::default()
     };
 
-    let database = Database::connect(&config.database.postgres)
-        .await
-        .expect("Failed to connect to database");
+    let database = Database::connect(&config.database.postgres).await.map_err(
+        |e| -> Box<dyn std::error::Error> {
+            format!("Failed to connect to database: {}", e).into()
+        },
+    )?;
 
     database
         .migrate()
         .await
-        .expect("Failed to run database migrations");
+        .map_err(|e| -> Box<dyn std::error::Error> {
+            format!("Failed to run database migrations: {}", e).into()
+        })?;
 
     let swagger =
         rocket_okapi::swagger_ui::make_swagger_ui(&rocket_okapi::swagger_ui::SwaggerUIConfig {
@@ -85,5 +96,16 @@ async fn rocket() -> _ {
             ],
         );
 
-    routes::mount(rocket)
+    Ok(routes::mount(rocket))
+}
+
+#[launch]
+async fn rocket() -> _ {
+    match web().await {
+        Ok(rocket) => rocket,
+        Err(e) => {
+            eprintln!("Failed to initialize Rocket: {}", e);
+            std::process::exit(1);
+        }
+    }
 }
