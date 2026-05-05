@@ -3,7 +3,6 @@ name: Security Audit
 on:
   schedule:
     - cron: "0 3 * * *"
-  push:
   pull_request:
 
 jobs:
