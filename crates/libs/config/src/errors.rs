@@ -22,6 +22,7 @@ use std::fmt;
 #[derive(Debug)]
 pub enum ConfigError {
     NotFound,
+    EnvVar(String),
     ParseError(toml::de::Error),
     Io(std::io::Error),
 }
@@ -31,6 +32,9 @@ impl fmt::Display for ConfigError {
         match self {
             ConfigError::NotFound => {
                 write!(f, "Config file not found")
+            }
+            ConfigError::EnvVar(e) => {
+                write!(f, "Environment variable error: {}", e)
             }
             ConfigError::ParseError(e) => {
                 write!(f, "Failed to parse config: {}", e)
