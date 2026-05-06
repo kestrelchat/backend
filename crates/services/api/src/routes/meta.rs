@@ -43,7 +43,7 @@ pub struct RegistrationMeta {
 #[get("/")]
 pub fn meta(config: &rocket::State<Config>) -> Json<Meta> {
     Json(Meta {
-        kestrel: env!("CARGO_PKG_VERSION").to_string(),
+        kestrel: env!("CARGO_PKG_VERSION").into(),
         features: FeaturesMeta {
             registration: RegistrationMeta {
                 minimum_age: config.api.registration.minimum_age,

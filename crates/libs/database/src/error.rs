@@ -54,14 +54,14 @@ impl DatabaseError {
                 Some("23505") => {
                     let constraint = db_err
                         .constraint()
-                        .map(|c| c.to_string())
-                        .unwrap_or_else(|| "unknown".to_string());
+                        .map(|c| c.into())
+                        .unwrap_or_else(|| "unknown".into());
                     return Self::UniqueViolation(constraint);
                 }
                 Some("23503") => return Self::ForeignKeyViolation,
                 Some("23502") => return Self::NotNullViolation,
                 Some("23514") => return Self::CheckViolation,
-                _ => return Self::Other(db_err.message().to_string()),
+                _ => return Self::Other(db_err.message().into()),
             }
         }
 

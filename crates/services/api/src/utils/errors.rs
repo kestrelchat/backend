@@ -141,12 +141,12 @@ fn make_response(
     message: Option<&str>,
     _req: &Request<'_>,
 ) -> Custom<Json<ErrorResponse>> {
-    let request_id = Ulid::new().to_string();
+    let request_id = Ulid::new().into();
     let body = ErrorResponse {
         error: ErrorObject {
-            code: code.to_string(),
+            code: code.into(),
             status: status.code,
-            message: message.map(|s| s.to_string()),
+            message: message.map(|s| s.into()),
         },
         request_id,
     };
@@ -163,9 +163,8 @@ impl OpenApiResponderInner for AppError {
     fn responses(_gen: &mut OpenApiGenerator) -> Result<Responses, OpenApiError> {
         let mut responses = Responses::default();
         let error_schema = RefOr::Object(Response {
-            description: "Error".to_string(),
-            content: std::iter::once(("application/json".to_string(), MediaType::default()))
-                .collect(),
+            description: "Error".into(),
+            content: std::iter::once(("application/json".into(), MediaType::default())).collect(),
             ..Default::default()
         });
 
