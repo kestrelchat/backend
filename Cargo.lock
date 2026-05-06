@@ -39,7 +39,7 @@ dependencies = [
  "chrono",
  "common",
  "config",
- "database",
+ "postgres",
  "rocket",
  "rocket_okapi",
  "schemars",
@@ -367,18 +367,6 @@ name = "data-encoding"
 version = "2.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7a1e2f27636f116493b8b860f5546edb47c8d8f8ea73e1d2a20be88e28d1fea"
-
-[[package]]
-name = "database"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "sqlx",
- "thiserror 2.0.18",
- "tokio",
- "ulid",
-]
 
 [[package]]
 name = "der"
@@ -1536,6 +1524,18 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
+
+[[package]]
+name = "postgres"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "sqlx",
+ "thiserror 2.0.18",
+ "tokio",
+ "ulid",
+]
 
 [[package]]
 name = "potential_utf"

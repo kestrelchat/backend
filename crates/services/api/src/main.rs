@@ -22,7 +22,7 @@ pub mod utils;
 use std::net::IpAddr;
 
 use config::Config as AppConfig;
-use database::connection::Database;
+use postgres::connection::Database;
 use rocket::Config as RocketConfig;
 
 use crate::utils::cors::{CorsFairing, preflight};

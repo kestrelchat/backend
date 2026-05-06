@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["crates/libs/common","crates/libs/config", "crates/libs/database","crates/services/api","crates/services/gateway"]
+members = ["crates/libs/common","crates/libs/config", "crates/libs/postgres","crates/services/api","crates/services/gateway"]

@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use common::utils::validation::{ValidationError, email, password};
-use database::error::DatabaseError;
+use postgres::error::DatabaseError;
 use rocket::serde::json::Json;
 use rocket::{Request, catch, http::Status, response::Responder, response::status::Custom};
 use rocket_okapi::OpenApiError;

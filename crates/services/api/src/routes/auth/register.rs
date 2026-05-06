@@ -20,7 +20,7 @@ use common::utils::{
     validation::{ValidationError, email, password},
 };
 use config::Config;
-use database::{
+use postgres::{
     connection::Database,
     error::DatabaseError,
     models::{
