@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use config::structs::network::Cors;
+use kestrel_config::structs::network::Cors;
 use rocket::{
     Request, Response,
     fairing::{Fairing, Info, Kind},

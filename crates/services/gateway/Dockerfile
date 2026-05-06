@@ -34,9 +34,9 @@ COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
 
 RUN if [ "$BUILD_MODE" = "release" ]; then \
-        cargo build --release -p gateway ; \
+        cargo build --release -p kestrel_gateway ; \
     else \
-        cargo build -p gateway ; \
+        cargo build -p kestrel_gateway ; \
     fi
 
 # Runtime stage
@@ -49,8 +49,8 @@ RUN apt-get update && apt-get install -y ca-certificates \
 
 ARG BUILD_MODE
 
-COPY --from=builder /app/target/${BUILD_MODE}/gateway /usr/local/bin/gateway
+COPY --from=builder /app/target/${BUILD_MODE}/kestrel_gateway /usr/local/bin/kestrel_gateway
 
 EXPOSE 5180
 
-CMD ["gateway"]
+CMD ["kestrel_gateway"]

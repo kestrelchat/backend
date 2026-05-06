@@ -15,12 +15,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use chrono::{Datelike, NaiveDate, Utc};
-use common::utils::{
-    normalize,
+use kestrel_common::utils::{
+    hasher, normalize,
     validation::{ValidationError, email, password},
 };
-use config::Config;
-use postgres::{
+use kestrel_config::Config;
+use kestrel_postgres::{
     connection::Database,
     error::DatabaseError,
     models::{
@@ -72,7 +72,7 @@ pub async fn register(
         return Err(AppError::bad_request("AGE_TOO_YOUNG"));
     }
 
-    let hashed_password = common::utils::hasher::hash(req.password.as_bytes())
+    let hashed_password = hasher::hash(req.password.as_bytes())
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 

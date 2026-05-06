@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use config::Config;
+use kestrel_config::Config;
 use rocket::serde::json::Json;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::openapi;

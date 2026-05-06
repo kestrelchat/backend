@@ -22,7 +22,7 @@ mod protocol;
 
 use std::net::IpAddr;
 
-use config::Config as AppConfig;
+use kestrel_config::Config as AppConfig;
 use rocket::Config as RocketConfig;
 
 use crate::gateway::gateway_route;

@@ -1,10 +1,10 @@
 [package]
-name = "gateway"
+name = "kestrel_gateway"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-config = { version = "0.1.0", path = "../../libs/config" }
+kestrel_config = { version = "0.1.0", path = "../../libs/config" }
 rocket = "0.5.1"
 serde = "1.0.228"
 serde_json = "1.0.149"

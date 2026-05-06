@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use common::utils::validation::{ValidationError, email, password};
-use postgres::error::DatabaseError;
+use kestrel_common::utils::validation::{ValidationError, email, password};
+use kestrel_postgres::error::DatabaseError;
 use rocket::serde::json::Json;
 use rocket::{Request, catch, http::Status, response::Responder, response::status::Custom};
 use rocket_okapi::OpenApiError;

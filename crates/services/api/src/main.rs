@@ -21,8 +21,8 @@ pub mod utils;
 
 use std::net::IpAddr;
 
-use config::Config as AppConfig;
-use postgres::connection::Database;
+use kestrel_config::Config as AppConfig;
+use kestrel_postgres::connection::Database;
 use rocket::Config as RocketConfig;
 
 use crate::utils::cors::{CorsFairing, preflight};

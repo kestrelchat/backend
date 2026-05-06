@@ -34,9 +34,9 @@ COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
 
 RUN if [ "$BUILD_MODE" = "release" ]; then \
-        cargo build --release -p api ; \
+        cargo build --release -p kestrel_api ; \
     else \
-        cargo build -p api ; \
+        cargo build -p kestrel_api ; \
     fi
 
 # Runtime stage
@@ -49,8 +49,8 @@ RUN apt-get update && apt-get install -y ca-certificates \
 
 ARG BUILD_MODE
 
-COPY --from=builder /app/target/${BUILD_MODE}/api /usr/local/bin/api
+COPY --from=builder /app/target/${BUILD_MODE}/kestrel_api /usr/local/bin/kestrel_api
 
 EXPOSE 5180
 
-CMD ["api"]
+CMD ["kestrel_api"]

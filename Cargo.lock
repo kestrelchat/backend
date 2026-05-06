@@ -33,21 +33,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
-name = "api"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "common",
- "config",
- "postgres",
- "rocket",
- "rocket_okapi",
- "schemars",
- "serde",
- "ulid",
-]
-
-[[package]]
 name = "argon2"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -222,27 +207,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "argon2",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ca0197aee26d1ae37445ee532fefce43251d24cc7c166799f4d46817f1d3973"
 dependencies = [
  "crossbeam-utils",
-]
-
-[[package]]
-name = "config"
-version = "0.1.0"
-dependencies = [
- "serde",
- "toml 1.1.2+spec-1.1.0",
 ]
 
 [[package]]
@@ -672,17 +642,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gateway"
-version = "0.1.0"
-dependencies = [
- "config",
- "rocket",
- "rocket_ws",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "generator"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1107,6 +1066,59 @@ dependencies = [
 ]
 
 [[package]]
+name = "kestrel_api"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "kestrel_common",
+ "kestrel_config",
+ "kestrel_postgres",
+ "rocket",
+ "rocket_okapi",
+ "schemars",
+ "serde",
+ "ulid",
+]
+
+[[package]]
+name = "kestrel_common"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+]
+
+[[package]]
+name = "kestrel_config"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "toml 1.1.2+spec-1.1.0",
+]
+
+[[package]]
+name = "kestrel_gateway"
+version = "0.1.0"
+dependencies = [
+ "kestrel_config",
+ "rocket",
+ "rocket_ws",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "kestrel_postgres"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "sqlx",
+ "thiserror 2.0.18",
+ "tokio",
+ "ulid",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1524,18 +1536,6 @@ name = "plain"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
-
-[[package]]
-name = "postgres"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "sqlx",
- "thiserror 2.0.18",
- "tokio",
- "ulid",
-]
 
 [[package]]
 name = "potential_utf"

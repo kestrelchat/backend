@@ -1,5 +1,5 @@
 [package]
-name = "postgres"
+name = "kestrel_postgres"
 version = "0.1.0"
 edition = "2024"
 
