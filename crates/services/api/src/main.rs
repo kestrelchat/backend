@@ -23,6 +23,7 @@ use std::net::IpAddr;
 
 use kestrel_config::Config as AppConfig;
 use kestrel_postgres::connection::Database;
+use kestrel_redis::connection::Redis;
 use rocket::Config as RocketConfig;
 
 use crate::utils::cors::{CorsFairing, preflight};
@@ -50,13 +51,17 @@ async fn web() -> Result<rocket::Rocket<rocket::Build>, Box<dyn std::error::Erro
         ..RocketConfig::default()
     };
 
-    let database = Database::connect(&config.database.postgres).await.map_err(
+    let postgres = Database::connect(&config.database.postgres).await.map_err(
         |e| -> Box<dyn std::error::Error> {
-            format!("Failed to connect to database: {}", e).into()
+            format!("Failed to connect to postgres: {}", e).into()
         },
     )?;
 
-    database
+    let redis = Redis::connect(&config.database.redis).await.map_err(
+        |e| -> Box<dyn std::error::Error> { format!("Failed to connect to redis: {}", e).into() },
+    )?;
+
+    postgres
         .migrate()
         .await
         .map_err(|e| -> Box<dyn std::error::Error> {
@@ -75,7 +80,8 @@ async fn web() -> Result<rocket::Rocket<rocket::Build>, Box<dyn std::error::Erro
 
     let rocket = rocket::custom(rocket_config)
         .attach(cors)
-        .manage(database)
+        .manage(postgres)
+        .manage(redis)
         .manage(config)
         .mount("/", routes![preflight])
         .mount("/swagger", swagger)

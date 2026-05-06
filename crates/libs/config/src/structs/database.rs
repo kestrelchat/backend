@@ -21,4 +21,5 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct DatabaseConfig {
     pub postgres: String,
+    pub redis: String,
 }

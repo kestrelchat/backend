@@ -3,9 +3,7 @@ is_production = false
 [network]
 # This must be 0.0.0.0 if you are hosting via Docker (recommended)
 host = "0.0.0.0"
-# I think for Kestrel by default we will allocate ports 5180-5189 to us.
-# I see no reason to allocate more than those 10 ports for my current plans.
-# - Stribes
+# By default we will allocate ports 5180-5189 to Kestrel. This does not include external services like Postgres.
 ports = { gateway = 5180, api = 5181 }
 
 [network.cors]
@@ -14,6 +12,7 @@ allow_credentials = true
 
 [database]
 postgres = "postgresql://kestrel:kestrel@postgres:5432/kestrel"
+redis = "redis://redis:6379"
 
 [api.registration]
 minimum_age = 16

@@ -51,7 +51,7 @@ pub struct RegisterResponse {
 #[openapi(tag = "Authentication")]
 #[post("/register", data = "<req>")]
 pub async fn register(
-    db: &State<Database>,
+    postgres: &State<Database>,
     config: &State<Config>,
     req: Json<RegisterRequest>,
 ) -> Result<Json<RegisterResponse>, AppError> {
@@ -77,7 +77,7 @@ pub async fn register(
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
     let account = AccountRepository
-        .create_account(db, &normalized_email, &hashed_password, birthday)
+        .create_account(postgres, &normalized_email, &hashed_password, birthday)
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "accounts_email_key" => {
@@ -87,7 +87,7 @@ pub async fn register(
         })?;
 
     let _user = UserRepository
-        .create_user(db, account.id.clone(), req.username.as_str())
+        .create_user(postgres, account.id.clone(), req.username.as_str())
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {

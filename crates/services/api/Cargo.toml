@@ -13,3 +13,4 @@ schemars = { version = "0.8", features = ["chrono"] }
 serde = "1.0.228"
 ulid = "1.2.1"
 kestrel_common = { version = "0.1.0", path = "../../libs/common" }
+kestrel_redis = { version = "0.1.0", path = "../../libs/redis" }
