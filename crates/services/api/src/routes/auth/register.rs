@@ -23,10 +23,7 @@ use kestrel_config::Config;
 use kestrel_postgres::{
     connection::Database,
     error::DatabaseError,
-    models::{
-        account::{AccountOps, AccountRepository},
-        user::{UserOps, UserRepository},
-    },
+    operations::{account::create_account, user::create_user},
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
@@ -76,8 +73,7 @@ pub async fn register(
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
-    let account = AccountRepository
-        .create_account(postgres, &normalized_email, &hashed_password, birthday)
+    let account = create_account(postgres, &normalized_email, &hashed_password, birthday)
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "accounts_email_key" => {
@@ -86,8 +82,7 @@ pub async fn register(
             other => AppError::from(other),
         })?;
 
-    let _user = UserRepository
-        .create_user(postgres, account.id.clone(), req.username.as_str())
+    let _user = create_user(postgres, account.id.clone(), req.username.as_str())
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {

@@ -18,7 +18,9 @@ use chrono::{NaiveDate, Utc};
 use sqlx::query_as;
 use ulid::Ulid;
 
-use crate::{connection::Database, error::DatabaseError, models::account::Account};
+use crate::connection::Database;
+use crate::error::DatabaseError;
+use kestrel_common::models::Account;
 
 pub async fn create_account(
     db: &Database,

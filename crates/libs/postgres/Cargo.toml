@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 async-trait = "0.1.89"
 chrono = "0.4.44"
+kestrel_common = { version = "0.1.0", path = "../common" }
 sqlx = { version = "0.8.6", features = [
     "postgres",
     "runtime-tokio-native-tls",

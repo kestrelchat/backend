@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 argon2 = "0.5.3"
+chrono = "0.4.44"
+sqlx = { version = "0.8.6", features = ["chrono"] }
