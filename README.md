@@ -96,6 +96,7 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 - [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2)
 - [async-trait](https://github.com/dtolnay/async-trait)
 - [chrono](https://github.com/chronotope/chrono)
+- [rand](https://github.com/rust-random/rand)
 - [redis](https://github.com/redis-rs/redis-rs)
 - [rocket](https://github.com/rwf2/Rocket)
 - [rocket_okapi](https://github.com/GREsau/rocket_okapi)
