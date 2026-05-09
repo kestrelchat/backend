@@ -6,4 +6,6 @@ edition = "2024"
 [dependencies]
 argon2 = "0.5.3"
 chrono = "0.4.44"
+rand = { version = "0.10.1", features = ["sys_rng"] }
+serde = "1.0.228"
 sqlx = { version = "0.8.6", features = ["chrono"] }
