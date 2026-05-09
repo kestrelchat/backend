@@ -1,4 +1,7 @@
-use crate::token::{base32::base32_encode, spec, types::Token};
+use crate::{
+    token::{spec, types::Token},
+    utils::base32::base32_encode,
+};
 
 pub fn encode(token: &Token) -> String {
     let mut bytes = Vec::with_capacity(spec::TOTAL_BYTES);

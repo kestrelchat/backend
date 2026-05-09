@@ -1,4 +1,7 @@
-use crate::token::{Token, base32::base32_decode, error::TokenError, spec};
+use crate::{
+    token::{Token, error::TokenError, spec},
+    utils::base32::base32_decode,
+};
 
 pub fn decode(input: &str) -> Result<Token, TokenError> {
     let bytes = base32_decode(input).map_err(|_| TokenError::InvalidEncoding)?;
