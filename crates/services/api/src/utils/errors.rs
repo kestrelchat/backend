@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use kestrel_common::utils::validation::{ValidationError, email, password};
+use kestrel_common::utils::validation::{ValidationError, email, password, username};
 use kestrel_postgres::error::DatabaseError;
 use rocket::serde::json::Json;
 use rocket::{Request, catch, http::Status, response::Responder, response::status::Custom};
@@ -114,6 +114,7 @@ impl From<ValidationError> for AppError {
                     AppError::bad_request("EMAIL_INVALID_DOMAIN")
                 }
             },
+
             ValidationError::Password(e) => match e {
                 password::ValidationError::Empty => AppError::bad_request("PASSWORD_EMPTY"),
                 password::ValidationError::TooShort => AppError::bad_request("PASSWORD_TOO_SHORT"),
@@ -129,6 +130,24 @@ impl From<ValidationError> for AppError {
                 }
                 password::ValidationError::MissingSpecial => {
                     AppError::bad_request("PASSWORD_MISSING_SPECIAL")
+                }
+            },
+
+            ValidationError::Username(e) => match e {
+                username::ValidationError::Empty => AppError::bad_request("USERNAME_EMPTY"),
+                username::ValidationError::TooShort => AppError::bad_request("USERNAME_TOO_SHORT"),
+                username::ValidationError::TooLong => AppError::bad_request("USERNAME_TOO_LONG"),
+                username::ValidationError::InvalidCharacters => {
+                    AppError::bad_request("USERNAME_INVALID_CHARACTERS")
+                }
+                username::ValidationError::StartsWithInvalidChar => {
+                    AppError::bad_request("USERNAME_INVALID_START")
+                }
+                username::ValidationError::EndsWithInvalidChar => {
+                    AppError::bad_request("USERNAME_INVALID_END")
+                }
+                username::ValidationError::ConsecutiveSeparators => {
+                    AppError::bad_request("USERNAME_CONSECUTIVE_SEPARATORS")
                 }
             },
         }
