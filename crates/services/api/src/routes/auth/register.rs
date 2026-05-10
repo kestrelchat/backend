@@ -17,7 +17,7 @@
 use chrono::{Datelike, NaiveDate, Utc};
 use kestrel_common::utils::{
     hasher, normalize,
-    validation::{ValidationError, email, password},
+    validation::{ValidationError, email, password, username},
 };
 use kestrel_config::Config;
 use kestrel_postgres::{
@@ -53,6 +53,7 @@ pub async fn register(
     req: Json<RegisterRequest>,
 ) -> Result<Json<RegisterResponse>, AppError> {
     let normalized_email = normalize::identity(&req.email);
+    let normalized_username = normalize::identity(&req.username);
 
     email::validate(&normalized_email, config.is_production)
         .await
@@ -61,6 +62,10 @@ pub async fn register(
     password::validate(&req.password)
         .await
         .map_err(ValidationError::Password)?;
+
+    username::validate(&normalized_username)
+        .await
+        .map_err(ValidationError::Username)?;
 
     let birthday = req
         .birthday
@@ -82,7 +87,7 @@ pub async fn register(
             other => AppError::from(other),
         })?;
 
-    let _user = create_user(postgres, account.id.clone(), req.username.as_str())
+    let _user = create_user(postgres, account.id.clone(), &normalized_username)
         .await
         .map_err(|e| match e {
             DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
