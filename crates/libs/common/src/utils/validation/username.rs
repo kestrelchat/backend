@@ -62,10 +62,10 @@ pub async fn validate(username: &str) -> Result<(), ValidationError> {
         last_was_sep = is_sep;
     }
 
-    if let Some(last) = username.chars().last() {
-        if last == '_' || last == '.' {
-            return Err(ValidationError::EndsWithInvalidChar);
-        }
+    if let Some(last) = username.chars().last()
+        && (last == '_' || last == '.')
+    {
+        return Err(ValidationError::EndsWithInvalidChar);
     }
 
     Ok(())
