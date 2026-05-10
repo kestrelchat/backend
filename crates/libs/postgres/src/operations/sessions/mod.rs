@@ -16,4 +16,4 @@
 
 pub mod create_session;
 
-pub use create_session::{create_session, SessionMetadata};
+pub use create_session::{SessionMetadata, create_session};
