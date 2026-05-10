@@ -44,18 +44,11 @@ pub async fn validate(email: &str, production: bool) -> Result<(), ValidationErr
         return Err(ValidationError::InvalidStructure);
     }
 
-    if !domain.contains('.') {
-        let is_localhost = domain == "localhost";
+    let invalid =
+        (!domain.contains('.') && domain != "localhost") || (domain == "localhost" && production);
 
-        if is_localhost {
-            if production {
-                return Err(ValidationError::InvalidDomain);
-            }
-        } else {
-            if !domain.contains('.') {
-                return Err(ValidationError::InvalidDomain);
-            }
-        }
+    if invalid {
+        return Err(ValidationError::InvalidDomain);
     }
 
     if domain.starts_with('.') || domain.ends_with('.') {
