@@ -61,11 +61,12 @@ impl DatabaseError {
                 Some("23503") => return Self::ForeignKeyViolation,
                 Some("23502") => return Self::NotNullViolation,
                 Some("23514") => return Self::CheckViolation,
-                _ => return Self::Other(db_err.message().into()),
+                _ => return Self::Other(db_err.message().to_string()),
             }
         }
 
         match err {
+            SqlxError::RowNotFound => Self::NotFound,
             SqlxError::PoolTimedOut | SqlxError::PoolClosed | SqlxError::Io(_) => {
                 Self::Connection(err)
             }

@@ -15,4 +15,5 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 pub mod account;
+pub mod sessions;
 pub mod user;

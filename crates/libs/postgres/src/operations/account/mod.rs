@@ -15,5 +15,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 pub mod create_account;
+pub mod lookup_account;
 
 pub use create_account::create_account;
+pub use lookup_account::get_account_by_email;
+pub use lookup_account::get_account_by_id;

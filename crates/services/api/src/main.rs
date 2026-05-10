@@ -21,6 +21,7 @@ pub mod utils;
 
 use std::net::IpAddr;
 
+use kestrel_common::utils::geoip::GeoIpClient;
 use kestrel_config::Config as AppConfig;
 use kestrel_postgres::connection::Database;
 use kestrel_redis::connection::Redis;
@@ -78,11 +79,14 @@ async fn web() -> Result<rocket::Rocket<rocket::Build>, Box<dyn std::error::Erro
         config: config.network.cors.clone(),
     };
 
+    let geoip = GeoIpClient::default();
+
     let rocket = rocket::custom(rocket_config)
         .attach(cors)
         .manage(postgres)
         .manage(redis)
         .manage(config)
+        .manage(geoip)
         .mount("/", routes![preflight])
         .mount("/swagger", swagger)
         .register(

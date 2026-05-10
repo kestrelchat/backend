@@ -14,10 +14,37 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod account;
-pub mod session;
-pub mod user;
+use kestrel_common::token::Token;
+use redis::AsyncCommands;
 
-pub use account::Account;
-pub use session::Session;
-pub use user::User;
+use crate::{connection::Redis, error::RedisError};
+
+const TTL_SECS: u64 = 20 * 60;
+
+pub struct CreatedSession {
+    pub auth_token: String,
+}
+
+pub async fn create_session(
+    redis: &Redis,
+    session_id: &str,
+    user_id: &str,
+) -> Result<CreatedSession, RedisError> {
+    let auth_token = Token::generate(2);
+
+    let key = format!("auth:{auth_token}");
+
+    let value = serde_json::json!({
+        "session_id": session_id,
+        "user_id":    user_id,
+    })
+    .to_string();
+
+    let mut conn = redis.conn().clone();
+
+    conn.set_ex::<_, _, ()>(&key, &value, TTL_SECS)
+        .await
+        .map_err(RedisError::Redis)?;
+
+    Ok(CreatedSession { auth_token })
+}
