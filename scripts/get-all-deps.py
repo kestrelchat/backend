@@ -4,7 +4,9 @@ import tomllib
 
 deps = set()
 
-for root, _, files in os.walk("."):
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+for root, _, files in os.walk(project_root):
     if "Cargo.toml" in files:
         path = os.path.join(root, "Cargo.toml")
         try:
