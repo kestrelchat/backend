@@ -18,7 +18,10 @@ use kestrel_common::utils::{geoip::GeoIpClient, hasher, normalize, user_agent::p
 use kestrel_postgres::{
     connection::Database,
     error::DatabaseError,
-    operations::{account::get_account_by_email, sessions::create_session as pg_create_session},
+    operations::{
+        account::get_account_by_email,
+        sessions::{SessionMetadata, create_session as pg_create_session},
+    },
 };
 use kestrel_redis::{
     connection::Redis, operations::sessions::create_session as redis_create_session,
@@ -83,13 +86,15 @@ pub async fn login(
     let pg_session = pg_create_session(
         postgres,
         &account.id,
-        Some(ip),
-        Some(country),
-        Some(region),
-        Some(city),
-        Some(user_agent),
-        Some(operating_system),
-        Some(platform),
+        SessionMetadata {
+            ip_address: Some(ip),
+            country: Some(country),
+            region: Some(region),
+            city: Some(city),
+            user_agent: Some(user_agent),
+            operating_system: Some(operating_system),
+            platform: Some(platform),
+        },
     )
     .await
     .map_err(AppError::from)?;

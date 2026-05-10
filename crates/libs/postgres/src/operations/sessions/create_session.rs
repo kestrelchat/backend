@@ -9,16 +9,20 @@ pub struct CreatedSession {
     pub refresh_token: String,
 }
 
+pub struct SessionMetadata {
+    pub ip_address: Option<std::net::IpAddr>,
+    pub country: Option<String>,
+    pub region: Option<String>,
+    pub city: Option<String>,
+    pub user_agent: Option<String>,
+    pub operating_system: Option<String>,
+    pub platform: Option<String>,
+}
+
 pub async fn create_session(
     db: &Database,
     user_id: &str,
-    ip_address: Option<std::net::IpAddr>,
-    country: Option<String>,
-    region: Option<String>,
-    city: Option<String>,
-    user_agent: Option<String>,
-    operating_system: Option<String>,
-    platform: Option<String>,
+    meta: SessionMetadata,
 ) -> Result<CreatedSession, DatabaseError> {
     let id = Ulid::new().to_string();
     let created_at = Utc::now();
@@ -57,13 +61,13 @@ pub async fn create_session(
     .bind(&id)
     .bind(user_id)
     .bind(&refresh_token_hash)
-    .bind(ip_address.map(|ip| ip.to_string()))
-    .bind(country)
-    .bind(region)
-    .bind(city)
-    .bind(user_agent)
-    .bind(operating_system)
-    .bind(platform)
+    .bind(meta.ip_address.map(|ip| ip.to_string()))
+    .bind(meta.country)
+    .bind(meta.region)
+    .bind(meta.city)
+    .bind(meta.user_agent)
+    .bind(meta.operating_system)
+    .bind(meta.platform)
     .bind(created_at)
     .bind(updated_at)
     .bind(expires_at)

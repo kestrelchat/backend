@@ -41,24 +41,23 @@ impl<'r> FromRequest<'r> for RequestContext {
 }
 
 fn extract_ip(req: &Request<'_>) -> Option<IpAddr> {
-    if let Some(ip) = req.headers().get_one("CF-Connecting-IP") {
-        if let Ok(ip) = ip.parse() {
-            return Some(ip);
-        }
+    if let Some(ip) = req.headers().get_one("CF-Connecting-IP")
+        && let Ok(ip) = ip.parse()
+    {
+        return Some(ip);
     }
 
-    if let Some(forwarded) = req.headers().get_one("X-Forwarded-For") {
-        if let Some(ip) = forwarded.split(',').next() {
-            if let Ok(ip) = ip.trim().parse() {
-                return Some(ip);
-            }
-        }
+    if let Some(forwarded) = req.headers().get_one("X-Forwarded-For")
+        && let Some(ip) = forwarded.split(',').next()
+        && let Ok(ip) = ip.trim().parse()
+    {
+        return Some(ip);
     }
 
-    if let Some(ip) = req.headers().get_one("X-Real-IP") {
-        if let Ok(ip) = ip.parse() {
-            return Some(ip);
-        }
+    if let Some(ip) = req.headers().get_one("X-Real-IP")
+        && let Ok(ip) = ip.parse()
+    {
+        return Some(ip);
     }
 
     req.client_ip()

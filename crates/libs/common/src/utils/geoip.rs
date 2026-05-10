@@ -31,21 +31,11 @@ pub struct GeoIpResponse {
     pub hosting: Option<bool>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct GeoInfo {
     pub country: Option<String>,
     pub region: Option<String>,
     pub city: Option<String>,
-}
-
-impl Default for GeoInfo {
-    fn default() -> Self {
-        Self {
-            country: None,
-            region: None,
-            city: None,
-        }
-    }
 }
 
 #[derive(Clone, Default)]
@@ -62,10 +52,10 @@ impl GeoIpClient {
         let bytes = resp.bytes().await.ok()?;
         let data: GeoIpResponse = serde_json::from_slice(&bytes).ok()?;
 
-        if let Some(status) = &data.status {
-            if status != "success" {
-                return None;
-            }
+        if let Some(status) = &data.status
+            && status != "success"
+        {
+            return None;
         }
 
         Some(GeoInfo {
