@@ -87,6 +87,7 @@ pub async fn register(
             other => AppError::from(other),
         })?;
 
+    // will be used once email verification is implemented
     let _user = create_user(postgres, account.id.clone(), &normalized_username)
         .await
         .map_err(|e| match e {

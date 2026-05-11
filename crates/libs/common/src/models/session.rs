@@ -44,5 +44,5 @@ pub struct Session {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RedisSession {
     pub session_id: String,
-    pub user_id: String,
+    pub account_id: String,
 }
