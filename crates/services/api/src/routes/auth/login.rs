@@ -99,12 +99,12 @@ pub async fn login(
     .await
     .map_err(AppError::from)?;
 
-    let redis_session = redis_create_session(redis, &pg_session.session.id, &account.id)
+    let auth_token = redis_create_session(redis, &pg_session.session.id, &account.id)
         .await
         .map_err(|_| AppError::internal_error("SESSION_STORE_FAILED"))?;
 
     Ok(Json(LoginResponse {
-        auth_token: redis_session.auth_token,
+        auth_token,
         refresh_token: pg_session.refresh_token,
     }))
 }

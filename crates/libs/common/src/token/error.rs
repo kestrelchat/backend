@@ -19,4 +19,5 @@ pub enum TokenError {
     InvalidLength,
     InvalidEncoding,
     UnsupportedVersion,
+    UnknownType,
 }

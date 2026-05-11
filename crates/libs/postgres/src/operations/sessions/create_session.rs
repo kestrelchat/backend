@@ -1,10 +1,14 @@
 use chrono::Utc;
-use kestrel_common::{models::Session, token::Token, utils::hasher};
+use kestrel_common::{
+    models::Session,
+    token::{Token, TokenType},
+    utils::hasher,
+};
 use ulid::Ulid;
 
 use crate::{connection::Database, error::DatabaseError};
 
-pub struct CreatedSession {
+pub struct PgCreatedSession {
     pub session: Session,
     pub refresh_token: String,
 }
@@ -23,13 +27,13 @@ pub async fn create_session(
     db: &Database,
     user_id: &str,
     meta: SessionMetadata,
-) -> Result<CreatedSession, DatabaseError> {
+) -> Result<PgCreatedSession, DatabaseError> {
     let id = Ulid::new().to_string();
     let created_at = Utc::now();
     let updated_at = created_at;
     let expires_at = created_at + chrono::Duration::days(30);
 
-    let refresh_token = Token::generate(1);
+    let refresh_token = Token::generate(TokenType::Refresh);
 
     let refresh_token_hash = hasher::hash(refresh_token.as_bytes())
         .await
@@ -75,7 +79,7 @@ pub async fn create_session(
     .await
     .map_err(DatabaseError::from_sqlx)?;
 
-    Ok(CreatedSession {
+    Ok(PgCreatedSession {
         session,
         refresh_token,
     })

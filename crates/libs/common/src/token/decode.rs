@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::{
-    token::{Token, error::TokenError, spec},
+    token::{Token, TokenType, error::TokenError, spec},
     utils::base32::base32_decode,
 };
 
@@ -36,7 +36,7 @@ pub fn decode(input: &str) -> Result<Token, TokenError> {
         return Err(TokenError::UnsupportedVersion);
     }
 
-    let token_type = bytes[7];
+    let token_type = TokenType::try_from(bytes[7]).map_err(|_| TokenError::UnknownType)?;
 
     let entropy: [u8; 16] = bytes[8..24]
         .try_into()

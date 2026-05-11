@@ -27,7 +27,7 @@ pub fn encode(token: &Token) -> String {
 
     bytes.push(token.version);
 
-    bytes.push(token.token_type);
+    bytes.push(token.token_type as u8);
 
     bytes.extend_from_slice(&token.entropy);
 
