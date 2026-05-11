@@ -51,6 +51,6 @@ ARG BUILD_MODE
 
 COPY --from=builder /app/target/${BUILD_MODE}/kestrel_api /usr/local/bin/kestrel_api
 
-EXPOSE 5180
+EXPOSE 5181
 
 CMD ["kestrel_api"]

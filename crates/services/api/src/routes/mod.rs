@@ -22,5 +22,7 @@ pub mod meta;
 use rocket::{Build, Rocket};
 
 pub fn mount(rocket: Rocket<Build>) -> Rocket<Build> {
-    rocket.mount("/auth", auth::routes())
+    rocket
+        .mount("/", routes![meta::meta])
+        .mount("/auth", auth::routes())
 }

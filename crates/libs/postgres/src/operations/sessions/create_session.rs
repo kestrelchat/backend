@@ -51,10 +51,9 @@ pub async fn create_session(
             created_at,
             updated_at,
             expires_at,
-            last_used_at,
-            revoked_at
+            last_used_at
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
         RETURNING *
         "#,
     )
@@ -72,7 +71,6 @@ pub async fn create_session(
     .bind(updated_at)
     .bind(expires_at)
     .bind(created_at)
-    .bind(None::<chrono::DateTime<Utc>>)
     .fetch_one(db.pool())
     .await
     .map_err(DatabaseError::from_sqlx)?;
