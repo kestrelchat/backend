@@ -109,7 +109,7 @@ fn is_old_enough(birthday: NaiveDate, min_age: i32) -> bool {
 
     let age = today.year()
         - birthday.year()
-        - if today.ordinal() < birthday.ordinal() {
+        - if (today.month(), today.day()) < (birthday.month(), birthday.day()) {
             1
         } else {
             0

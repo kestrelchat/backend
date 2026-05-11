@@ -27,7 +27,7 @@ use kestrel_redis::{
     connection::Redis, operations::sessions::create_session as redis_create_session,
 };
 use rocket::{State, serde::json::Json};
-use rocket_okapi::okapi::schemars;
+use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{errors::AppError, request_context::RequestContext};
@@ -44,6 +44,7 @@ pub struct LoginResponse {
     refresh_token: String,
 }
 
+#[openapi(tag = "Authentication")]
 #[post("/login", data = "<req>")]
 pub async fn login(
     postgres: &State<Database>,
