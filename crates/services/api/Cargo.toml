@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 chrono = { workspace = true }
-kestrel_common = { workspace = true }
+kestrel_common = { workspace = true, features = ["geoip", "user_agent"] }
 kestrel_config = { workspace = true }
 kestrel_postgres = { workspace = true }
 kestrel_redis = { workspace = true }

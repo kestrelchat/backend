@@ -3,13 +3,17 @@ name = "kestrel_common"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+geoip = ["dep:reqwest"]
+user_agent = ["dep:uaparser", "dep:once_cell"]
+
 [dependencies]
 argon2 = { workspace = true }
 chrono = { workspace = true }
-once_cell = { workspace = true }
+once_cell = { workspace = true, optional = true }
 rand = { workspace = true }
-reqwest = { workspace = true }
+reqwest = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 sqlx = { workspace = true }
-uaparser = { workspace = true }
+uaparser = { workspace = true, optional = true }
