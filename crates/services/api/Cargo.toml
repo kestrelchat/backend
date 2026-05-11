@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chrono = { version = "0.4.44", features = ["serde"] }
-kestrel_config = { version = "0.1.0", path = "../../libs/config" }
-kestrel_postgres = { version = "0.1.0", path = "../../libs/postgres" }
-rocket = "0.5.1"
-rocket_okapi = { version = "0.9.0", features = ["swagger"] }
-schemars = { version = "0.8", features = ["chrono"] }
-serde = "1.0.228"
-ulid = "1.2.1"
-kestrel_common = { version = "0.1.0", path = "../../libs/common" }
-kestrel_redis = { version = "0.1.0", path = "../../libs/redis" }
+chrono = { workspace = true }
+kestrel_common = { workspace = true }
+kestrel_config = { workspace = true }
+kestrel_postgres = { workspace = true }
+kestrel_redis = { workspace = true }
+rocket = { workspace = true }
+rocket_okapi = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+ulid = { workspace = true }

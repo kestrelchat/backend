@@ -1459,12 +1459,10 @@ dependencies = [
 name = "kestrel_postgres"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "chrono",
  "kestrel_common",
  "sqlx",
  "thiserror 2.0.18",
- "tokio",
  "ulid",
 ]
 

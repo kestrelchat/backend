@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-kestrel_config = { version = "0.1.0", path = "../../libs/config" }
-rocket = "0.5.1"
-serde = "1.0.228"
-serde_json = "1.0.149"
-ws = { package = "rocket_ws", version = "0.1.1" }
+kestrel_config = { workspace = true }
+rocket = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ws = { workspace = true }
