@@ -19,9 +19,9 @@
 pub mod connection;
 pub mod router;
 
-use ws::WebSocket;
+use rocket_ws::WebSocket;
 
 #[get("/")]
-pub fn gateway_route(ws: WebSocket) -> ws::Channel<'static> {
+pub fn gateway_route(ws: WebSocket) -> rocket_ws::Channel<'static> {
     connection::gateway(ws)
 }

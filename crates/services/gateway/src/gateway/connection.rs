@@ -17,11 +17,11 @@
  */
 
 use rocket::futures::StreamExt;
-use ws::WebSocket;
+use rocket_ws::WebSocket;
 
 use crate::{gateway::router, protocol::packet::Packet};
 
-pub fn gateway(ws: WebSocket) -> ws::Channel<'static> {
+pub fn gateway(ws: WebSocket) -> rocket_ws::Channel<'static> {
     ws.channel(|mut stream| {
         Box::pin(async move {
             while let Some(message) = stream.next().await {
@@ -30,7 +30,7 @@ pub fn gateway(ws: WebSocket) -> ws::Channel<'static> {
                     Err(_) => break,
                 };
 
-                if let ws::Message::Text(text) = msg
+                if let rocket_ws::Message::Text(text) = msg
                     && let Ok(packet) = serde_json::from_str::<Packet>(&text)
                 {
                     router::route(packet).await;
