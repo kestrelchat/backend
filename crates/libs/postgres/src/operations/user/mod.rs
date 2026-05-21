@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+pub mod count_users;
 pub mod create_user;
 
+pub use count_users::count_users;
 pub use create_user::create_user;

@@ -30,7 +30,7 @@ pub fn mount(mut rocket: Rocket<Build>) -> Rocket<Build> {
         rocket,
         "/".to_owned(),
         settings,
-        "/"    => openapi_get_routes_spec![meta::meta],
+        "/"    => openapi_get_routes_spec![meta::meta, meta::users_count],
         "/auth" => auth::routes(),
     );
     rocket
