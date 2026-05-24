@@ -37,7 +37,7 @@ pub struct ChangePasswordRequest {
 }
 
 #[openapi(tag = "Authentication")]
-#[post("/change-password", data = "<req>")]
+#[post("/password/change", data = "<req>")]
 pub async fn change_password(
     postgres: &State<Database>,
     req: Json<ChangePasswordRequest>,
