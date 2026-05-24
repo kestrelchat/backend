@@ -14,9 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+pub mod change_password;
 pub mod create_account;
 pub mod lookup_account;
 
+pub use change_password::change_password;
 pub use create_account::create_account;
 pub use lookup_account::get_account_by_email;
 pub use lookup_account::get_account_by_id;

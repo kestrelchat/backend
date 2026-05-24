@@ -14,17 +14,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use rocket::Route;
-use rocket_okapi::{okapi::openapi3::OpenApi, openapi_get_routes_spec};
+use chrono::Utc;
+use sqlx::query;
 
-mod change_password;
-mod login;
-mod register;
+use crate::connection::Database;
+use crate::error::DatabaseError;
 
-pub fn routes() -> (Vec<Route>, OpenApi) {
-    openapi_get_routes_spec![
-        register::register,
-        login::login,
-        change_password::change_password
-    ]
+pub async fn change_password(
+    db: &Database,
+    id: String,
+    password: &str,
+) -> Result<(), DatabaseError> {
+    let updated_at = Utc::now();
+
+    query(
+        r#"
+        UPDATE accounts
+        SET
+            password = $1,
+            updated_at = $2
+        WHERE
+            id = $3
+        "#,
+    )
+    .bind(password)
+    .bind(updated_at)
+    .bind(id)
+    .execute(db.pool())
+    .await
+    .map_err(DatabaseError::from_sqlx)?;
+
+    Ok(())
 }
