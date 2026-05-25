@@ -5,7 +5,6 @@ members = [
     "crates/libs/config",
     "crates/libs/postgres",
     "crates/libs/redis",
-    "crates/libs/hcaptcha",
     "crates/services/api",
     "crates/services/gateway",
 ]
@@ -16,7 +15,6 @@ kestrel_common = { version = "0.1.0", path = "crates/libs/common" }
 kestrel_config = { version = "0.1.0", path = "crates/libs/config" }
 kestrel_postgres = { version = "0.1.0", path = "crates/libs/postgres" }
 kestrel_redis = { version = "0.1.0", path = "crates/libs/redis" }
-kestrel_hcaptcha = { version = "0.1.0", path = "crates/libs/hcaptcha" }
 
 # External crates
 argon2 = "0.5.3"

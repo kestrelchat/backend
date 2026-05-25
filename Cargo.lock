@@ -1442,7 +1442,6 @@ dependencies = [
  "chrono",
  "kestrel_common",
  "kestrel_config",
- "kestrel_hcaptcha",
  "kestrel_postgres",
  "kestrel_redis",
  "rocket",
@@ -1458,6 +1457,7 @@ version = "0.1.0"
 dependencies = [
  "argon2",
  "chrono",
+ "hcaptcha",
  "once_cell",
  "rand 0.10.1",
  "reqwest",
@@ -1484,15 +1484,6 @@ dependencies = [
  "rocket_ws",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "kestrel_hcaptcha"
-version = "0.1.0"
-dependencies = [
- "hcaptcha",
- "reqwest",
- "serde",
 ]
 
 [[package]]
