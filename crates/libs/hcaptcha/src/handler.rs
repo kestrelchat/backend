@@ -1,7 +1,6 @@
 use std::io::{Error, ErrorKind};
 
 use hcaptcha::Hcaptcha;
-use serde::Deserialize;
 
 #[derive(Hcaptcha)]
 pub struct HCaptchaForm<'a> {
@@ -12,9 +11,6 @@ pub struct HCaptchaForm<'a> {
 #[derive(serde::Deserialize)]
 struct HcaptchaVerifyResponse {
     success: bool,
-
-    #[serde(default, rename = "error-codes")]
-    error_codes: Vec<String>,
 }
 
 pub async fn handle_form(form: HCaptchaForm<'_>, secret_key: &str) -> Result<(), Error> {

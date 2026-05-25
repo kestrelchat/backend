@@ -15,7 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use kestrel_common::utils::{geoip::GeoIpClient, hasher, normalize, user_agent::parse_user_agent};
-use kestrel_config::{Config, config};
+use kestrel_config::Config;
 use kestrel_hcaptcha::handler::{HCaptchaForm, handle_form};
 use kestrel_postgres::{
     connection::Database,
