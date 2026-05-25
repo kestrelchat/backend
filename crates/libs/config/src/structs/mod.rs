@@ -19,6 +19,7 @@
 pub mod api;
 pub mod config;
 pub mod database;
+pub mod hcaptcha;
 pub mod network;
 
 pub use config::Config;

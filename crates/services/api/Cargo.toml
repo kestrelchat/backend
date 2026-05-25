@@ -14,3 +14,5 @@ serde = "1.0.228"
 ulid = "1.2.1"
 kestrel_common = { version = "0.1.0", path = "../../libs/common" }
 kestrel_redis = { version = "0.1.0", path = "../../libs/redis" }
+hcaptcha = "3.2.1"
+kestrel_hcaptcha = { version = "0.1.0", path = "../../libs/hcaptcha" }

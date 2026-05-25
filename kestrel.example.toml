@@ -14,5 +14,8 @@ allow_credentials = true
 postgres = "postgresql://kestrel:kestrel@postgres:5432/kestrel"
 redis = "redis://redis:6379"
 
+[hcaptcha]
+secret = "ES_000000000000001"
+
 [api.registration]
 minimum_age = 16

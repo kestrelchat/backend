@@ -18,7 +18,9 @@
 
 use serde::Deserialize;
 
-use crate::structs::{api::ApiConfig, database::DatabaseConfig, network::NetworkConfig};
+use crate::structs::{
+    api::ApiConfig, database::DatabaseConfig, hcaptcha::HCaptchaConfig, network::NetworkConfig,
+};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -27,4 +29,5 @@ pub struct Config {
     pub network: NetworkConfig,
     pub database: DatabaseConfig,
     pub api: ApiConfig,
+    pub hcaptcha: HCaptchaConfig,
 }
