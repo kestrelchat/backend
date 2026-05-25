@@ -1,0 +1,27 @@
+name: Performance Issue
+description: Report slow or inefficient behavior
+title: "perf: "
+labels: ["performance"]
+projects: ["kestrelchat/5"]
+
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is slow or inefficient?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context / workload
+    validations:
+      required: false
