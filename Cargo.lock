@@ -1440,7 +1440,6 @@ name = "kestrel_api"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "hcaptcha",
  "kestrel_common",
  "kestrel_config",
  "kestrel_hcaptcha",
@@ -1491,13 +1490,9 @@ dependencies = [
 name = "kestrel_hcaptcha"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "hcaptcha",
  "reqwest",
- "rocket",
- "schemars",
  "serde",
- "serde_json",
 ]
 
 [[package]]

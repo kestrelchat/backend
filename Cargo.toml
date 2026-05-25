@@ -24,7 +24,7 @@ chrono = { version = "0.4.44", features = ["serde"] }
 once_cell = "1.21.4"
 rand = { version = "0.10.1", features = ["sys_rng"] }
 redis = { version = "1.2.1", features = ["tokio-comp", "connection-manager"] }
-reqwest = "0.13.3"
+reqwest = { version = "0.13.3", features = ["json"] }
 rocket = "0.5.1"
 rocket_okapi = { version = "0.9.0", features = ["swagger"] }
 schemars = { version = "0.8", features = ["chrono"] }
