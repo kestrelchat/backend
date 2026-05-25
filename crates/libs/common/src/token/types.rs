@@ -14,26 +14,41 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-// Token Types:
-// 1 - Refresh Token
-// 2 - Auth Token
-
 use rand::TryRng;
 use rand::rngs::SysRng;
 
 use crate::token::encode::encode;
 use crate::token::spec::VERSION;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum TokenType {
+    Refresh = 1,
+    Auth = 2,
+}
+
+impl TryFrom<u8> for TokenType {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            1 => Ok(Self::Refresh),
+            2 => Ok(Self::Auth),
+            _ => Err(()),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
 pub struct Token {
     pub version: u8,
     pub timestamp: u64,
-    pub token_type: u8,
+    pub token_type: TokenType,
     pub entropy: [u8; 16],
 }
 
 impl Token {
-    fn new(token_type: u8) -> Self {
+    fn new(token_type: TokenType) -> Self {
         Self {
             version: VERSION,
             timestamp: current_time_millis(),
@@ -42,7 +57,7 @@ impl Token {
         }
     }
 
-    pub fn generate(token_type: u8) -> String {
+    pub fn generate(token_type: TokenType) -> String {
         let token = Self::new(token_type);
         encode(&token)
     }

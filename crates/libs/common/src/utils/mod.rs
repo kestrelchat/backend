@@ -15,8 +15,12 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 pub mod base32;
-pub mod geoip;
 pub mod hasher;
 pub mod normalize;
-pub mod user_agent;
 pub mod validation;
+
+#[cfg(feature = "geoip")]
+pub mod geoip;
+
+#[cfg(feature = "user_agent")]
+pub mod user_agent;

@@ -22,4 +22,4 @@ pub mod types;
 
 pub use decode::decode;
 pub use error::TokenError;
-pub use types::Token;
+pub use types::{Token, TokenType};

@@ -14,8 +14,35 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod count_users;
-pub mod create_user;
+use chrono::Utc;
+use sqlx::query;
 
-pub use count_users::count_users;
-pub use create_user::create_user;
+use crate::connection::Database;
+use crate::error::DatabaseError;
+
+pub async fn change_password(
+    db: &Database,
+    id: String,
+    password: &str,
+) -> Result<(), DatabaseError> {
+    let updated_at = Utc::now();
+
+    query(
+        r#"
+        UPDATE accounts
+        SET
+            password = $1,
+            updated_at = $2
+        WHERE
+            id = $3
+        "#,
+    )
+    .bind(password)
+    .bind(updated_at)
+    .bind(id)
+    .execute(db.pool())
+    .await
+    .map_err(DatabaseError::from_sqlx)?;
+
+    Ok(())
+}

@@ -20,12 +20,26 @@ use rocket::{
     Request,
     request::{FromRequest, Outcome},
 };
+use rocket_okapi::{
+    r#gen::OpenApiGenerator,
+    request::{OpenApiFromRequest, RequestHeaderInput},
+};
 use std::net::IpAddr;
 
 #[derive(Debug, Clone)]
 pub struct RequestContext {
     pub ip: Option<IpAddr>,
     pub user_agent: Option<String>,
+}
+
+impl<'r> OpenApiFromRequest<'r> for RequestContext {
+    fn from_request_input(
+        _gen: &mut OpenApiGenerator,
+        _name: String,
+        _required: bool,
+    ) -> rocket_okapi::Result<RequestHeaderInput> {
+        Ok(RequestHeaderInput::None)
+    }
 }
 
 #[rocket::async_trait]

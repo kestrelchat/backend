@@ -29,7 +29,7 @@ use kestrel_redis::{
     connection::Redis, operations::sessions::create_session as redis_create_session,
 };
 use rocket::{State, serde::json::Json};
-use rocket_okapi::okapi::schemars;
+use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{errors::AppError, request_context::RequestContext};
@@ -47,6 +47,7 @@ pub struct LoginResponse {
     refresh_token: String,
 }
 
+#[openapi(tag = "Authentication")]
 #[post("/login", data = "<req>")]
 pub async fn login(
     postgres: &State<Database>,
@@ -108,12 +109,12 @@ pub async fn login(
     .await
     .map_err(AppError::from)?;
 
-    let redis_session = redis_create_session(redis, &pg_session.session.id, &account.id)
+    let auth_token = redis_create_session(redis, &pg_session.session.id, &account.id)
         .await
         .map_err(|_| AppError::internal_error("SESSION_STORE_FAILED"))?;
 
     Ok(Json(LoginResponse {
-        auth_token: redis_session.auth_token,
+        auth_token,
         refresh_token: pg_session.refresh_token,
     }))
 }

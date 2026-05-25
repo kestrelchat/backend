@@ -87,6 +87,7 @@ pub async fn register(
             other => AppError::from(other),
         })?;
 
+    // will be used once email verification is implemented
     let _user = create_user(postgres, account.id.clone(), &normalized_username)
         .await
         .map_err(|e| match e {
@@ -109,7 +110,7 @@ fn is_old_enough(birthday: NaiveDate, min_age: i32) -> bool {
 
     let age = today.year()
         - birthday.year()
-        - if today.ordinal() < birthday.ordinal() {
+        - if (today.month(), today.day()) < (birthday.month(), birthday.day()) {
             1
         } else {
             0

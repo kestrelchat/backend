@@ -17,11 +17,14 @@
  */
 
 use kestrel_config::Config;
+use kestrel_postgres::connection::Database;
 use rocket::serde::json::Json;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Serialize;
+
+use crate::utils::errors::AppError;
 
 #[derive(Serialize, JsonSchema)]
 pub struct Meta {
@@ -50,4 +53,11 @@ pub fn meta(config: &rocket::State<Config>) -> Json<Meta> {
             },
         },
     })
+}
+
+#[openapi(tag = "Core")]
+#[get("/users/count")]
+pub async fn users_count(db: &rocket::State<Database>) -> Result<Json<u64>, AppError> {
+    use kestrel_postgres::operations::user::count_users;
+    Ok(Json(count_users(db).await?))
 }

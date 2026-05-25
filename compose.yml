@@ -9,7 +9,7 @@ services:
         BUILD_MODE: ${BUILD_MODE:-debug}
 
     volumes:
-      - ./kestrel.toml:/var/kestrel/conf.toml:ro
+      - ./kestrel.toml:/var/kestrel/conf.toml:ro,z
     environment:
       - KESTREL_CONFIG=/var/kestrel/conf.toml
 
@@ -28,7 +28,7 @@ services:
         BUILD_MODE: ${BUILD_MODE:-debug}
 
     volumes:
-      - ./kestrel.toml:/var/kestrel/conf.toml:ro
+      - ./kestrel.toml:/var/kestrel/conf.toml:ro,z
     environment:
       - KESTREL_CONFIG=/var/kestrel/conf.toml
 
