@@ -107,6 +107,7 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 - [serde](https://github.com/serde-rs/serde)
 - [serde_json](https://github.com/serde-rs/json)
 - [sqlx](https://github.com/launchbadge/sqlx)
+- [testcontainers](https://github.com/testcontainers/testcontainers-rs)
 - [thiserror](https://github.com/dtolnay/thiserror)
 - [tokio](https://github.com/tokio-rs/tokio)
 - [toml](https://github.com/toml-rs/toml)
