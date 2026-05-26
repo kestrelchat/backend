@@ -34,4 +34,8 @@ toml = "1.1.2"
 uaparser = "0.6.4"
 ulid = "1.2.1"
 rocket_ws = "0.1.1"
+<<<<<<< HEAD
 hcaptcha = "3.2.1"
+=======
+testcontainers-modules = { version = "0.15.0", features = ["postgres", "redis"] }
+>>>>>>> e118e15 (feat: set up testcontainers)
