@@ -11,8 +11,6 @@ use rocket_okapi::{
     request::{OpenApiFromRequest, RequestHeaderInput},
 };
 
-use crate::utils::request_context::RequestContext;
-
 #[derive(Debug, Clone)]
 pub struct AuthContext {
     pub user_id: String,
