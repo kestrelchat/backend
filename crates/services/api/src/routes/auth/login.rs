@@ -59,10 +59,12 @@ pub async fn login(
     ctx: RequestContext,
     req: Json<LoginRequest>,
 ) -> Result<Json<LoginResponse>, AppError> {
-    match handle_form(HCaptchaForm { token: &req.token }, &config.hcaptcha.secret).await {
-        Ok(_) => (),
-        Err(_) => return Err(AppError::unauthorized("FAILED_CAPTCHA")),
-    };
+    if let Some(hcaptcha) = &config.hcaptcha {
+        match handle_form(HCaptchaForm { token: &req.token }, &hcaptcha.secret).await {
+            Ok(_) => (),
+            Err(_) => return Err(AppError::unauthorized("FAILED_CAPTCHA")),
+        };
+    }
 
     let normalized_email = normalize::identity(&req.email);
 

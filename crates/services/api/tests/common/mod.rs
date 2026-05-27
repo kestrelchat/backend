@@ -4,7 +4,6 @@ use kestrel_config::{
     structs::{
         api::{ApiConfig, RegistrationConfig},
         database::DatabaseConfig,
-        hcaptcha::HCaptchaConfig,
         network::{Cors, NetworkConfig, Ports},
     },
 };
@@ -66,9 +65,7 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Client)) {
         api: ApiConfig {
             registration: RegistrationConfig { minimum_age: 16 },
         },
-        hcaptcha: HCaptchaConfig {
-            secret: "".to_string(),
-        },
+        hcaptcha: None,
     };
     let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
     let client = Client::tracked(rocket).await.unwrap();

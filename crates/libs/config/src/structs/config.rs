@@ -29,5 +29,5 @@ pub struct Config {
     pub network: NetworkConfig,
     pub database: DatabaseConfig,
     pub api: ApiConfig,
-    pub hcaptcha: HCaptchaConfig,
+    pub hcaptcha: Option<HCaptchaConfig>,
 }
