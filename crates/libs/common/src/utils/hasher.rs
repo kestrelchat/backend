@@ -27,7 +27,7 @@ pub async fn password_verify(input: &[u8], digest: &str) -> Result<(), ()> {
     argon2.verify_password(input, &parsed).map_err(|_| ())
 }
 
-/// Hashes an input using Blake3 and returns a base32-encoded hash string.
+/// Hashes an input using BLAKE3 and returns a base32-encoded hash string.
 pub fn hash(input: &[u8]) -> String {
     base32_encode(blake3::hash(input).as_bytes())
 }
