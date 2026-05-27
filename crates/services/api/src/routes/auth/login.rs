@@ -78,7 +78,7 @@ pub async fn login(
         },
     };
 
-    hasher::verify(req.password.as_bytes(), &account.password)
+    hasher::password_verify(req.password.as_bytes(), &account.password)
         .await
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 

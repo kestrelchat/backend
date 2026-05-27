@@ -74,7 +74,7 @@ pub async fn register(
         return Err(AppError::bad_request("AGE_TOO_YOUNG"));
     }
 
-    let hashed_password = hasher::hash(req.password.as_bytes())
+    let hashed_password = hasher::password_hash(req.password.as_bytes())
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 

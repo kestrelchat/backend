@@ -10,6 +10,7 @@ hcaptcha = ["dep:hcaptcha"]
 
 [dependencies]
 argon2 = { workspace = true }
+blake3 = { workspace = true }
 chrono = { workspace = true }
 once_cell = { workspace = true, optional = true }
 rand = { workspace = true }

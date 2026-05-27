@@ -35,9 +35,7 @@ pub async fn create_session(
 
     let refresh_token = Token::generate(TokenType::Refresh);
 
-    let refresh_token_hash = hasher::hash(refresh_token.as_bytes())
-        .await
-        .map_err(|_| DatabaseError::Other("failed to hash refresh token".to_string()))?;
+    let refresh_token_hash = hasher::hash(refresh_token.as_bytes());
 
     let session = sqlx::query_as::<_, Session>(
         r#"

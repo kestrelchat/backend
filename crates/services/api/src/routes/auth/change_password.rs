@@ -56,7 +56,7 @@ pub async fn change_password(
         },
     };
 
-    hasher::verify(req.old_password.as_bytes(), &account.password)
+    hasher::password_verify(req.old_password.as_bytes(), &account.password)
         .await
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
@@ -64,7 +64,7 @@ pub async fn change_password(
         .await
         .map_err(ValidationError::Password)?;
 
-    let hashed_password = hasher::hash(req.new_password.as_bytes())
+    let hashed_password = hasher::password_hash(req.new_password.as_bytes())
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
