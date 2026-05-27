@@ -41,4 +41,5 @@ pub enum PendingMfaKind {
 pub struct PendingMfa {
     pub kind: PendingMfaKind,
     pub account_id: String,
+    pub protected_payload: String,
 }

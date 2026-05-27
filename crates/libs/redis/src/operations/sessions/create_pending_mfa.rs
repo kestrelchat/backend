@@ -1,10 +1,13 @@
 use kestrel_common::{
     models::session::PendingMfa,
     token::{Token, TokenType},
+    utils::hasher::hash,
 };
 use redis::AsyncCommands;
 
-use crate::{connection::Redis, error::RedisError};
+use crate::{
+    connection::Redis, error::RedisError, utils::protected_pending_mfa::ProtectedPendingMfa,
+};
 
 const TTL_SECS: u64 = 20 * 60;
 
@@ -13,10 +16,14 @@ pub async fn create_pending_mfa(
     pending_mfa: PendingMfa,
 ) -> Result<String, RedisError> {
     let temp_token = Token::generate(TokenType::PendingMfa);
-    let key = format!("pending_mfa:{temp_token}");
+    let token_hash = hash(temp_token.as_bytes());
+    let key = format!("pending_mfa:{token_hash}");
 
-    let value =
-        serde_json::to_string(&pending_mfa).map_err(|e| RedisError::Other(e.to_string()))?;
+    let protected_pending_mfa = ProtectedPendingMfa::new(pending_mfa, &temp_token)
+        .map_err(|_| RedisError::Other("encryption failed".to_string()))?;
+
+    let value = serde_json::to_string(&protected_pending_mfa)
+        .map_err(|e| RedisError::Other(e.to_string()))?;
 
     let mut conn = redis.conn().clone();
 

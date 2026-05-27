@@ -47,6 +47,11 @@ impl TotpSetup {
         self.0.get_secret_base32()
     }
 
+    /// Returns the raw secret bytes of the TOTP configuration
+    pub fn get_secret_bytes(&self) -> &[u8] {
+        &self.0.secret
+    }
+
     /// Generates a current time-based verification code
     ///
     /// Wrapper for [`TOTP::generate_current`]

@@ -1,4 +1,4 @@
-use kestrel_common::utils::{hasher, totp::TotpSetup};
+use kestrel_common::utils::{base32::base32_encode, hasher, totp::TotpSetup};
 use kestrel_postgres::{
     connection::Database,
     error::DatabaseError,
@@ -8,7 +8,9 @@ use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::utils::{
+    auth_context::AuthContext, errors::AppError, totp_secret_protection::encrypt_totp_secret,
+};
 
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct SetupTotpRequest {
@@ -47,12 +49,20 @@ pub async fn setup_totp(
     let totp = TotpSetup::generate();
     let secret_base32 = totp.get_secret_base32();
 
+    let mut secret = totp.get_secret_bytes().to_vec();
+
+    encrypt_totp_secret(&req.password, &account.password, &mut secret)
+        .await
+        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+
+    let protected_secret_base32 = base32_encode(&secret);
+
     // Persist the secret to the user's account
-    set_totp_secret(postgres, &account.id, Some(&secret_base32))
+    set_totp_secret(postgres, &account.id, Some(&protected_secret_base32))
         .await
         .map_err(AppError::from)?;
 
-    // Generate provisioning URI for authenticator applications
+    // Generate a URI for authenticator applications
     let uri = totp.to_uri(account.email);
 
     Ok(Json(SetupTotpResponse {

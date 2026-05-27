@@ -1,7 +1,10 @@
 use kestrel_common::{
     hcaptcha::handler::{HCaptchaForm, handle_form},
     models::session::{PendingMfa, PendingMfaKind},
-    utils::{geoip::GeoIpClient, hasher, normalize, totp::TotpSetup, user_agent::parse_user_agent},
+    utils::{
+        base32::base32_decode, geoip::GeoIpClient, hasher, normalize, totp::TotpSetup,
+        user_agent::parse_user_agent,
+    },
 };
 use kestrel_config::Config;
 use kestrel_postgres::{
@@ -23,7 +26,9 @@ use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 
-use crate::utils::{errors::AppError, request_context::RequestContext};
+use crate::utils::{
+    errors::AppError, request_context::RequestContext, totp_secret_protection::decrypt_totp_secret,
+};
 
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct LoginRequest {
@@ -96,16 +101,28 @@ pub async fn login(
         .await
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
-    if account.totp_secret.is_none() {
+    let Some(totp_secret) = account.totp_secret else {
         let response = establish_session(postgres, redis, geoip, &ctx, &account.id).await?;
         return Ok(Json(response));
-    }
+    };
+
+    let mut secret =
+        base32_decode(&totp_secret).map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+
+    decrypt_totp_secret(&req.password, &account.password, &mut secret)
+        .await
+        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+
+    // Encode the decrypted secret back to standard representation for the MFA verification step
+    let totp = TotpSetup::from_secret_bytes(secret)
+        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
     let temp_token = create_pending_mfa(
         redis,
         PendingMfa {
             kind: PendingMfaKind::Totp,
             account_id: account.id.clone(),
+            protected_payload: totp.get_secret_base32(),
         },
     )
     .await
@@ -137,10 +154,7 @@ pub async fn login_mfa(
 
     match pending_mfa.kind {
         PendingMfaKind::Totp => {
-            let secret = account
-                .totp_secret
-                .ok_or_else(|| AppError::internal_error("MISSING_MFA_SECRET"))?;
-            let totp = TotpSetup::from_secret_base32(secret)
+            let totp = TotpSetup::from_secret_base32(pending_mfa.protected_payload)
                 .map_err(|_| AppError::internal_error("INVALID_MFA_SECRET"))?;
 
             if totp.verify(&req.code).is_err() {
