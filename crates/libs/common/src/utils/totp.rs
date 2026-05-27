@@ -7,6 +7,14 @@ const ISSUER: &str = "Kestrel";
 /// A wrapper around [`TOTP`] with helper methods
 pub struct TotpSetup(TOTP);
 
+/// Errors that can occur when using [`TotpSetup`]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TotpError {
+    InvalidSecret,
+    InvalidCode,
+    TimeUnavailable,
+}
+
 impl TotpSetup {
     /// Generates a new TOTP secret and wraps it
     pub fn generate() -> Self {
@@ -18,14 +26,17 @@ impl TotpSetup {
     /// Constructs TOTP configuration from a secret
     ///
     /// `secret` must be at least 128 bits long
-    pub fn from_secret_bytes(secret: Vec<u8>) -> Result<Self, ()> {
-        let inner = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret).map_err(|_| ())?;
+    pub fn from_secret_bytes(secret: Vec<u8>) -> Result<Self, TotpError> {
+        let inner =
+            TOTP::new(Algorithm::SHA1, 6, 1, 30, secret).map_err(|_| TotpError::InvalidSecret)?;
         Ok(Self(inner))
     }
 
     /// Reconstructs TOTP configuration from base32 secret
-    pub fn from_secret_base32(secret: String) -> Result<Self, ()> {
-        let secret = Secret::Encoded(secret).to_bytes().map_err(|_| ())?;
+    pub fn from_secret_base32(secret: String) -> Result<Self, TotpError> {
+        let secret = Secret::Encoded(secret)
+            .to_bytes()
+            .map_err(|_| TotpError::InvalidSecret)?;
         Self::from_secret_bytes(secret)
     }
 
@@ -39,16 +50,21 @@ impl TotpSetup {
     /// Generates a current time-based verification code
     ///
     /// Wrapper for [`TOTP::generate_current`]
-    pub fn generate_current(&self) -> Result<String, ()> {
-        self.0.generate_current().map_err(|_| ())
+    pub fn generate_current(&self) -> Result<String, TotpError> {
+        self.0
+            .generate_current()
+            .map_err(|_| TotpError::InvalidCode)
     }
 
     /// Will check if token is valid by current system time, accounting skew
     ///
     /// Wrapper for [`TOTP::check_current`]
-    pub fn verify(&self, token: &str) -> Result<(), ()> {
-        let success = self.0.check_current(token).map_err(|_| ())?;
-        success.then_some(()).ok_or(())
+    pub fn verify(&self, token: &str) -> Result<(), TotpError> {
+        let success = self
+            .0
+            .check_current(token)
+            .map_err(|_| TotpError::InvalidCode)?;
+        success.then_some(()).ok_or(TotpError::InvalidCode)
     }
 
     /// Serializes to an URI format compatible with Google Authenticator
