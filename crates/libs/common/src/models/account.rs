@@ -26,4 +26,5 @@ pub struct Account {
     pub birthday: NaiveDate,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub totp_secret: Option<String>,
 }

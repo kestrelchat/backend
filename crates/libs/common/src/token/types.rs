@@ -25,6 +25,7 @@ use crate::token::spec::VERSION;
 pub enum TokenType {
     Refresh = 1,
     Auth = 2,
+    PendingMfa = 3,
 }
 
 impl TryFrom<u8> for TokenType {

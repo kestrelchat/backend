@@ -1,19 +1,3 @@
-// Kestrel - a modern instant-messaging service written in Rust
-// Copyright (C) 2026 Kestrel Chat
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use sqlx::query_as;
 
 use crate::connection::Database;
@@ -30,7 +14,8 @@ pub async fn get_account_by_id(db: &Database, id: &str) -> Result<Account, Datab
             password,
             birthday,
             created_at,
-            updated_at
+            updated_at,
+            totp_secret
         FROM accounts
         WHERE id = $1
         "#,
@@ -53,7 +38,8 @@ pub async fn get_account_by_email(db: &Database, email: &str) -> Result<Account,
             password,
             birthday,
             created_at,
-            updated_at
+            updated_at,
+            totp_secret
         FROM accounts
         WHERE email = $1
         "#,

@@ -112,5 +112,6 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 - [thiserror](https://github.com/dtolnay/thiserror)
 - [tokio](https://github.com/tokio-rs/tokio)
 - [toml](https://github.com/toml-rs/toml)
+- [totp-rs](https://github.com/constantoine/totp-rs)
 - [uaparser](https://github.com/ua-parser/uap-rust)
 - [ulid](https://github.com/ulid/spec)

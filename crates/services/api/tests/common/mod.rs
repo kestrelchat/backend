@@ -1,3 +1,8 @@
+#![allow(dead_code)]
+
+use std::sync::Arc;
+
+use chrono::{DateTime, Timelike, Utc};
 use kestrel_api::web;
 use kestrel_config::{
     Config,
@@ -7,7 +12,13 @@ use kestrel_config::{
         server::{CorsConfig, PortsConfig, ServerConfig},
     },
 };
-use rocket::{futures::join, local::asynchronous::Client};
+use rocket::{
+    futures::join,
+    http::{Header, StatusClass},
+    local::asynchronous::Client,
+    tokio::task::JoinSet,
+};
+use serde_json::{Value, json};
 use testcontainers_modules::{
     postgres::Postgres,
     redis::Redis,
@@ -45,7 +56,7 @@ impl Containers {
     }
 }
 
-pub async fn run_with_containers(visitor: impl AsyncFn(Client)) {
+pub async fn run_with_containers(visitor: impl AsyncFn(Arc<Client>)) {
     let containers = Containers::up().await;
     let (postgres_url, redis_url) = containers.get_connections().await;
     let config = Config {
@@ -75,5 +86,80 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Client)) {
     };
     let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
     let client = Client::tracked(rocket).await.unwrap();
-    visitor(client).await;
+    visitor(Arc::new(client)).await;
+}
+
+/// Credentials used for authentication and testing purposes.
+#[derive(Debug, Clone)]
+pub struct UserCredentials {
+    pub email: String,
+    pub username: String,
+    pub password: String,
+}
+
+pub async fn register_test_users(client: &Arc<Client>, count: usize) -> Vec<UserCredentials> {
+    let time = DateTime::<Utc>::default().nanosecond();
+    let mut join_set = JoinSet::new();
+    for i in 0..count {
+        let client = client.clone();
+        join_set.spawn(async move {
+            let username = format!("{time}_{i}");
+            let password = "loremIpsum123!".to_string();
+            let email = format!("{username}@example.com");
+
+            let body = json!({
+                "email": email.clone(),
+                "username": username.clone(),
+                "password": password.clone(),
+                "birthday": "2005-03-12".to_string(),
+            });
+            client
+                .clone()
+                .post("/auth/register")
+                .json(&body)
+                .dispatch()
+                .await;
+            UserCredentials {
+                email,
+                username,
+                password,
+            }
+        });
+    }
+    join_set.join_all().await
+}
+
+#[derive(Debug, Clone)]
+pub struct TokenPair {
+    pub auth_token: String,
+    pub refresh_token: String,
+}
+
+pub async fn login(client: &Arc<Client>, user: &UserCredentials) -> TokenPair {
+    let req_body = json!({
+        "email": user.email,
+        "password": user.password,
+        "token": ""
+    });
+    let res = client
+        .post("/auth/login")
+        .header(Header::new("X-Real-IP", "127.0.0.1"))
+        .json(&req_body)
+        .dispatch()
+        .await;
+    assert_eq!(
+        res.status().class(),
+        StatusClass::Success,
+        "login failed: {}",
+        res.into_string().await.unwrap()
+    );
+    let res_body = res.into_json::<Value>().await.unwrap();
+    TokenPair {
+        auth_token: res_body["auth_token"].as_str().unwrap().to_string(),
+        refresh_token: res_body["refresh_token"].as_str().unwrap().to_string(),
+    }
+}
+
+pub fn bearer_auth(token: &str) -> Header<'static> {
+    Header::new("Authorization", format!("Bearer {}", token))
 }
