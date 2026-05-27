@@ -37,8 +37,6 @@ pub async fn list_sessions(
 ) -> Result<Json<SessionResponse>, AppError> {
     let user_id = auth_ctx.user_id;
 
-    println!("{}", user_id);
-
     let sessions = lookup_sessions(postgres, &user_id)
         .await
         .map_err(AppError::from)?
