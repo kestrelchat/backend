@@ -29,24 +29,24 @@ pub async fn web(
     };
 
     let addr: IpAddr = config
-        .network
+        .server
         .host
         .parse()
         .map_err(|e: std::net::AddrParseError| format!("Invalid host address: {}", e))?;
 
     let rocket_config = RocketConfig {
         address: addr,
-        port: config.network.ports.api,
+        port: config.server.ports.api,
         ..RocketConfig::default()
     };
 
-    let postgres = Database::connect(&config.database.postgres).await.map_err(
-        |e| -> Box<dyn std::error::Error> {
+    let postgres = Database::connect(&config.database.postgres.url)
+        .await
+        .map_err(|e| -> Box<dyn std::error::Error> {
             format!("Failed to connect to postgres: {}", e).into()
-        },
-    )?;
+        })?;
 
-    let redis = Redis::connect(&config.database.redis).await.map_err(
+    let redis = Redis::connect(&config.database.redis.url).await.map_err(
         |e| -> Box<dyn std::error::Error> { format!("Failed to connect to redis: {}", e).into() },
     )?;
 
@@ -64,7 +64,7 @@ pub async fn web(
         });
 
     let cors = CorsFairing {
-        config: config.network.cors.clone(),
+        config: config.server.cors.clone(),
     };
 
     let geoip = GeoIpClient::default();
