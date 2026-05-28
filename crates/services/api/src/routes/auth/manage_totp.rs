@@ -121,7 +121,7 @@ pub async fn confirm_enable_totp(
         .await
         .map_err(AppError::from)?;
 
-    let _ = delete_pending_mfa(&redis, &req.temp_token).await;
+    let _ = delete_pending_mfa(redis, &req.temp_token).await;
 
     Ok(())
 }
