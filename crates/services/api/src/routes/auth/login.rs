@@ -1,7 +1,13 @@
 use kestrel_common::{
     hcaptcha::handler::{HCaptchaForm, handle_form},
     models::session::{PendingMfa, PendingMfaKind},
-    utils::{geoip::GeoIpClient, hasher, normalize, totp::TotpSetup, user_agent::parse_user_agent},
+    utils::{
+        geoip::GeoIpClient,
+        hasher::{self, DECOY_PASSWORD_HASH},
+        normalize,
+        totp::TotpSetup,
+        user_agent::parse_user_agent,
+    },
 };
 use kestrel_config::Config;
 use kestrel_postgres::{
@@ -85,20 +91,23 @@ pub async fn login(
     let normalized_email = normalize::identity(&req.email);
 
     let account = match get_account_by_email(postgres, &normalized_email).await {
-        Ok(acc) => acc,
-
+        Ok(acc) => Ok(acc),
         Err(e) => match e {
-            DatabaseError::NotFound => {
-                return Err(AppError::unauthorized("INVALID_CREDENTIALS"));
-            }
-
-            other => return Err(AppError::from(other)),
+            DatabaseError::NotFound => Err(AppError::unauthorized("INVALID_CREDENTIALS")),
+            other => Err(AppError::from(other)),
         },
     };
 
-    hasher::password_verify(req.password.as_bytes(), &account.password)
+    let password = if let Ok(account) = &account {
+        &account.password
+    } else {
+        DECOY_PASSWORD_HASH.as_str()
+    };
+    hasher::password_verify(req.password.as_bytes(), password)
         .await
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+
+    let account = account?;
 
     let Some(totp_secret) = account.totp_secret else {
         let response = establish_session(postgres, redis, geoip, &ctx, &account.id).await?;
@@ -108,7 +117,7 @@ pub async fn login(
     // Decrypt the TOTP secret using the user's password
     let totp = decrypt_totp_secret(&req.password, &account.password, totp_secret)
         .await
-        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+        .map_err(|_| AppError::unauthorized("TOTP_DECRYPT_FAILED"))?;
 
     // The TOTP secret is stored in Redis, encrypted by the temporary token
     let temp_token = create_pending_mfa(

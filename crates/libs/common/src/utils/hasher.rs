@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use argon2::{
     Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version,
     password_hash::{SaltString, rand_core::OsRng},
@@ -82,3 +84,14 @@ pub async fn password_derive_key(
 
     Ok(output)
 }
+
+pub static DECOY_PASSWORD_HASH: LazyLock<String> = LazyLock::new(|| {
+    let argon2 = Argon2::default();
+
+    let salt = SaltString::generate(&mut OsRng);
+    let hash = argon2
+        .hash_password(b"decoy password", &salt)
+        .expect("failed to hash decoy password");
+
+    hash.to_string()
+});
