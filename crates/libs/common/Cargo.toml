@@ -22,3 +22,4 @@ totp-rs = { workspace = true }
 uaparser = { workspace = true, optional = true }
 hcaptcha = { workspace = true, optional = true }
 schemars = { workspace = true }
+zeroize = { workspace = true }

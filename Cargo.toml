@@ -18,6 +18,7 @@ kestrel_redis = { version = "0.1.0", path = "crates/libs/redis" }
 
 # External crates
 argon2 = "0.5.3"
+base64 = "0.22.1"
 blake3 = "1.8.5"
 chrono = { version = "0.4.44", features = ["serde"] }
 chacha20poly1305 = "0.10.1"
@@ -38,4 +39,5 @@ ulid = "1.2.1"
 rocket_ws = "0.1.1"
 hcaptcha = "3.2.1"
 testcontainers-modules = { version = "0.15.0", features = ["postgres", "redis"] }
-totp-rs = "5.7.1"
+totp-rs = { version = "5.7.1", features = ["zeroize"] }
+zeroize = { version = "1.8.2", features = ["derive"] }

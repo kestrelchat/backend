@@ -1,10 +1,7 @@
 use kestrel_common::{
     hcaptcha::handler::{HCaptchaForm, handle_form},
     models::session::{PendingMfa, PendingMfaKind},
-    utils::{
-        base32::base32_decode, geoip::GeoIpClient, hasher, normalize, totp::TotpSetup,
-        user_agent::parse_user_agent,
-    },
+    utils::{geoip::GeoIpClient, hasher, normalize, totp::TotpSetup, user_agent::parse_user_agent},
 };
 use kestrel_config::Config;
 use kestrel_postgres::{
@@ -27,7 +24,7 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{
-    errors::AppError, request_context::RequestContext, totp_secret_protection::decrypt_totp_secret,
+    errors::AppError, request_context::RequestContext, totp_secret::decrypt_totp_secret,
 };
 
 #[derive(Deserialize, schemars::JsonSchema)]
@@ -106,17 +103,12 @@ pub async fn login(
         return Ok(Json(response));
     };
 
-    let mut secret =
-        base32_decode(&totp_secret).map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
-
-    decrypt_totp_secret(&req.password, &account.password, &mut secret)
+    // Decrypt the TOTP secret using the user's password
+    let totp = decrypt_totp_secret(&req.password, &account.password, totp_secret)
         .await
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
-    // Encode the decrypted secret back to standard representation for the MFA verification step
-    let totp = TotpSetup::from_secret_bytes(secret)
-        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
-
+    // The TOTP secret is stored in Redis, encrypted by the temporary token
     let temp_token = create_pending_mfa(
         redis,
         PendingMfa {

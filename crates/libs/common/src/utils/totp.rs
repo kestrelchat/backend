@@ -1,10 +1,12 @@
 use argon2::password_hash::rand_core::{OsRng, RngCore};
 use totp_rs::{Algorithm, Secret, TOTP};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// URL encoded name of the provider
 const ISSUER: &str = "Kestrel";
 
 /// A wrapper around [`TOTP`] with helper methods
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub struct TotpSetup(TOTP);
 
 /// Errors that can occur when using [`TotpSetup`]
@@ -75,7 +77,7 @@ impl TotpSetup {
     /// Serializes to an URI format compatible with Google Authenticator
     ///
     /// For more info, see: [Key-Uri-Format](<https://github.com/google/google-authenticator/wiki/Key-Uri-Format/f1e21a2dc3b46cae34f6d5a0e6d69e425fc2bd31>)
-    pub fn to_uri(self, account_name: String) -> String {
+    pub fn build_uri(&self, account_name: String) -> String {
         let label = format!("{ISSUER}:{account_name}");
         let parameters = format!("secret={}&issuer={}", self.0.get_secret_base32(), ISSUER);
         format!("otpauth://totp/{label}?{parameters}")

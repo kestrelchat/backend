@@ -1,19 +1,3 @@
-// Kestrel - a modern instant-messaging service written in Rust
-// Copyright (C) 2026 Kestrel Chat
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 use kestrel_common::utils::{
     hasher, normalize,
     validation::{ValidationError, password},
@@ -21,13 +5,18 @@ use kestrel_common::utils::{
 use kestrel_postgres::{
     connection::Database,
     error::DatabaseError,
-    operations::account::{change_password as postgres_change_password, get_account_by_email},
+    operations::account::{
+        change_password as postgres_change_password, get_account_by_email, set_totp_secret,
+    },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
 
-use crate::utils::errors::AppError;
+use crate::utils::{
+    errors::AppError,
+    totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
+};
 
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct ChangePasswordRequest {
@@ -68,6 +57,15 @@ pub async fn change_password(
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
+    if let Some(old_ciphertext) = account.totp_secret {
+        let totp = decrypt_totp_secret(&req.old_password, &account.password, old_ciphertext)
+            .await
+            .map_err(|_| AppError::internal_error("TOTP_DECRYPT_FAILED"))?;
+        let new_ciphertext = encrypt_totp_secret(&req.new_password, &hashed_password, totp)
+            .await
+            .map_err(|_| AppError::internal_error("TOTP_ENCRYPT_FAILED"))?;
+        set_totp_secret(postgres, &account.id, Some(&new_ciphertext)).await?;
+    }
     postgres_change_password(postgres, account.id, &hashed_password).await?;
 
     Ok(())

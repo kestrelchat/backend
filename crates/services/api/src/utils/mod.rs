@@ -2,4 +2,4 @@ pub mod auth_context;
 pub mod cors;
 pub mod errors;
 pub mod request_context;
-pub mod totp_secret_protection;
+pub mod totp_secret;
