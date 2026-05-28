@@ -89,6 +89,5 @@ pub async fn decrypt_totp_secret(
         .decrypt_in_place(&nonce, b"", &mut secret)
         .map_err(|_| TotpSecretProtectionError::Encryption)?;
 
-    Ok(TotpSetup::from_secret_bytes(secret)
-        .map_err(|_| TotpSecretProtectionError::InvalidSecret)?)
+    TotpSetup::from_secret_bytes(secret).map_err(|_| TotpSecretProtectionError::InvalidSecret)
 }
