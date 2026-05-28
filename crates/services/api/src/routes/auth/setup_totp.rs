@@ -57,7 +57,7 @@ pub async fn setup_totp(
         .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
     // Persist the secret to the user's account
-    set_totp_secret(postgres, &account.id, Some(&protected_secret))
+    set_totp_secret(postgres.pool(), &account.id, Some(&protected_secret))
         .await
         .map_err(AppError::from)?;
 

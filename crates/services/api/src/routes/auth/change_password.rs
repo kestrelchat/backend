@@ -58,6 +58,12 @@ pub async fn change_password(
         .await
         .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
+    let mut tx = postgres
+        .pool()
+        .begin()
+        .await
+        .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
+
     if let Some(old_ciphertext) = account.totp_secret {
         let totp = decrypt_totp_secret(&req.old_password, &account.password, old_ciphertext)
             .await
@@ -65,9 +71,13 @@ pub async fn change_password(
         let new_ciphertext = encrypt_totp_secret(&req.new_password, &hashed_password, totp)
             .await
             .map_err(|_| AppError::internal_error("TOTP_ENCRYPT_FAILED"))?;
-        set_totp_secret(postgres, &account.id, Some(&new_ciphertext)).await?;
+        set_totp_secret(tx.as_mut(), &account.id, Some(&new_ciphertext)).await?;
     }
-    postgres_change_password(postgres, account.id, &hashed_password).await?;
+    postgres_change_password(tx.as_mut(), account.id, &hashed_password).await?;
+
+    tx.commit()
+        .await
+        .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
 
     Ok(())
 }
