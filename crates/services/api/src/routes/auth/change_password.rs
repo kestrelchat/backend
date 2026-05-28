@@ -12,13 +12,14 @@ use kestrel_postgres::{
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::{
     errors::AppError,
     totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
 };
 
-#[derive(Deserialize, schemars::JsonSchema)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct ChangePasswordRequest {
     email: String,
     old_password: String,

@@ -12,14 +12,16 @@ use kestrel_postgres::{
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::errors::AppError;
 
-#[derive(Deserialize, schemars::JsonSchema)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct RegisterRequest {
     email: String,
     username: String,
     password: String,
+    #[zeroize(skip)]
     birthday: Option<NaiveDate>,
 }
 

@@ -22,19 +22,20 @@ use kestrel_redis::{
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::{
     errors::AppError, request_context::RequestContext, totp_secret::decrypt_totp_secret,
 };
 
-#[derive(Deserialize, schemars::JsonSchema)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct LoginRequest {
     email: String,
     password: String,
     token: String,
 }
 
-#[derive(Deserialize, schemars::JsonSchema)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct MfaLoginRequest {
     temp_token: String,
     code: String,
@@ -45,7 +46,7 @@ pub enum MfaMethod {
     Totp,
 }
 
-#[derive(Serialize, schemars::JsonSchema)]
+#[derive(Serialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 #[serde(tag = "status")]
 pub enum LoginResponse {
     /// Authentication completed successfully
@@ -56,6 +57,7 @@ pub enum LoginResponse {
     /// Password correct, but MFA verification is required
     RequiresMfa {
         temp_token: String,
+        #[zeroize(skip)]
         method: MfaMethod,
     },
 }

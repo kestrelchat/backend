@@ -7,15 +7,16 @@ use kestrel_postgres::{
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::{auth_context::AuthContext, errors::AppError, totp_secret::encrypt_totp_secret};
 
-#[derive(Deserialize, schemars::JsonSchema)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct SetupTotpRequest {
     pub password: String,
 }
 
-#[derive(Serialize, schemars::JsonSchema)]
+#[derive(Serialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct SetupTotpResponse {
     pub uri: String,
     pub secret: String,
