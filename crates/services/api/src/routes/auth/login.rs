@@ -43,15 +43,14 @@ pub async fn login(
     ctx: RequestContext,
     req: Json<LoginRequest>,
 ) -> Result<Json<LoginResponse>, AppError> {
-    if config.features.hcaptcha.enabled {
-        if let Err(_) = handle_form(
+    if config.features.hcaptcha.enabled
+        && let Err(_) = handle_form(
             HCaptchaForm { token: &req.token },
             config.features.hcaptcha.secret.as_deref(),
         )
         .await
-        {
-            return Err(AppError::unauthorized("FAILED_CAPTCHA"));
-        }
+    {
+        return Err(AppError::unauthorized("FAILED_CAPTCHA"));
     }
 
     let normalized_email = normalize::identity(&req.email);
