@@ -13,7 +13,17 @@ struct HcaptchaVerifyResponse {
     success: bool,
 }
 
-pub async fn handle_form(form: HCaptchaForm<'_>, secret_key: &str) -> Result<(), Error> {
+pub async fn handle_form(form: HCaptchaForm<'_>, secret_key: Option<&str>) -> Result<(), Error> {
+    let secret_key = match secret_key {
+        Some(s) => s,
+        None => {
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                "HCAPTCHA_MISCONFIGURED",
+            ));
+        }
+    };
+
     let client = reqwest::Client::new();
 
     let response = client

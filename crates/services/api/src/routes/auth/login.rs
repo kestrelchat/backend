@@ -46,7 +46,7 @@ pub async fn login(
     if config.features.hcaptcha.enabled {
         if let Err(_) = handle_form(
             HCaptchaForm { token: &req.token },
-            &config.features.hcaptcha.secret,
+            config.features.hcaptcha.secret.as_deref(),
         )
         .await
         {

@@ -24,7 +24,7 @@ url = "redis://redis:6379"
 
 [features.hcaptcha]
 enabled = false
-secret = "ES_000000000000001"
+# secret = "ES_000000000000001" # Uncomment this line if you set enabled = true!
 
 [features.registration]
 enabled = true

@@ -69,7 +69,7 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Client)) {
             },
             hcaptcha: HCaptchaConfig {
                 enabled: false,
-                secret: "ES_000000000000001".to_string(),
+                secret: None,
             },
         },
     };
