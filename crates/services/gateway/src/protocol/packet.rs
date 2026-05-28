@@ -23,7 +23,7 @@ use crate::protocol::opcode::OpCode;
 
 #[derive(Debug, Deserialize)]
 pub struct Packet {
-    pub op: OpCode,
-    pub t: Option<String>,
-    pub d: Value,
+  pub op: OpCode,
+  pub t: Option<String>,
+  pub d: Value,
 }

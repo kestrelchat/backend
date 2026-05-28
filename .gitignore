@@ -11,6 +11,7 @@ venv/
 *.toml
 !*.example.toml
 !Cargo.toml
+!rustfmt.toml
 !audit.toml
 
 # Rust / Cargo Build Artifacts

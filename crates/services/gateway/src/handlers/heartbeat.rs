@@ -17,5 +17,5 @@
  */
 
 pub async fn handle() {
-    println!("heartbeat");
+  println!("heartbeat");
 }

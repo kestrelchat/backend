@@ -15,9 +15,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 pub fn identity(input: &str) -> String {
-    input.trim().to_lowercase()
+  input.trim().to_lowercase()
 }
 
 pub fn display(input: &str) -> String {
-    input.trim().to_string()
+  input.trim().to_string()
 }

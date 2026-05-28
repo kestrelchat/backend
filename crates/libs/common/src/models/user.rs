@@ -19,9 +19,9 @@ use sqlx::FromRow;
 
 #[derive(Debug, Clone, FromRow)]
 pub struct User {
-    pub id: String,
-    pub username: String,
-    pub discrim: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+  pub id: String,
+  pub username: String,
+  pub discrim: String,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
