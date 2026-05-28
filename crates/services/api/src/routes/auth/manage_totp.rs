@@ -9,7 +9,7 @@ use kestrel_postgres::{
 };
 use kestrel_redis::{
     connection::Redis,
-    operations::sessions::{create_pending_mfa, get_pending_mfa},
+    operations::sessions::{create_pending_mfa, delete_pending_mfa, get_pending_mfa},
 };
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
@@ -120,6 +120,8 @@ pub async fn confirm_enable_totp(
     set_totp_secret(postgres.pool(), &account.id, Some(&protected_secret))
         .await
         .map_err(AppError::from)?;
+
+    let _ = delete_pending_mfa(&redis, &req.temp_token).await;
 
     Ok(())
 }
