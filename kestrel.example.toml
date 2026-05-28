@@ -1,21 +1,31 @@
+# Used to allow email@localhost on registration
 is_production = false
 
-[network]
-# This must be 0.0.0.0 if you are hosting via Docker (recommended)
+[server]
+# Host must be 0.0.0.0 if you are hosting via Docker!
 host = "0.0.0.0"
-# By default we will allocate ports 5180-5189 to Kestrel. This does not include external services like Postgres.
-ports = { gateway = 5180, api = 5181 }
 
-[network.cors]
+[server.ports]
+gateway = 5180
+api = 5181
+
+[server.cors]
+# allowed_origins defines which domains are permitted to make cross-origin requests.
+# Use ["*"] to allow any website or web client to access the API.
+# You can also restrict this to specific origins, e.g. ["https://kestrel.chat"].
 allowed_origins = ["*"]
-allow_credentials = true
+allow_credentials = false
 
-[database]
-postgres = "postgresql://kestrel:kestrel@postgres:5432/kestrel"
-redis = "redis://redis:6379"
+[database.postgres]
+url = "postgresql://kestrel:kestrel@postgres:5432/kestrel"
 
-[hcaptcha]
+[database.redis]
+url = "redis://redis:6379"
+
+[features.hcaptcha]
+enabled = false
 secret = "ES_000000000000001"
 
-[api.registration]
+[features.registration]
+enabled = true
 minimum_age = 16
