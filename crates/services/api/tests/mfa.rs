@@ -12,13 +12,11 @@ mod common;
 
 /// Enrolls a test user into TOTP multi-factor authentication and returns the setup instance.
 async fn setup_totp_for(client: &Arc<Client>, user: &UserCredentials) -> TotpSetup {
-    let session = login(client, user);
+    let session = login(client, user).await;
 
     let totp_res = client
         .post("/auth/mfa/totp")
-        .header(rocket::http::Header::new("X-Real-IP", "127.0.0.1"))
-        .header(bearer_auth(&session.await.auth_token))
-        .json(&json!({ "password": user.password }))
+        .header(bearer_auth(&session.auth_token))
         .dispatch()
         .await;
 
@@ -26,7 +24,18 @@ async fn setup_totp_for(client: &Arc<Client>, user: &UserCredentials) -> TotpSet
     let totp_body: Value = totp_res.into_json().await.unwrap();
     let totp_secret = totp_body["secret"].as_str().unwrap();
 
-    TotpSetup::from_secret_base32(totp_secret.to_string()).unwrap()
+    let totp = TotpSetup::from_secret_base32(totp_secret.to_string()).unwrap();
+    let code = totp.generate_current().unwrap();
+
+    let temp_token = totp_body["temp_token"].as_str().unwrap();
+    client
+        .post("/auth/mfa/totp/confirm")
+        .header(bearer_auth(&session.auth_token))
+        .json(&json!({ "temp_token": temp_token, "password": user.password, "code": code }))
+        .dispatch()
+        .await;
+
+    totp
 }
 
 /// Initiates the first step of the login challenge for a user with MFA enabled.

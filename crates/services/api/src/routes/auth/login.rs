@@ -1,6 +1,6 @@
 use kestrel_common::{
     hcaptcha::handler::{HCaptchaForm, handle_form},
-    models::session::{PendingMfa, PendingMfaKind},
+    models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
     utils::{
         geoip::GeoIpClient,
         hasher::{self, DECOY_PASSWORD_HASH},
@@ -123,6 +123,7 @@ pub async fn login(
     let temp_token = create_pending_mfa(
         redis,
         PendingMfa {
+            scope: PendingMfaScope::Login,
             kind: PendingMfaKind::Totp,
             account_id: account.id.clone(),
             protected_payload: totp.get_secret_base32(),
@@ -150,6 +151,10 @@ pub async fn login_mfa(
         .await
         .map_err(|_| AppError::unauthorized("INVALID_MFA_TOKEN"))?
         .ok_or_else(|| AppError::unauthorized("EXPIRED_MFA_TOKEN"))?;
+
+    if pending_mfa.scope != PendingMfaScope::Login {
+        return Err(AppError::unauthorized("INVALID_MFA_TOKEN"));
+    }
 
     let account = get_account_by_id(postgres, &pending_mfa.account_id)
         .await
