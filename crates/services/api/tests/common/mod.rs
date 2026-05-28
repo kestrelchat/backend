@@ -2,9 +2,9 @@ use kestrel_api::web;
 use kestrel_config::{
     Config,
     structs::{
-        api::{ApiConfig, RegistrationConfig},
-        database::DatabaseConfig,
-        network::{Cors, NetworkConfig, Ports},
+        database::{DatabaseConfig, PostgresConfig, RedisConfig},
+        features::{FeatureConfig, HCaptchaConfig, RegistrationConfig},
+        server::{CorsConfig, PortsConfig, ServerConfig},
     },
 };
 use rocket::{futures::join, local::asynchronous::Client};
@@ -50,22 +50,28 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Client)) {
     let (postgres_url, redis_url) = containers.get_connections().await;
     let config = Config {
         is_production: false,
-        network: NetworkConfig {
+        server: ServerConfig {
             host: "127.0.0.1".to_string(),
-            ports: Ports { gateway: 0, api: 0 },
-            cors: Cors {
+            ports: PortsConfig { gateway: 0, api: 0 },
+            cors: CorsConfig {
                 allowed_origins: vec!["*".to_string()],
                 allow_credentials: true,
             },
         },
         database: DatabaseConfig {
-            postgres: postgres_url,
-            redis: redis_url,
+            postgres: PostgresConfig { url: postgres_url },
+            redis: RedisConfig { url: redis_url },
         },
-        api: ApiConfig {
-            registration: RegistrationConfig { minimum_age: 16 },
+        features: FeatureConfig {
+            registration: RegistrationConfig {
+                enabled: false,
+                minimum_age: 16,
+            },
+            hcaptcha: HCaptchaConfig {
+                enabled: false,
+                secret: "ES_000000000000001".to_string(),
+            },
         },
-        hcaptcha: None,
     };
     let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
     let client = Client::tracked(rocket).await.unwrap();

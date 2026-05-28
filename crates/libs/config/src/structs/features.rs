@@ -2,18 +2,18 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct FeatureConfig {
-    pub hcaptcha: HCaptcha,
-    pub registration: Registration,
+    pub hcaptcha: HCaptchaConfig,
+    pub registration: RegistrationConfig,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct HCaptcha {
+pub struct HCaptchaConfig {
     pub enabled: bool,
     pub secret: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Registration {
+pub struct RegistrationConfig {
     pub enabled: bool,
     pub minimum_age: u32,
 }

@@ -1,4 +1,4 @@
-use kestrel_config::structs::server::Cors;
+use kestrel_config::structs::server::CorsConfig;
 use rocket::{
     Request, Response,
     fairing::{Fairing, Info, Kind},
@@ -12,7 +12,7 @@ pub fn preflight() -> NoContent {
 }
 
 pub struct CorsFairing {
-    pub config: Cors,
+    pub config: CorsConfig,
 }
 
 #[rocket::async_trait]

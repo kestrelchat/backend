@@ -2,16 +2,16 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct DatabaseConfig {
-    pub postgres: Postgres,
-    pub redis: Redis,
+    pub postgres: PostgresConfig,
+    pub redis: RedisConfig,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Postgres {
+pub struct PostgresConfig {
     pub url: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Redis {
+pub struct RedisConfig {
     pub url: String,
 }
