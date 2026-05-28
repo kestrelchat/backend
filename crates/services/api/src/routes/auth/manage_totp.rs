@@ -12,23 +12,23 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 use crate::utils::{auth_context::AuthContext, errors::AppError, totp_secret::encrypt_totp_secret};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
-pub struct SetupTotpRequest {
+pub struct EnableTotpRequest {
     pub password: String,
 }
 
 #[derive(Serialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
-pub struct SetupTotpResponse {
+pub struct EnableTotpResponse {
     pub uri: String,
     pub secret: String,
 }
 
 #[openapi(tag = "Authentication")]
 #[post("/mfa/totp", data = "<req>")]
-pub async fn setup_totp(
+pub async fn enable_totp(
     postgres: &State<Database>,
     auth_ctx: AuthContext,
-    req: Json<SetupTotpRequest>,
-) -> Result<Json<SetupTotpResponse>, AppError> {
+    req: Json<EnableTotpRequest>,
+) -> Result<Json<EnableTotpResponse>, AppError> {
     let account = match get_account_by_id(postgres, &auth_ctx.user_id).await {
         Ok(acc) => acc,
         Err(e) => match e {
@@ -61,8 +61,43 @@ pub async fn setup_totp(
         .await
         .map_err(AppError::from)?;
 
-    Ok(Json(SetupTotpResponse {
+    Ok(Json(EnableTotpResponse {
         uri,
         secret: secret_base32,
     }))
+}
+
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
+pub struct DisableTotpRequest {
+    pub password: String,
+}
+
+#[openapi(tag = "Authentication")]
+#[delete("/mfa/totp", data = "<req>")]
+pub async fn disable_totp(
+    postgres: &State<Database>,
+    auth_ctx: AuthContext,
+    req: Json<DisableTotpRequest>,
+) -> Result<(), AppError> {
+    let account = match get_account_by_id(postgres, &auth_ctx.user_id).await {
+        Ok(acc) => acc,
+        Err(e) => match e {
+            DatabaseError::NotFound => {
+                return Err(AppError::unauthorized("INVALID_CREDENTIALS"));
+            }
+            other => return Err(AppError::from(other)),
+        },
+    };
+
+    // Verify the user's password before allowing removal of MFA
+    hasher::password_verify(req.password.as_bytes(), &account.password)
+        .await
+        .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
+
+    // Remove the TOTP secret from the user's account
+    set_totp_secret(postgres.pool(), &account.id, None)
+        .await
+        .map_err(AppError::from)?;
+
+    Ok(())
 }

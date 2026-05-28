@@ -129,7 +129,7 @@ pub async fn register_test_users(client: &Arc<Client>, count: usize) -> Vec<User
     join_set.join_all().await
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct TokenPair {
     pub auth_token: String,
     pub refresh_token: String,

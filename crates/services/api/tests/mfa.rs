@@ -5,7 +5,7 @@ use rocket::{http::StatusClass, local::asynchronous::Client};
 use serde_json::{Value, json};
 
 use crate::common::{
-    UserCredentials, bearer_auth, login, register_test_users, run_with_containers,
+    TokenPair, UserCredentials, bearer_auth, login, register_test_users, run_with_containers,
 };
 
 mod common;
@@ -59,7 +59,7 @@ async fn initiate_login_mfa(client: &Arc<Client>, user: &UserCredentials) -> Str
 }
 
 /// Completes the second step of the login challenge using a temporary token and a generated TOTP code.
-async fn complete_login_mfa(client: &Client, temp_token: &str, code: &str) -> Value {
+async fn complete_login_mfa(client: &Client, temp_token: &str, code: &str) -> TokenPair {
     let mfa_body = json!({
         "temp_token": temp_token,
         "code": code
@@ -81,27 +81,56 @@ async fn complete_login_mfa(client: &Client, temp_token: &str, code: &str) -> Va
 
     let mfa_res_body: Value = mfa_response.into_json().await.unwrap();
     assert_eq!(mfa_res_body["status"], "Success");
-    assert!(mfa_res_body["auth_token"].is_string());
-    assert!(mfa_res_body["refresh_token"].is_string());
 
-    mfa_res_body
+    TokenPair {
+        auth_token: mfa_res_body["auth_token"].as_str().unwrap().to_string(),
+        refresh_token: mfa_res_body["refresh_token"].as_str().unwrap().to_string(),
+    }
 }
 
 #[rocket::async_test]
 async fn mfa_login_flow() {
     run_with_containers(async |client| {
-        // 1. Setup - Create a user and enroll them into TOTP
+        // 1. Create a user and enroll them into TOTP
         let user = register_test_users(&client, 1).await.pop().unwrap();
         let totp = setup_totp_for(&client, &user).await;
 
-        // 2. Step 1: Request initial login to receive temporary MFA token
+        // 2. Request initial login to receive temporary MFA token
         let temp_token = initiate_login_mfa(&client, &user).await;
 
-        // 3. Step 2: Generate current time-based code
+        // 3. Generate current time-based code
         let code = totp.generate_current().unwrap();
 
-        // 4. Step 3: Complete challenge and acquire access tokens
+        // 4. Complete challenge and acquire access tokens
         complete_login_mfa(&client, &temp_token, &code).await;
+    })
+    .await;
+}
+
+#[rocket::async_test]
+async fn disable_totp() {
+    run_with_containers(async |client| {
+        // 1. Register user and enable TOTP
+        let user = register_test_users(&client, 1).await.pop().unwrap();
+        let totp = setup_totp_for(&client, &user).await;
+
+        // 2. Initiate login MFA
+        let temp_token = initiate_login_mfa(&client, &user).await;
+        let code = totp.generate_current().unwrap();
+        let session = complete_login_mfa(&client, &temp_token, &code).await;
+
+        // 3. Disable TOTP
+        let response = client
+            .delete("/auth/mfa/totp")
+            .header(rocket::http::Header::new("X-Real-IP", "127.0.0.1"))
+            .header(bearer_auth(&session.auth_token))
+            .json(&json!({"password": user.password}))
+            .dispatch()
+            .await;
+        assert_eq!(response.status().class(), StatusClass::Success);
+
+        // 4. Verify login works without TOTP
+        login(&client, &user).await;
     })
     .await;
 }
@@ -109,7 +138,7 @@ async fn mfa_login_flow() {
 #[rocket::async_test]
 async fn password_change_reencrypts_secret() {
     run_with_containers(async |client| {
-        // 1. Setup - Create user and enroll them into TOTP
+        // 1. Create user and enroll them into TOTP
         let mut user = register_test_users(&client, 1).await.pop().unwrap();
         let totp = setup_totp_for(&client, &user).await;
 
