@@ -36,6 +36,10 @@ pub async fn register(
     config: &State<Config>,
     req: Json<RegisterRequest>,
 ) -> Result<Json<RegisterResponse>, AppError> {
+    if !config.features.registration.enabled {
+        return Err(AppError::unauthorized("REGISTRATION_DISABLED"));
+    }
+
     let normalized_email = normalize::identity(&req.email);
     let normalized_username = normalize::identity(&req.username);
 
