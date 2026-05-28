@@ -45,14 +45,14 @@ fn gateway() -> Result<rocket::Rocket<rocket::Build>, Box<dyn std::error::Error>
     let config = AppConfig::load().map_err(|e| format!("Failed to load config: {}", e))?;
 
     let addr: IpAddr = config
-        .network
+        .server
         .host
         .parse()
         .map_err(|e: std::net::AddrParseError| format!("Invalid host address: {}", e))?;
 
     let rocket_config = RocketConfig {
         address: addr,
-        port: config.network.ports.gateway,
+        port: config.server.ports.gateway,
         ..RocketConfig::default()
     };
 
