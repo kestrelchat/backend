@@ -75,7 +75,7 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Arc<Client>)) {
         },
         features: FeatureConfig {
             registration: RegistrationConfig {
-                enabled: false,
+                enabled: true,
                 minimum_age: 16,
             },
             hcaptcha: HCaptchaConfig {
@@ -113,12 +113,9 @@ pub async fn register_test_users(client: &Arc<Client>, count: usize) -> Vec<User
                 "password": password.clone(),
                 "birthday": "2005-03-12".to_string(),
             });
-            client
-                .clone()
-                .post("/auth/register")
-                .json(&body)
-                .dispatch()
-                .await;
+            let client = client.clone();
+            let res = client.post("/auth/register").json(&body).dispatch().await;
+            assert_eq!(res.status().class(), StatusClass::Success);
             UserCredentials {
                 email,
                 username,
