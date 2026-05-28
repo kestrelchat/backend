@@ -96,7 +96,7 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 - [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2)
 - [async-trait](https://github.com/dtolnay/async-trait)
 - [blake3](https://github.com/BLAKE3-team/BLAKE3)
-- [chacha20poly1305](https://github.com/RustCrypto/block-ciphers/tree/master/chacha20poly1305)
+- [chacha20poly1305](https://github.com/RustCrypto/AEADs/tree/master/chacha20poly1305)
 - [chrono](https://github.com/chronotope/chrono)
 - [once_cell](https://github.com/matklad/once_cell)
 - [rand](https://github.com/rust-random/rand)
@@ -116,3 +116,4 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 - [totp-rs](https://github.com/constantoine/totp-rs)
 - [uaparser](https://github.com/ua-parser/uap-rust)
 - [ulid](https://github.com/ulid/spec)
+- [zeroize](https://github.com/RustCrypto/utils/tree/master/zeroize)
