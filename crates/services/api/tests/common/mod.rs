@@ -9,6 +9,7 @@ use kestrel_config::{
   structs::{
     database::{DatabaseConfig, PostgresConfig, RedisConfig},
     features::{FeatureConfig, HCaptchaConfig, RegistrationConfig},
+    instance::InstanceConfig,
     server::{CorsConfig, PortsConfig, ServerConfig},
   },
 };
@@ -74,6 +75,11 @@ pub async fn run_with_containers(
   let container_urls = containers.get_urls().await;
   let config = Config {
     is_production: false,
+    instance: InstanceConfig {
+      name: "Kestrel Test".to_string(),
+      domain: "kestrel.local".to_string(),
+      description: None,
+    },
     server: ServerConfig {
       host: "127.0.0.1".to_string(),
       ports: PortsConfig { gateway: 0, api: 0 },
@@ -97,6 +103,7 @@ pub async fn run_with_containers(
       },
       hcaptcha: HCaptchaConfig {
         enabled: false,
+        sitekey: None,
         secret: None,
       },
     },
