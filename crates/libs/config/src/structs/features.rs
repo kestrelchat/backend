@@ -9,6 +9,7 @@ pub struct FeatureConfig {
 #[derive(Debug, Deserialize)]
 pub struct HCaptchaConfig {
   pub enabled: bool,
+  pub sitekey: Option<String>,
   pub secret: Option<String>,
 }
 

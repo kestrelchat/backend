@@ -24,6 +24,13 @@ url = "redis://redis:6379"
 
 [features.hcaptcha]
 enabled = false
+
+# Your hCaptcha site key.
+# Required when enabled = true.
+# sitekey = "00000000-0000-0000-0000-000000000000"
+
+# Your hCaptcha secret key.
+# Required when enabled = true.
 # secret = "ES_000000000000001" # Uncomment this line if you set enabled = true!
 
 [features.registration]
