@@ -38,7 +38,7 @@ enabled = false
 
 # Your hCaptcha secret key.
 # Required when enabled = true.
-# secret = "ES_000000000000001" # Uncomment this line if you set enabled = true!
+# secret = "ES_000000000000001"
 
 [features.registration]
 enabled = true
