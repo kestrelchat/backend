@@ -128,10 +128,10 @@ pub async fn register_test_users(
       let email = format!("{username}@example.com");
 
       let body = json!({
-          "email": email.clone(),
-          "username": username.clone(),
-          "password": password.clone(),
-          "birthday": "2005-03-12".to_string(),
+        "email": email.clone(),
+        "username": username.clone(),
+        "password": password.clone(),
+        "birthday": "2005-03-12".to_string(),
       });
       let client = client.clone();
       let res = client.post("/auth/register").json(&body).dispatch().await;
@@ -154,9 +154,9 @@ pub struct TokenPair {
 
 pub async fn login(client: &Arc<Client>, user: &UserCredentials) -> TokenPair {
   let req_body = json!({
-      "email": user.email,
-      "password": user.password,
-      "token": ""
+    "email": user.email,
+    "password": user.password,
+    "token": ""
   });
   let res = client
     .post("/auth/login")

@@ -17,20 +17,20 @@ async fn registration_atomicity() {
     let password = "loremIpsum123!";
 
     let body = json!({
-        "email": first_email,
-        "username": username,
-        "password": password,
-        "birthday": "2007-05-17",
+      "email": first_email,
+      "username": username,
+      "password": password,
+      "birthday": "2007-05-17",
     });
     let client = client.clone();
     let res = client.post("/auth/register").json(&body).dispatch().await;
     assert_eq!(res.status().class(), StatusClass::Success);
 
     let body = json!({
-        "email": second_email,
-        "username": username,
-        "password": password,
-        "birthday": "2007-05-17",
+      "email": second_email,
+      "username": username,
+      "password": password,
+      "birthday": "2007-05-17",
     });
     let client = client.clone();
     let res = client.post("/auth/register").json(&body).dispatch().await;
