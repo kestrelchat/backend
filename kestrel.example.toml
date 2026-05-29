@@ -1,6 +1,13 @@
 # Used to allow email@localhost on registration
 is_production = false
 
+[instance]
+name = "My Kestrel Instance"
+domain = "domain.tld"
+
+# Optional
+description = "My awesome Kestrel server"
+
 [server]
 # Host must be 0.0.0.0 if you are hosting via Docker!
 host = "0.0.0.0"
