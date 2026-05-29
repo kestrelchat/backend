@@ -52,7 +52,6 @@ impl ProtectedPendingMfa {
     OsRng.fill_bytes(nonce.as_mut());
 
     let mut protected_payload = pending_mfa.protected_payload.into_bytes();
-    protected_payload.reserve(24);
 
     cipher
       .encrypt_in_place(&nonce, b"", &mut protected_payload)
