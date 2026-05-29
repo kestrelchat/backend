@@ -1,13 +1,12 @@
 use chrono::{NaiveDate, Utc};
-use sqlx::query_as;
+use sqlx::{PgExecutor, query_as};
 use ulid::Ulid;
 
-use crate::connection::Database;
 use crate::error::DatabaseError;
 use kestrel_common::models::Account;
 
 pub async fn create_account(
-  db: &Database,
+  db: impl PgExecutor<'_>,
   email: &str,
   password: &str,
   birthday: NaiveDate,
@@ -30,7 +29,7 @@ pub async fn create_account(
     .bind(created_at)
     .bind(updated_at)
     .bind(None::<String>)
-    .fetch_one(db.pool())
+    .fetch_one(db)
     .await
     .map_err(DatabaseError::from_sqlx)?;
 

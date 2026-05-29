@@ -25,9 +25,14 @@ use testcontainers_modules::{
   testcontainers::{ContainerAsync, runners::AsyncRunner},
 };
 
-struct Containers {
-  postgres: ContainerAsync<Postgres>,
-  redis: ContainerAsync<Redis>,
+pub struct Containers {
+  pub postgres: ContainerAsync<Postgres>,
+  pub redis: ContainerAsync<Redis>,
+}
+
+pub struct ContainerUrls {
+  pub postgres: String,
+  pub redis: String,
 }
 
 impl Containers {
@@ -40,7 +45,7 @@ impl Containers {
     }
   }
 
-  async fn get_connections(&self) -> (String, String) {
+  pub async fn get_urls(&self) -> ContainerUrls {
     let postgres_url = async {
       let host = self.postgres.get_host().await.unwrap();
       let port = self.postgres.get_host_port_ipv4(5432).await.unwrap();
@@ -53,13 +58,20 @@ impl Containers {
       format!("redis://{}:{}", host, port)
     };
 
-    join!(postgres_url, redis_url)
+    let (postgres_url, redis_url) = join!(postgres_url, redis_url);
+
+    ContainerUrls {
+      postgres: postgres_url,
+      redis: redis_url,
+    }
   }
 }
 
-pub async fn run_with_containers(visitor: impl AsyncFn(Arc<Client>)) {
+pub async fn run_with_containers(
+  visitor: impl AsyncFn(Containers, Arc<Client>),
+) {
   let containers = Containers::up().await;
-  let (postgres_url, redis_url) = containers.get_connections().await;
+  let container_urls = containers.get_urls().await;
   let config = Config {
     is_production: false,
     server: ServerConfig {
@@ -71,8 +83,12 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Arc<Client>)) {
       },
     },
     database: DatabaseConfig {
-      postgres: PostgresConfig { url: postgres_url },
-      redis: RedisConfig { url: redis_url },
+      postgres: PostgresConfig {
+        url: container_urls.postgres,
+      },
+      redis: RedisConfig {
+        url: container_urls.redis,
+      },
     },
     features: FeatureConfig {
       registration: RegistrationConfig {
@@ -87,7 +103,7 @@ pub async fn run_with_containers(visitor: impl AsyncFn(Arc<Client>)) {
   };
   let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
   let client = Client::tracked(rocket).await.unwrap();
-  visitor(Arc::new(client)).await;
+  visitor(containers, Arc::new(client)).await;
 }
 
 /// Credentials used for authentication and testing purposes.

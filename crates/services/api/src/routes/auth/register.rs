@@ -68,8 +68,14 @@ pub async fn register(
     .await
     .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
+  let mut tx = postgres
+    .pool()
+    .begin()
+    .await
+    .map_err(|_| AppError::internal_error("BEGIN_TX_FAILED"))?;
+
   let account =
-    create_account(postgres, &normalized_email, &hashed_password, birthday)
+    create_account(tx.as_mut(), &normalized_email, &hashed_password, birthday)
       .await
       .map_err(|e| match e {
         DatabaseError::UniqueViolation(ref c) if c == "accounts_email_key" => {
@@ -79,14 +85,19 @@ pub async fn register(
       })?;
 
   // will be used once email verification is implemented
-  let _user = create_user(postgres, account.id.clone(), &normalized_username)
+  let _user =
+    create_user(tx.as_mut(), account.id.clone(), &normalized_username)
+      .await
+      .map_err(|e| match e {
+        DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
+          AppError::conflict("USERNAME_TAKEN")
+        }
+        other => AppError::from(other),
+      })?;
+
+  tx.commit()
     .await
-    .map_err(|e| match e {
-      DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
-        AppError::conflict("USERNAME_TAKEN")
-      }
-      other => AppError::from(other),
-    })?;
+    .map_err(|_| AppError::internal_error("COMMIT_TX_FAILED"))?;
 
   // TODO: SEND VERIFICATION EMAIL
 

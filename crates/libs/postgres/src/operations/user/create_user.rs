@@ -1,12 +1,11 @@
 use chrono::Utc;
-use sqlx::query_as;
+use sqlx::{PgExecutor, query_as};
 
-use crate::connection::Database;
 use crate::error::DatabaseError;
 use kestrel_common::models::User;
 
 pub async fn create_user(
-  db: &Database,
+  db: impl PgExecutor<'_>,
   id: String,
   username: &str,
 ) -> Result<User, DatabaseError> {
@@ -27,7 +26,7 @@ pub async fn create_user(
   .bind(discrim)
   .bind(created_at)
   .bind(updated_at)
-  .fetch_one(db.pool())
+  .fetch_one(db)
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

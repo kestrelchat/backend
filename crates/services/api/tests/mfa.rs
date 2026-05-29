@@ -110,7 +110,7 @@ async fn complete_login_mfa(
 
 #[rocket::async_test]
 async fn mfa_login_flow() {
-  run_with_containers(async |client| {
+  run_with_containers(async |_, client| {
     // 1. Create a user and enroll them into TOTP
     let user = register_test_users(&client, 1).await.pop().unwrap();
     let totp = setup_totp_for(&client, &user).await;
@@ -129,7 +129,7 @@ async fn mfa_login_flow() {
 
 #[rocket::async_test]
 async fn disable_totp() {
-  run_with_containers(async |client| {
+  run_with_containers(async |_, client| {
     // 1. Register user and enable TOTP
     let user = register_test_users(&client, 1).await.pop().unwrap();
     let totp = setup_totp_for(&client, &user).await;
@@ -157,7 +157,7 @@ async fn disable_totp() {
 
 #[rocket::async_test]
 async fn password_change_reencrypts_secret() {
-  run_with_containers(async |client| {
+  run_with_containers(async |_, client| {
     // 1. Create user and enroll them into TOTP
     let mut user = register_test_users(&client, 1).await.pop().unwrap();
     let totp = setup_totp_for(&client, &user).await;
