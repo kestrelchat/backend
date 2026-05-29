@@ -17,9 +17,9 @@ pub struct Meta {
 
 #[derive(Serialize, JsonSchema)]
 pub struct InstanceMeta {
-    pub name: String,
-    pub domain: String,
-    pub description: Option<String>,
+  pub name: String,
+  pub domain: String,
+  pub description: Option<String>,
 }
 
 #[derive(Serialize, JsonSchema)]
@@ -46,9 +46,9 @@ pub fn meta(config: &rocket::State<Config>) -> Json<Meta> {
   Json(Meta {
     kestrel: env!("CARGO_PKG_VERSION").into(),
     instance: InstanceMeta {
-        name: config.instance.name.clone(),
-        domain: config.instance.domain.clone(),
-        description: config.instance.description.clone(),
+      name: config.instance.name.clone(),
+      domain: config.instance.domain.clone(),
+      description: config.instance.description.clone(),
     },
     features: FeaturesMeta {
       hcaptcha: HCaptchaMeta {

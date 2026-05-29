@@ -1,7 +1,8 @@
 use serde::Deserialize;
 
 use crate::structs::{
-  database::DatabaseConfig, features::FeatureConfig, instance::InstanceConfig, server::ServerConfig
+  database::DatabaseConfig, features::FeatureConfig, instance::InstanceConfig,
+  server::ServerConfig,
 };
 
 #[derive(Debug, Deserialize)]
