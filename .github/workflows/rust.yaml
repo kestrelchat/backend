@@ -16,6 +16,8 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
 
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
