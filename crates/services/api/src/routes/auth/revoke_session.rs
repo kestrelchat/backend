@@ -53,8 +53,9 @@ pub async fn revoke_all_sessions(
 ) -> Result<Json<LogoutResponse>, AppError> {
   let user_id = auth_ctx.user_id;
   let current_token = auth_ctx.token;
+  let revoke_current_session = auth_ctx.session_id;
 
-  postgres_revoke_all_sessions(postgres, &user_id, &current_token)
+  postgres_revoke_all_sessions(postgres, &user_id, &current_session)
     .await
     .map_err(AppError::from)?;
 
