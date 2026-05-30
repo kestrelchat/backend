@@ -2,7 +2,7 @@ use kestrel_common::{
   models::RedisSession,
   token::{Token, TokenType},
 };
-use redis::AsyncCommands;
+use redis::{AsyncCommands, aio::ConnectionManager};
 
 use crate::{connection::Redis, error::RedisError};
 
@@ -28,21 +28,35 @@ pub async fn create_session(
   // user_id -> tokens index
   let user_key = format!("user:{}:tokens", account_id);
 
-  conn
-    .sadd::<_, _, ()>(&user_key, &auth_token)
-    .await
-    .map_err(RedisError::Redis)?;
+  index_token(&mut conn, &user_key, &auth_token).await?;
 
-  conn
-    .expire::<_, ()>(&user_key, TTL_SECS as i64)
-    .await
-    .map_err(RedisError::Redis)?;
+  // session_id -> tokens index
+  let session_key = format!("session:{}:tokens", session_id);
 
-  // create auth token
+  index_token(&mut conn, &session_key, &auth_token).await?;
+
   conn
     .set_ex::<_, _, ()>(&key, &value, TTL_SECS)
     .await
     .map_err(RedisError::Redis)?;
 
   Ok(auth_token)
+}
+
+pub async fn index_token(
+  conn: &mut ConnectionManager,
+  index_key: &str,
+  token: &str,
+) -> Result<(), RedisError> {
+  conn
+    .sadd::<_, _, ()>(index_key, token)
+    .await
+    .map_err(RedisError::Redis)?;
+
+  conn
+    .expire::<_, ()>(index_key, TTL_SECS as i64)
+    .await
+    .map_err(RedisError::Redis)?;
+
+  Ok(())
 }
