@@ -27,11 +27,18 @@ pub async fn create_session(
 
   // user_id -> tokens index
   let user_key = format!("user:{}:tokens", account_id);
+
   conn
     .sadd::<_, _, ()>(&user_key, &auth_token)
     .await
     .map_err(RedisError::Redis)?;
 
+  conn
+    .expire::<_, ()>(&user_key, TTL_SECS as i64)
+    .await
+    .map_err(RedisError::Redis)?;
+
+  // create auth token
   conn
     .set_ex::<_, _, ()>(&key, &value, TTL_SECS)
     .await
