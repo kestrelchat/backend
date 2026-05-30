@@ -25,7 +25,7 @@ pub struct LogoutResponse {
 }
 
 #[openapi(tag = "Sessions")]
-#[delete("/logout")]
+#[post("/logout")]
 pub async fn revoke_current_session(
   redis: &State<Redis>,
   postgres: &State<Database>,
