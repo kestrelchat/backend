@@ -5,6 +5,7 @@ use crate::{connection::Redis, error::RedisError};
 pub async fn revoke_all_sessions(
   redis: &Redis,
   account_id: &str,
+  current_token: &str,
 ) -> Result<(), RedisError> {
   let mut conn = redis.conn().clone();
 
@@ -18,8 +19,11 @@ pub async fn revoke_all_sessions(
     .collect();
 
   for token in &tokens {
-    let auth_key = format!("auth:{token}");
+    if token == current_token {
+      continue;
+    }
 
+    let auth_key = format!("auth:{token}");
     conn.del(&auth_key).await.map_err(RedisError::Redis)?;
   }
 

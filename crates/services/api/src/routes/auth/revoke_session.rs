@@ -52,12 +52,13 @@ pub async fn revoke_all_sessions(
   auth_ctx: AuthContext,
 ) -> Result<Json<LogoutResponse>, AppError> {
   let user_id = auth_ctx.user_id;
+  let current_token = auth_ctx.token;
 
-  postgres_revoke_all_sessions(postgres, &user_id)
+  postgres_revoke_all_sessions(postgres, &user_id, &current_token)
     .await
     .map_err(AppError::from)?;
 
-  redis_revoke_all_sessions(redis, &user_id)
+  redis_revoke_all_sessions(redis, &user_id, &current_token)
     .await
     .map_err(AppError::from)?;
 
