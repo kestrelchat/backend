@@ -1,10 +1,16 @@
 use kestrel_postgres::{
   connection::Database,
-  operations::sessions::{revoke_session as postgres_revoke_session},
+  operations::sessions::{
+    revoke_all_sessions as postgres_revoke_all_sessions,
+    revoke_session as postgres_revoke_session,
+  },
 };
 use kestrel_redis::{
   connection::Redis,
-  operations::sessions::revoke_session as redis_revoke_session,
+  operations::sessions::{
+    revoke_all_sessions as redis_revoke_all_sessions,
+    revoke_session as redis_revoke_session,
+  },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
@@ -33,6 +39,26 @@ pub async fn revoke_current_session(
     .map_err(AppError::from)?;
 
   redis_revoke_session(redis, &auth_token)
+    .await
+    .map_err(AppError::from)?;
+
+  Ok(Json(LogoutResponse { success: true }))
+}
+
+#[openapi(tag = "Sessions")]
+#[delete("/sessions")]
+pub async fn revoke_all_sessions(
+  redis: &State<Redis>,
+  postgres: &State<Database>,
+  auth_ctx: AuthContext,
+) -> Result<Json<LogoutResponse>, AppError> {
+  let user_id = auth_ctx.user_id;
+
+  postgres_revoke_all_sessions(postgres, &user_id)
+    .await
+    .map_err(AppError::from)?;
+
+  redis_revoke_all_sessions(redis, &user_id)
     .await
     .map_err(AppError::from)?;
 
