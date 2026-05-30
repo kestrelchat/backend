@@ -2,6 +2,7 @@ use kestrel_common::utils::validation::{
   ValidationError, email, password, username,
 };
 use kestrel_postgres::error::DatabaseError;
+use kestrel_redis::error::RedisError;
 use rocket::serde::json::Json;
 use rocket::{
   Request, catch, http::Status, response::Responder, response::status::Custom,
@@ -70,6 +71,9 @@ impl AppError {
   pub fn conflict(code: impl Into<String>) -> Self {
     Self::new(code, Status::Conflict)
   }
+  pub fn service_unavailable(code: impl Into<String>) -> Self {
+    Self::new(code, Status::ServiceUnavailable)
+  }
   pub fn internal_error(code: impl Into<String>) -> Self {
     Self::new(code, Status::InternalServerError)
   }
@@ -78,14 +82,33 @@ impl AppError {
 impl From<DatabaseError> for AppError {
   fn from(err: DatabaseError) -> Self {
     match err {
-      DatabaseError::UniqueViolation(_) => {
-        AppError::conflict("ALREADY_EXISTS")
-      }
+      DatabaseError::UniqueViolation(_) => AppError::conflict("ALREADY_EXISTS"),
       DatabaseError::NotFound => AppError::not_found("NOT_FOUND"),
       DatabaseError::ForeignKeyViolation => {
         AppError::bad_request("INVALID_REFERENCE")
       }
       _ => AppError::internal_error("INTERNAL_SERVER_ERROR"),
+    }
+  }
+}
+
+impl From<RedisError> for AppError {
+  fn from(err: RedisError) -> Self {
+    match err {
+      RedisError::NotFound => AppError::not_found("NOT_FOUND"),
+
+      RedisError::Timeout
+      | RedisError::Connection(_)
+      | RedisError::Io(_)
+      | RedisError::Protocol(_)
+      | RedisError::Redis(_)
+      | RedisError::Unexpected => {
+        AppError::service_unavailable("SERVICE_UNAVAILABLE")
+      }
+
+      RedisError::Client(_) | RedisError::Other(_) => {
+        AppError::internal_error("INTERNAL_SERVER_ERROR")
+      }
     }
   }
 }
