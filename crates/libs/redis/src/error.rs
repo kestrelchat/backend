@@ -3,6 +3,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum RedisError {
+  #[error("not found")]
+  NotFound,
+
   #[error("connection error: {0}")]
   Connection(InnerRedisError),
 
