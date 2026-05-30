@@ -32,13 +32,12 @@ pub async fn revoke_current_session(
   auth_ctx: AuthContext,
 ) -> Result<Json<LogoutResponse>, AppError> {
   let session_id = auth_ctx.session_id;
-  let auth_token = auth_ctx.token;
 
   postgres_revoke_session(postgres, &session_id)
     .await
     .map_err(AppError::from)?;
 
-  redis_revoke_session(redis, &auth_token)
+  redis_revoke_session(redis, &session_id)
     .await
     .map_err(AppError::from)?;
 
