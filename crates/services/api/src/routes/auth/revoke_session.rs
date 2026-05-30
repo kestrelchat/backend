@@ -1,0 +1,40 @@
+use kestrel_postgres::{
+  connection::Database,
+  operations::sessions::{revoke_session as postgres_revoke_session},
+};
+use kestrel_redis::{
+  connection::Redis,
+  operations::sessions::revoke_session as redis_revoke_session,
+};
+use rocket::{State, serde::json::Json};
+use rocket_okapi::openapi;
+use schemars::JsonSchema;
+use serde::Serialize;
+
+use crate::utils::{auth_context::AuthContext, errors::AppError};
+
+#[derive(Serialize, JsonSchema)]
+pub struct LogoutResponse {
+  pub success: bool,
+}
+
+#[openapi(tag = "Sessions")]
+#[delete("/logout")]
+pub async fn revoke_current_session(
+  redis: &State<Redis>,
+  postgres: &State<Database>,
+  auth_ctx: AuthContext,
+) -> Result<Json<LogoutResponse>, AppError> {
+  let session_id = auth_ctx.session_id;
+  let auth_token = auth_ctx.token;
+
+  postgres_revoke_session(postgres, &session_id)
+    .await
+    .map_err(AppError::from)?;
+
+  redis_revoke_session(redis, &auth_token)
+    .await
+    .map_err(AppError::from)?;
+
+  Ok(Json(LogoutResponse { success: true }))
+}

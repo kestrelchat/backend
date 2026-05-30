@@ -6,6 +6,7 @@ mod list_sessions;
 mod login;
 mod manage_totp;
 mod register;
+mod revoke_session;
 
 pub fn routes() -> (Vec<Route>, OpenApi) {
   openapi_get_routes_spec![
@@ -14,6 +15,7 @@ pub fn routes() -> (Vec<Route>, OpenApi) {
     login::login_mfa,
     change_password::change_password,
     list_sessions::list_sessions,
+    revoke_session::revoke_current_session,
     manage_totp::enable_totp,
     manage_totp::confirm_enable_totp,
     manage_totp::disable_totp,
