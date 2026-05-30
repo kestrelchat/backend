@@ -79,17 +79,13 @@ impl From<DatabaseError> for AppError {
   fn from(err: DatabaseError) -> Self {
     match err {
       DatabaseError::UniqueViolation(_) => {
-        AppError::conflict("UNIQUE_VIOLATION")
+        AppError::conflict("ALREADY_EXISTS")
       }
       DatabaseError::NotFound => AppError::not_found("NOT_FOUND"),
       DatabaseError::ForeignKeyViolation => {
-        AppError::bad_request("FOREIGN_KEY_VIOLATION")
+        AppError::bad_request("INVALID_REFERENCE")
       }
-      DatabaseError::NotNullViolation => {
-        AppError::bad_request("NOT_NULL_VIOLATION")
-      }
-      DatabaseError::CheckViolation => AppError::bad_request("CHECK_VIOLATION"),
-      _ => AppError::internal_error("DATABASE_ERROR"),
+      _ => AppError::internal_error("INTERNAL_SERVER_ERROR"),
     }
   }
 }
