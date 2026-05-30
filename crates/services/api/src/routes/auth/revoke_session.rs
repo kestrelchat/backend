@@ -63,3 +63,22 @@ pub async fn revoke_all_sessions(
 
   Ok(Json(LogoutResponse { success: true }))
 }
+
+#[openapi(tag = "Sessions")]
+#[delete("/sessions/<session_id>")]
+pub async fn revoke_session(
+  redis: &State<Redis>,
+  postgres: &State<Database>,
+  _auth_ctx: AuthContext,
+  session_id: &str,
+) -> Result<Json<LogoutResponse>, AppError> {
+  postgres_revoke_session(postgres, &session_id)
+    .await
+    .map_err(AppError::from)?;
+
+  redis_revoke_session(redis, &session_id)
+    .await
+    .map_err(AppError::from)?;
+
+  Ok(Json(LogoutResponse { success: true }))
+}

@@ -17,6 +17,7 @@ pub fn routes() -> (Vec<Route>, OpenApi) {
     change_password::change_password,
     list_sessions::list_sessions,
     revoke_session::revoke_all_sessions,
+    revoke_session::revoke_session,
     manage_totp::enable_totp,
     manage_totp::confirm_enable_totp,
     manage_totp::disable_totp,
