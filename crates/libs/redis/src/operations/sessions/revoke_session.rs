@@ -20,14 +20,10 @@ pub async fn revoke_session(
   for token in &tokens {
     let auth_key = format!("auth:{token}");
 
-    conn.del(&auth_key)
-      .await
-      .map_err(RedisError::Redis)?;
+    conn.del(&auth_key).await.map_err(RedisError::Redis)?;
   }
 
-  conn.del(&session_key)
-    .await
-    .map_err(RedisError::Redis)?;
+  conn.del(&session_key).await.map_err(RedisError::Redis)?;
 
   Ok(())
 }
