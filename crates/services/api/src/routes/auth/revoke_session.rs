@@ -19,18 +19,13 @@ use serde::Serialize;
 
 use crate::utils::{auth_context::AuthContext, errors::AppError};
 
-#[derive(Serialize, JsonSchema)]
-pub struct LogoutResponse {
-  pub success: bool,
-}
-
 #[openapi(tag = "Sessions")]
 #[post("/logout")]
 pub async fn revoke_current_session(
   redis: &State<Redis>,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
-) -> Result<Json<LogoutResponse>, AppError> {
+) -> Result<(), AppError> {
   let session_id = auth_ctx.session_id;
 
   postgres_revoke_session(postgres, &session_id)
@@ -41,7 +36,7 @@ pub async fn revoke_current_session(
     .await
     .map_err(AppError::from)?;
 
-  Ok(Json(LogoutResponse { success: true }))
+  Ok(())
 }
 
 #[openapi(tag = "Sessions")]
@@ -50,7 +45,7 @@ pub async fn revoke_all_sessions(
   redis: &State<Redis>,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
-) -> Result<Json<LogoutResponse>, AppError> {
+) -> Result<(), AppError> {
   let user_id = auth_ctx.user_id;
   let current_token = auth_ctx.token;
   let current_session = auth_ctx.session_id;
@@ -63,7 +58,7 @@ pub async fn revoke_all_sessions(
     .await
     .map_err(AppError::from)?;
 
-  Ok(Json(LogoutResponse { success: true }))
+  Ok(())
 }
 
 #[openapi(tag = "Sessions")]
@@ -73,7 +68,7 @@ pub async fn revoke_session(
   postgres: &State<Database>,
   _auth_ctx: AuthContext,
   session_id: &str,
-) -> Result<Json<LogoutResponse>, AppError> {
+) -> Result<(), AppError> {
   postgres_revoke_session(postgres, session_id)
     .await
     .map_err(AppError::from)?;
@@ -82,5 +77,5 @@ pub async fn revoke_session(
     .await
     .map_err(AppError::from)?;
 
-  Ok(Json(LogoutResponse { success: true }))
+  Ok(())
 }
