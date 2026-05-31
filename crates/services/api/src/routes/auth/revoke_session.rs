@@ -12,10 +12,8 @@ use kestrel_redis::{
     revoke_session as redis_revoke_session,
   },
 };
-use rocket::{State, serde::json::Json};
+use rocket::{State};
 use rocket_okapi::openapi;
-use schemars::JsonSchema;
-use serde::Serialize;
 
 use crate::utils::{auth_context::AuthContext, errors::AppError};
 
