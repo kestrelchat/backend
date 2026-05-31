@@ -2,6 +2,7 @@ use rocket::Route;
 use rocket_okapi::{okapi::openapi3::OpenApi, openapi_get_routes_spec};
 
 mod change_password;
+mod fetch_session;
 mod list_sessions;
 mod login;
 mod manage_totp;
@@ -15,7 +16,9 @@ pub fn routes() -> (Vec<Route>, OpenApi) {
     login::login_mfa,
     revoke_session::revoke_current_session,
     change_password::change_password,
+    fetch_session::fetch_session,
     list_sessions::list_sessions,
+    fetch_session::fetch_session,
     revoke_session::revoke_all_sessions,
     revoke_session::revoke_session,
     manage_totp::enable_totp,
