@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod meta;
+pub mod users;
 
 use rocket::{Build, Rocket};
 use rocket_okapi::{
@@ -13,8 +14,9 @@ pub fn mount(mut rocket: Rocket<Build>) -> Rocket<Build> {
       rocket,
       "/".to_owned(),
       settings,
-      "/"    => openapi_get_routes_spec![meta::meta, meta::users_count],
+      "/"    => openapi_get_routes_spec![meta::meta],
       "/auth" => auth::routes(),
+      "/users" => users::routes(),
   );
   rocket
 }
