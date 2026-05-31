@@ -1,4 +1,5 @@
 pub mod create_session;
+pub mod fetch_session;
 pub mod lookup_sessions;
 pub mod revoke_all_sessions;
 pub mod revoke_session;
