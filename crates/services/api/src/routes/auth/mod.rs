@@ -2,7 +2,6 @@ use rocket::Route;
 use rocket_okapi::{okapi::openapi3::OpenApi, openapi_get_routes_spec};
 
 mod change_password;
-mod fetch_session;
 mod list_sessions;
 mod login;
 mod manage_totp;
