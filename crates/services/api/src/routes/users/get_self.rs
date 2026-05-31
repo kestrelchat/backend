@@ -30,7 +30,7 @@ pub struct SessionView {
 }
 
 #[openapi(tag = "Sessions")]
-#[get("/users/@me")]
+#[get("/@me")]
 pub async fn get_self(
   postgres: &State<Database>,
   auth_ctx: AuthContext,
