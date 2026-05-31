@@ -39,7 +39,7 @@ use crate::utils::{
 pub struct LoginRequest {
   email: String,
   password: String,
-  token: String,
+  hcaptcha_token: Option<String>,
 }
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
@@ -79,14 +79,18 @@ pub async fn login(
   ctx: RequestContext,
   req: Json<LoginRequest>,
 ) -> Result<Json<LoginResponse>, AppError> {
-  if config.features.hcaptcha.enabled
-    && let Err(_) = handle_form(
-      HCaptchaForm { token: &req.token },
+  if config.features.hcaptcha.enabled {
+    let token = req
+      .hcaptcha_token
+      .as_deref()
+      .ok_or_else(|| AppError::unauthorized("MISSING_CAPTCHA"))?;
+
+    handle_form(
+      HCaptchaForm { token },
       config.features.hcaptcha.secret.as_deref(),
     )
     .await
-  {
-    return Err(AppError::unauthorized("FAILED_CAPTCHA"));
+    .map_err(|_| AppError::unauthorized("FAILED_CAPTCHA"))?;
   }
 
   let normalized_email = normalize::identity(&req.email);
