@@ -24,8 +24,8 @@ pub enum DatabaseError {
   #[error("not-null constraint violation")]
   NotNullViolation,
 
-  #[error("check constraint violation")]
-  CheckViolation,
+  #[error("check constraint violation on '{0}'")]
+  CheckViolation(String),
 
   #[error("invalid operation: {0}")]
   InvalidOperation(String),
@@ -41,29 +41,45 @@ impl DatabaseError {
         Some("23505") => {
           let constraint = db_err
             .constraint()
-            .map(|c| c.into())
-            .unwrap_or_else(|| "unknown".into());
+            .map(|c| c.to_string())
+            .unwrap_or_else(|| "unknown_unique".to_string());
+
           return Self::UniqueViolation(constraint);
         }
-        Some("23503") => return Self::ForeignKeyViolation,
-        Some("23502") => return Self::NotNullViolation,
-        Some("23514") => return Self::CheckViolation,
-        _ => return Self::Other(db_err.message().to_string()),
+        Some("23503") => {
+          return Self::ForeignKeyViolation;
+        }
+        Some("23502") => {
+          return Self::NotNullViolation;
+        }
+        Some("23514") => {
+          let constraint = db_err
+            .constraint()
+            .map(|c| c.to_string())
+            .unwrap_or_else(|| "unknown_check".to_string());
+
+          return Self::CheckViolation(constraint);
+        }
+        _ => {
+          return Self::Other(db_err.message().to_string());
+        }
       }
     }
 
     match err {
       SqlxError::RowNotFound => Self::NotFound,
+
       SqlxError::PoolTimedOut | SqlxError::PoolClosed | SqlxError::Io(_) => {
         Self::Connection(err)
       }
+
       _ => Self::Query(err),
     }
   }
 }
 
 impl From<SqlxError> for DatabaseError {
-    fn from(err: SqlxError) -> Self {
-        Self::from_sqlx(err)
-    }
+  fn from(err: SqlxError) -> Self {
+    Self::from_sqlx(err)
+  }
 }
