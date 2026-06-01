@@ -27,6 +27,9 @@ pub enum DatabaseError {
   #[error("check constraint violation")]
   CheckViolation,
 
+  #[error("invalid operation: {0}")]
+  InvalidOperation(String),
+
   #[error("other database error: {0}")]
   Other(String),
 }
@@ -57,4 +60,10 @@ impl DatabaseError {
       _ => Self::Query(err),
     }
   }
+}
+
+impl From<SqlxError> for DatabaseError {
+    fn from(err: SqlxError) -> Self {
+        Self::from_sqlx(err)
+    }
 }
