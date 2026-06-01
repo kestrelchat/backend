@@ -1,4 +1,7 @@
-use std::{fmt::{Display, Formatter}, str::FromStr};
+use std::{
+  fmt::{Display, Formatter},
+  str::FromStr,
+};
 
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
@@ -26,16 +29,16 @@ pub enum RelationshipAction {
 }
 
 impl Display for RelationshipType {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-      let s = match self {
-        RelationshipType::Friend => "friend",
-        RelationshipType::IncomingRequest => "incoming_request",
-        RelationshipType::OutgoingRequest => "outgoing_request",
-        RelationshipType::Block => "block",
-      };
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    let s = match self {
+      RelationshipType::Friend => "friend",
+      RelationshipType::IncomingRequest => "incoming_request",
+      RelationshipType::OutgoingRequest => "outgoing_request",
+      RelationshipType::Block => "block",
+    };
 
-      write!(f, "{}", s)
-    }
+    write!(f, "{}", s)
+  }
 }
 
 impl FromStr for RelationshipType {
