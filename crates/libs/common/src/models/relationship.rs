@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::{Display, Formatter}, str::FromStr};
 
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
@@ -18,13 +18,24 @@ pub enum RelationshipType {
   Block,
 }
 
-impl ToString for RelationshipType {
-  fn to_string(&self) -> String {
-    serde_json::to_string(self)
-      .unwrap()
-      .trim_matches('"')
-      .to_string()
-  }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum RelationshipAction {
+  Friend,
+  Block,
+}
+
+impl Display for RelationshipType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+      let s = match self {
+        RelationshipType::Friend => "friend",
+        RelationshipType::IncomingRequest => "incoming_request",
+        RelationshipType::OutgoingRequest => "outgoing_request",
+        RelationshipType::Block => "block",
+      };
+
+      write!(f, "{}", s)
+    }
 }
 
 impl FromStr for RelationshipType {
