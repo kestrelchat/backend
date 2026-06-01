@@ -29,7 +29,7 @@ pub async fn create_relationship(
     postgres,
     user_id.as_str(),
     target_id,
-    req.relationship_action,
+    req.relationship_action.clone(),
   )
   .await
   .map_err(|e| match e {
