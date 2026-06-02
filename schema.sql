@@ -102,9 +102,7 @@ CREATE TABLE IF NOT EXISTS relationships (
 
     CONSTRAINT nickname_only_for_friends
         CHECK (
-            (type = 'friend' AND nickname IS NOT NULL)
-            OR
-            (type <> 'friend' AND nickname IS NULL)
+            type = 'friend' OR nickname IS NULL
         ),
 
     CONSTRAINT nickname_length
@@ -120,5 +118,5 @@ CREATE INDEX IF NOT EXISTS idx_user_relationships_user_id
 CREATE INDEX IF NOT EXISTS idx_user_relationships_target_id
     ON relationships (target_id);
 
-CREATE INDEX IF NOT EXISTS idx_user_relationships_type
-    ON relationships (type);
+CREATE INDEX IF NOT EXISTS idx_user_relationships_user_pair
+    ON relationships (user_id, target_id);
