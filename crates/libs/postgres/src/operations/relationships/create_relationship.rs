@@ -16,15 +16,14 @@ pub async fn create_relationship(
     RelationshipAction::Friend => {
       let either_blocked: bool = sqlx::query_scalar(
         r#"
-                SELECT EXISTS (
-                    SELECT 1 FROM relationships
-                    WHERE (
-                        (user_id = $1 AND target_id = $2)
-                     OR (user_id = $2 AND target_id = $1)
-                    )
-                    AND type = 'block'
-                )
-                "#,
+          SELECT EXISTS (
+            SELECT 1 FROM relationships
+            WHERE (user_id, target_id, type) IN (
+              ($1, $2, 'block'),
+              ($2, $1, 'block')
+            )
+          )
+        "#,
       )
       .bind(user_id)
       .bind(target_id)
@@ -39,15 +38,16 @@ pub async fn create_relationship(
 
       let pending: Option<(String, String)> = sqlx::query_as(
         r#"
-                SELECT user_id, target_id
-                FROM relationships
-                WHERE (
-                    (user_id = $1 AND target_id = $2)
-                 OR (user_id = $2 AND target_id = $1)
-                )
-                AND type IN ('incoming_request', 'outgoing_request')
-                LIMIT 1
-                "#,
+          SELECT user_id, target_id
+          FROM relationships
+          WHERE
+            (user_id, target_id) IN (
+              ($1, $2),
+              ($2, $1)
+            )
+            AND type = 'outgoing_request'
+          LIMIT 1
+        "#,
       )
       .bind(user_id)
       .bind(target_id)
@@ -58,14 +58,13 @@ pub async fn create_relationship(
         if requester_id == target_id {
           sqlx::query(
             r#"
-                        UPDATE relationships
-                        SET type = 'friend', updated_at = $3
-                        WHERE (
-                            (user_id = $1 AND target_id = $2)
-                         OR (user_id = $2 AND target_id = $1)
-                        )
-                        AND type IN ('incoming_request', 'outgoing_request')
-                        "#,
+              UPDATE relationships
+              SET type = 'friend', updated_at = $3
+              WHERE (user_id, target_id, type) IN (
+                ($1, $2, 'incoming_request'),
+                ($2, $1, 'outgoing_request')
+              )
+            "#,
           )
           .bind(user_id)
           .bind(target_id)
@@ -74,20 +73,19 @@ pub async fn create_relationship(
           .await?;
 
           let relationships: Vec<Relationship> = sqlx::query_as(
-                        r#"
-                        SELECT user_id, target_id, type, nickname, created_at, updated_at
-                        FROM relationships
-                        WHERE (
-                            (user_id = $1 AND target_id = $2)
-                         OR (user_id = $2 AND target_id = $1)
-                        )
-                        AND type = 'friend'
-                        "#,
-                    )
-                    .bind(user_id)
-                    .bind(target_id)
-                    .fetch_all(db.pool())
-                    .await?;
+            r#"
+              SELECT user_id, target_id, type, nickname, created_at, updated_at
+              FROM relationships
+              WHERE (user_id, target_id, type) IN (
+                ($1, $2, 'friend'),
+                ($2, $1, 'friend')
+              )
+            "#,
+          )
+          .bind(user_id)
+          .bind(target_id)
+          .fetch_all(db.pool())
+          .await?;
 
           return Ok(relationships);
         } else {
@@ -99,13 +97,14 @@ pub async fn create_relationship(
 
       let already_friends: bool = sqlx::query_scalar(
         r#"
-                SELECT EXISTS (
-                    SELECT 1 FROM relationships
-                    WHERE user_id = $1
-                      AND target_id = $2
-                      AND type = 'friend'
-                )
-                "#,
+          SELECT EXISTS (
+            SELECT 1 FROM relationships
+            WHERE (user_id, target_id, type) IN (
+              ($1, $2, 'friend'),
+              ($2, $1, 'friend')
+            )
+          )
+        "#,
       )
       .bind(user_id)
       .bind(target_id)
@@ -118,48 +117,36 @@ pub async fn create_relationship(
         ));
       }
 
-      let outgoing = sqlx::query_as::<_, Relationship>(
-                r#"
-                INSERT INTO relationships (user_id, target_id, type, created_at, updated_at)
-                VALUES ($1, $2, 'outgoing_request', $3, $4)
-                RETURNING user_id, target_id, type, nickname, created_at, updated_at
-                "#,
-            )
-            .bind(user_id)
-            .bind(target_id)
-            .bind(updated_at)
-            .bind(created_at)
-            .fetch_one(db.pool())
-            .await?;
+      let relationships = sqlx::query_as::<_, Relationship>(
+        r#"
+          INSERT INTO relationships (user_id, target_id, type, created_at, updated_at)
+          VALUES
+            ($1, $2, 'outgoing_request', $3, $4),
+            ($2, $1, 'incoming_request', $3, $4)
+          RETURNING user_id, target_id, type, nickname, created_at, updated_at
+        "#,
+      )
+      .bind(user_id)
+      .bind(target_id)
+      .bind(updated_at)
+      .bind(created_at)
+      .fetch_all(db.pool())
+      .await?;
 
-      let incoming = sqlx::query_as::<_, Relationship>(
-                r#"
-                INSERT INTO relationships (user_id, target_id, type, created_at, updated_at)
-                VALUES ($1, $2, 'incoming_request', $3, $4)
-                RETURNING user_id, target_id, type, nickname, created_at, updated_at
-                "#,
-            )
-            .bind(target_id)
-            .bind(user_id)
-            .bind(created_at)
-            .bind(updated_at)
-            .fetch_one(db.pool())
-            .await?;
-
-      Ok(vec![outgoing, incoming])
+      Ok(relationships)
     }
 
     RelationshipAction::Block => {
       // remove any existing friendship
       sqlx::query(
         r#"
-                DELETE FROM relationships
-                WHERE (
-                    (user_id = $1 AND target_id = $2)
-                 OR (user_id = $2 AND target_id = $1)
-                )
-                AND type IN ('friend', 'incoming_request', 'outgoing_request')
-                "#,
+          DELETE FROM relationships
+          WHERE (user_id, target_id) IN (
+            ($1, $2),
+            ($2, $1)
+          )
+          AND type IN ('friend', 'incoming_request', 'outgoing_request')
+        "#,
       )
       .bind(user_id)
       .bind(target_id)
@@ -167,18 +154,18 @@ pub async fn create_relationship(
       .await?;
 
       let blocked = sqlx::query_as::<_, Relationship>(
-                r#"
-                INSERT INTO relationships (user_id, target_id, type, created_at, updated_at)
-                VALUES ($1, $2, 'block', $3, $4)
-                RETURNING user_id, target_id, type, nickname, created_at, updated_at
-                "#,
-            )
-            .bind(user_id)
-            .bind(target_id)
-            .bind(updated_at)
-            .bind(created_at)
-            .fetch_one(db.pool())
-            .await?;
+        r#"
+          INSERT INTO relationships (user_id, target_id, type, created_at, updated_at)
+          VALUES ($1, $2, 'block', $3, $4)
+          RETURNING user_id, target_id, type, nickname, created_at, updated_at
+        "#,
+      )
+      .bind(user_id)
+      .bind(target_id)
+      .bind(updated_at)
+      .bind(created_at)
+      .fetch_one(db.pool())
+      .await?;
 
       Ok(vec![blocked])
     }
