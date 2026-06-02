@@ -12,6 +12,7 @@ use crate::utils::{auth_context::AuthContext, errors::AppError};
 
 #[derive(Serialize, JsonSchema)]
 pub struct GetSelfResponse {
+  pub id: String,
   pub session: SessionView,
 }
 
@@ -54,5 +55,8 @@ pub async fn get_self(
       last_used_at: s.last_used_at,
     })?;
 
-  Ok(Json(GetSelfResponse { session }))
+  Ok(Json(GetSelfResponse {
+    id: user_id,
+    session,
+  }))
 }
