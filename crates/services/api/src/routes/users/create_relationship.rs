@@ -15,7 +15,7 @@ pub struct CreateRelationship {
   pub relationship_action: RelationshipAction,
 }
 
-#[openapi(tag = "Core")]
+#[openapi(tag = "Relationships")]
 #[post("/@me/relationships/<target_id>", data = "<req>")]
 pub async fn create_relationship(
   postgres: &State<Database>,
