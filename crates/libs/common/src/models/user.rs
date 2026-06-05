@@ -9,3 +9,10 @@ pub struct User {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, FromRow)]
+pub struct UserSummary {
+  pub id: String,
+  pub username: String,
+  pub discrim: String,
+}
