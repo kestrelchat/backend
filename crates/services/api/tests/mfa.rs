@@ -161,11 +161,13 @@ async fn password_change_reencrypts_secret() {
     // 1. Create user and enroll them into TOTP
     let mut user = register_test_users(&client, 1).await.pop().unwrap();
     let totp = setup_totp_for(&client, &user).await;
+    let temp_token = initiate_login_mfa(&client, &user).await;
+    let code = totp.generate_current().unwrap();
+    let session = complete_login_mfa(&client, &temp_token, &code).await;
 
     // 2. Execute password change request
     let new_password = "NewSecurePassword123!".to_string();
     let change_pwd_body = json!({
-      "email": user.email,
       "old_password": user.password,
       "new_password": new_password
     });
@@ -173,6 +175,7 @@ async fn password_change_reencrypts_secret() {
     let change_res = client
       .post("/auth/password/change")
       .json(&change_pwd_body)
+      .header(bearer_auth(&session.auth_token))
       .dispatch()
       .await;
 
