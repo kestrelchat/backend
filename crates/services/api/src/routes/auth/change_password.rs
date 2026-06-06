@@ -1,28 +1,36 @@
 use kestrel_common::utils::{
-  hasher, normalize,
+  hasher,
   validation::{ValidationError, password},
 };
 use kestrel_postgres::{
   connection::Database,
   error::DatabaseError,
-  operations::account::{
-    change_password as postgres_change_password, get_account_by_email,
-    set_totp_secret,
+  operations::{
+    account::{
+      change_password as postgres_change_password, get_account_by_id,
+      set_totp_secret,
+    },
+    sessions::revoke_all_sessions as postgres_revoke_all_sessions,
   },
 };
+use kestrel_redis::{
+  connection::Redis,
+  operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
+};
+
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::{
+  auth_context::AuthContext,
   errors::AppError,
   totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
 };
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct ChangePasswordRequest {
-  email: String,
   old_password: String,
   new_password: String,
 }
@@ -31,11 +39,11 @@ pub struct ChangePasswordRequest {
 #[post("/password/change", data = "<req>")]
 pub async fn change_password(
   postgres: &State<Database>,
+  redis: &State<Redis>,
+  auth_ctx: AuthContext,
   req: Json<ChangePasswordRequest>,
 ) -> Result<(), AppError> {
-  let normalized_email = normalize::identity(&req.email);
-
-  let account = match get_account_by_email(postgres, &normalized_email).await {
+  let account = match get_account_by_id(postgres, &auth_ctx.user_id).await {
     Ok(acc) => acc,
 
     Err(e) => match e {
@@ -81,6 +89,14 @@ pub async fn change_password(
   tx.commit()
     .await
     .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
+
+  redis_revoke_all_sessions(redis, &auth_ctx.user_id, &auth_ctx.token).await?;
+  postgres_revoke_all_sessions(
+    postgres,
+    &auth_ctx.user_id,
+    &auth_ctx.session_id,
+  )
+  .await?;
 
   Ok(())
 }
