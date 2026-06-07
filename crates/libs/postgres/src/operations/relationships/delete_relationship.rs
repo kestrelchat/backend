@@ -44,8 +44,7 @@ pub async fn delete_relationship(
       Ok(relationships)
     }
 
-    RelationshipType::IncomingRequest
-    | RelationshipType::OutgoingRequest => {
+    RelationshipType::IncomingRequest | RelationshipType::OutgoingRequest => {
       let relationships = sqlx::query_as::<_, Relationship>(
         r#"
           DELETE FROM relationships
