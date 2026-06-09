@@ -6,6 +6,7 @@ mod list_sessions;
 mod login;
 mod manage_totp;
 mod register;
+mod reset_password;
 mod revoke_session;
 
 pub fn routes() -> (Vec<Route>, OpenApi) {
@@ -15,6 +16,9 @@ pub fn routes() -> (Vec<Route>, OpenApi) {
     login::login_mfa,
     revoke_session::revoke_current_session,
     change_password::change_password,
+    reset_password::request_password_reset,
+    reset_password::validate_password_reset,
+    reset_password::reset_password,
     list_sessions::list_sessions,
     revoke_session::revoke_all_sessions,
     revoke_session::revoke_session,

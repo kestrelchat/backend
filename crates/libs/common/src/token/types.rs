@@ -10,6 +10,7 @@ pub enum TokenType {
   Refresh = 1,
   Auth = 2,
   PendingMfa = 3,
+  PasswordReset = 4,
 }
 
 impl TryFrom<u8> for TokenType {
