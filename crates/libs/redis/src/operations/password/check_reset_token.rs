@@ -10,10 +10,8 @@ pub async fn check_reset_token(
 
   let mut conn = redis.conn().clone();
 
-  let account_id: Option<String> = conn
-    .get(&key)
-    .await
-    .map_err(RedisError::Redis)?;
+  let account_id: Option<String> =
+    conn.get(&key).await.map_err(RedisError::Redis)?;
 
   let account_id = match account_id {
     Some(id) => id,
