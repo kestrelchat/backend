@@ -53,12 +53,12 @@ pub async fn request_password_reset(
 
   let mut reset_token = "NOP".to_string(); // ASSEMBLY REFRENCE!!111!
 
-  if let Ok(account) = get_account_by_email(postgres, &req.email).await {
-    if let Ok(token) = create_reset_token(redis, &account.id).await {
-      reset_token = token;
+  if let Ok(account) = get_account_by_email(postgres, &req.email).await
+    && let Ok(token) = create_reset_token(redis, &account.id).await
+  {
+    reset_token = token;
 
-      // SEND EMAIL HERE
-    }
+    // SEND EMAIL HERE
   }
 
   // We don't have a tool for sending emails, this is temporary.
