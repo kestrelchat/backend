@@ -5,7 +5,7 @@ use kestrel_common::utils::{
 use kestrel_config::Config;
 use kestrel_postgres::{
   connection::Database,
-  operations::account::{change_password, get_account_by_email},
+  operations::account::{change_password, get_account_by_email, set_totp_secret},
 };
 use kestrel_redis::{
   connection::Redis,
@@ -103,6 +103,10 @@ pub async fn reset_password(
     .begin()
     .await
     .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
+
+  set_totp_secret(postgres.pool(), &account_id, None)
+    .await
+    .map_err(AppError::from)?;
 
   change_password(tx.as_mut(), account_id, &hashed_password).await?;
 
