@@ -5,7 +5,9 @@ use kestrel_common::utils::{
 use kestrel_config::Config;
 use kestrel_postgres::{
   connection::Database,
-  operations::account::{change_password, get_account_by_email, set_totp_secret},
+  operations::account::{
+    change_password, get_account_by_email, set_totp_secret,
+  },
 };
 use kestrel_redis::{
   connection::Redis,
