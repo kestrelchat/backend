@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod guilds;
 pub mod meta;
 pub mod users;
 
@@ -16,6 +17,7 @@ pub fn mount(mut rocket: Rocket<Build>) -> Rocket<Build> {
       settings,
       "/"    => openapi_get_routes_spec![meta::meta],
       "/auth" => auth::routes(),
+      "/guilds" => guilds::routes(),
       "/users" => users::routes(),
   );
   rocket
