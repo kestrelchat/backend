@@ -17,7 +17,7 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::utils::errors::AppError;
+use crate::{guards::rate_limit::WithinRateLimit, utils::errors::AppError};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct RegisterRequest {
@@ -38,6 +38,7 @@ pub struct RegisterResponse {
 #[openapi(tag = "Authentication")]
 #[post("/register", data = "<req>")]
 pub async fn register(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   config: &State<Config>,
   req: Json<RegisterRequest>,

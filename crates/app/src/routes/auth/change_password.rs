@@ -23,10 +23,13 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::utils::{
-  auth_context::AuthContext,
-  errors::AppError,
-  totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{
+    auth_context::AuthContext,
+    errors::AppError,
+    totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
+  },
 };
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
@@ -38,6 +41,7 @@ pub struct ChangePasswordRequest {
 #[openapi(tag = "Authentication")]
 #[post("/password/change", data = "<req>")]
 pub async fn change_password(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   auth_ctx: AuthContext,

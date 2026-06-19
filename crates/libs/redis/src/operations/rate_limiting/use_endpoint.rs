@@ -1,4 +1,8 @@
-use std::{fmt::Display, net::IpAddr};
+use std::{
+  fmt::Display,
+  net::IpAddr,
+  time::{Instant, SystemTime},
+};
 
 use kestrel_config::structs::features::{
   RateLimitConfig, SystemRateLimitConfig,
@@ -47,25 +51,34 @@ impl CompiledRateLimiter {
     user: &RateLimitUserId<'_>,
   ) -> Result<u64, RedisError> {
     let mut conn = redis.conn().clone();
+    let now_ms = SystemTime::now()
+      .duration_since(std::time::UNIX_EPOCH)
+      .unwrap_or_default()
+      .as_nanos() as f64
+      * 1e-6;
 
     let global_script = &self.global;
-    let global_wait: u64 = Self::prepare_invoke(global_script, "global", user)
+    let endpoint_script = self.get_endpoint_script(endpoint);
+
+    let global_invocation =
+      Self::prepare_invoke(global_script, "global", user, now_ms);
+    let endpoint_invocation =
+      Self::prepare_invoke(endpoint_script, endpoint, user, now_ms);
+
+    let stamp = Instant::now();
+    let global_wait: u64 = global_invocation
       .invoke_async(&mut conn)
       .await
       .map_err(RedisError::Redis)?;
+    let endpoint_wait: u64 = endpoint_invocation
+      .invoke_async(&mut conn)
+      .await
+      .map_err(RedisError::Redis)?;
+    let elapsed = stamp.elapsed().as_micros() as u64;
+    // TODO: Remove after investigation
+    eprintln!("Rate limit elapsed: {elapsed}μs");
 
-    if global_wait > 0 {
-      return Ok(global_wait);
-    }
-
-    let endpoint_script = self.get_endpoint_script(endpoint);
-    let endpoint_wait: u64 =
-      Self::prepare_invoke(endpoint_script, endpoint, user)
-        .invoke_async(&mut conn)
-        .await
-        .map_err(RedisError::Redis)?;
-
-    Ok(endpoint_wait)
+    Ok(global_wait.max(endpoint_wait))
   }
 
   /// Returns the appropriate script for the specified endpoint.
@@ -76,15 +89,14 @@ impl CompiledRateLimiter {
   /// Compiles the rate limit configuration into a Lua table string format.
   fn compile_config(config: &RateLimitConfig) -> String {
     format!(
-      "{{ short_window = {{ max = {}, duration = {} }}, long_window = {{ max = {}, duration = {} }}, bucket = {{ capacity = {}, use_cost = {}, fill_interval = {}, fill_step = {} }} }}",
+      "{{ short_window = {{ max = {}, duration_ms = {} }}, long_window = {{ max = {}, duration_ms = {} }}, bucket = {{ capacity = {}, use_cost = {}, duration_ms = {} }} }}",
       config.short_window.max,
-      config.short_window.duration.as_millis(),
+      config.short_window.duration.as_nanos() as f64 * 1e-6,
       config.long_window.max,
-      config.long_window.duration.as_millis(),
+      config.long_window.duration.as_nanos() as f64 * 1e-6,
       config.bucket.capacity,
       config.bucket.use_cost,
-      config.bucket.fill_interval.as_millis(),
-      config.bucket.fill_step
+      config.bucket.duration.as_nanos() as f64 * 1e-6
     )
   }
 
@@ -93,17 +105,31 @@ impl CompiledRateLimiter {
     script: &'sc Script,
     resource: &str,
     user: &RateLimitUserId,
+    now_ms: f64,
   ) -> ScriptInvocation<'sc> {
     let mut invocation = script.prepare_invoke();
     invocation.key(format!("{{rate-limit:{user}:{resource}}}:updated-at"));
     invocation.key(format!("{{rate-limit:{user}:{resource}}}:bucket"));
     invocation.key(format!("{{rate-limit:{user}:{resource}}}:short-window"));
     invocation.key(format!("{{rate-limit:{user}:{resource}}}:long-window"));
+    invocation.arg(now_ms);
     invocation
   }
 
   /// The script template for the rate limit script.
   const SCRIPT_TEMPLATE: &str = include_str!("use_endpoint.lua");
+
+  pub async fn warm_up(&self, redis: &Redis) -> Result<(), RedisError> {
+    let mut conn = redis.conn().clone();
+
+    self.global.load_async(&mut conn).await.ok();
+    self.standard.load_async(&mut conn).await.ok();
+    for script in self.custom.values() {
+      script.load_async(&mut conn).await.ok();
+    }
+
+    Ok(())
+  }
 }
 
 impl From<&'_ SystemRateLimitConfig> for CompiledRateLimiter {

@@ -1,19 +1,19 @@
 use std::sync::Arc;
 
 use kestrel_common::utils::totp::TotpSetup;
-use rocket::{http::StatusClass, local::asynchronous::Client};
+use rocket::http::StatusClass;
 use serde_json::{Value, json};
 
 use crate::common::{
-  TokenPair, UserCredentials, bearer_auth, login, register_test_users,
-  run_with_containers,
+  TestClient, TokenPair, UserCredentials, bearer_auth, login,
+  register_test_users, run_with_containers,
 };
 
 mod common;
 
 /// Enrolls a test user into TOTP multi-factor authentication and returns the setup instance.
 async fn setup_totp_for(
-  client: &Arc<Client>,
+  client: &Arc<TestClient>,
   user: &UserCredentials,
 ) -> TotpSetup {
   let session = login(client, user).await;
@@ -44,7 +44,7 @@ async fn setup_totp_for(
 
 /// Initiates the first step of the login challenge for a user with MFA enabled.
 async fn initiate_login_mfa(
-  client: &Arc<Client>,
+  client: &Arc<TestClient>,
   user: &UserCredentials,
 ) -> String {
   let req_body = json!({
@@ -53,12 +53,7 @@ async fn initiate_login_mfa(
     "token": "placeholder"
   });
 
-  let response = client
-    .post("/auth/login")
-    .header(rocket::http::Header::new("X-Real-IP", "127.0.0.1"))
-    .json(&req_body)
-    .dispatch()
-    .await;
+  let response = client.post("/auth/login").json(&req_body).dispatch().await;
 
   assert_eq!(
     response.status().class(),
@@ -76,7 +71,7 @@ async fn initiate_login_mfa(
 
 /// Completes the second step of the login challenge using a temporary token and a generated TOTP code.
 async fn complete_login_mfa(
-  client: &Client,
+  client: &TestClient,
   temp_token: &str,
   code: &str,
 ) -> TokenPair {
@@ -87,7 +82,6 @@ async fn complete_login_mfa(
 
   let mfa_response = client
     .post("/auth/login/mfa")
-    .header(rocket::http::Header::new("X-Real-IP", "127.0.0.1"))
     .json(&mfa_body)
     .dispatch()
     .await;
@@ -142,7 +136,6 @@ async fn disable_totp() {
     // 3. Disable TOTP
     let response = client
       .delete("/auth/mfa/totp")
-      .header(rocket::http::Header::new("X-Real-IP", "127.0.0.1"))
       .header(bearer_auth(&session.auth_token))
       .json(&json!({"password": user.password}))
       .dispatch()

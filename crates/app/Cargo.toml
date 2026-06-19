@@ -21,3 +21,4 @@ zeroize = { workspace = true }
 [dev-dependencies]
 testcontainers-modules = { workspace = true }
 serde_json = { workspace = true }
+redis = { workspace = true }

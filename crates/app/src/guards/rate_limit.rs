@@ -7,10 +7,13 @@ use kestrel_redis::{
   },
 };
 use rocket::{
-  Response,
   http::{Header, Status},
   request::{FromRequest, Outcome},
   tokio::join,
+};
+use rocket_okapi::{
+  r#gen::OpenApiGenerator,
+  request::{OpenApiFromRequest, RequestHeaderInput},
 };
 
 use crate::utils::auth_context::AuthContext;
@@ -25,9 +28,19 @@ use crate::utils::auth_context::AuthContext;
 #[derive(Debug, Clone, Copy)]
 pub struct WithinRateLimit;
 
+impl<'r> OpenApiFromRequest<'r> for WithinRateLimit {
+  fn from_request_input(
+    _gen: &mut OpenApiGenerator,
+    _name: String,
+    _required: bool,
+  ) -> rocket_okapi::Result<RequestHeaderInput> {
+    Ok(RequestHeaderInput::None)
+  }
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for WithinRateLimit {
-  type Error = Response<'r>;
+  type Error = Option<Header<'static>>;
 
   async fn from_request(
     req: &'r rocket::Request<'_>,
@@ -42,17 +55,14 @@ impl<'r> FromRequest<'r> for WithinRateLimit {
         (rate_limiter, redis)
       }
       _ => {
-        return Outcome::Error((
-          Status::InternalServerError,
-          Response::default(),
-        ));
+        return Outcome::Error((Status::InternalServerError, None));
       }
     };
 
     let user_id = match &auth_ctx {
       Outcome::Success(auth_ctx) => RateLimitUserId::User(&auth_ctx.user_id),
       _ if let Some(ip) = req.client_ip() => RateLimitUserId::Ip(ip),
-      _ => return Outcome::Error((Status::Unauthorized, Response::default())),
+      _ => return Outcome::Error((Status::Unauthorized, None)),
     };
 
     let path = if req.uri().is_normalized() {
@@ -67,13 +77,9 @@ impl<'r> FromRequest<'r> for WithinRateLimit {
       Ok(0) => Outcome::Success(WithinRateLimit),
       Ok(retry_after) => Outcome::Error((
         Status::TooManyRequests,
-        Response::build()
-          .header(Header::new("Retry-After", retry_after.to_string()))
-          .finalize(),
+        Some(Header::new("Retry-After", retry_after.to_string())),
       )),
-      Err(_) => {
-        Outcome::Error((Status::InternalServerError, Response::default()))
-      }
+      Err(_) => Outcome::Error((Status::InternalServerError, None)),
     }
   }
 }

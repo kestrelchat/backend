@@ -13,7 +13,10 @@ use schemars::JsonSchema;
 use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{auth_context::AuthContext, errors::AppError},
+};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, JsonSchema)]
 pub struct DeleteGuildRequest {
@@ -23,6 +26,7 @@ pub struct DeleteGuildRequest {
 #[openapi(tag = "Guilds")]
 #[delete("/<guild_id>", data = "<req>")]
 pub async fn delete_guild(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
   guild_id: &str,

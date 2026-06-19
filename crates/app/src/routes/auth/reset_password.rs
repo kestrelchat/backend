@@ -18,7 +18,7 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::utils::errors::AppError;
+use crate::{guards::rate_limit::WithinRateLimit, utils::errors::AppError};
 
 #[derive(Deserialize, JsonSchema)]
 pub struct PasswordResetRequest {
@@ -44,6 +44,7 @@ pub struct ResetPasswordRequest {
 #[openapi(tag = "Authentication")]
 #[post("/password/reset/request", data = "<req>")]
 pub async fn request_password_reset(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   config: &State<Config>,
@@ -71,6 +72,7 @@ pub async fn request_password_reset(
 #[openapi(tag = "Authentication")]
 #[post("/password/reset/validate", data = "<req>")]
 pub async fn validate_password_reset(
+  _within_rate_limit: WithinRateLimit,
   redis: &State<Redis>,
   req: Json<PasswordResetValidateRequest>,
 ) -> Result<(), AppError> {
@@ -84,6 +86,7 @@ pub async fn validate_password_reset(
 #[openapi(tag = "Authentication")]
 #[post("/password/reset", data = "<req>")]
 pub async fn reset_password(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   req: Json<ResetPasswordRequest>,

@@ -8,7 +8,10 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Serialize;
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{auth_context::AuthContext, errors::AppError},
+};
 
 #[derive(Serialize, JsonSchema)]
 pub struct SessionResponse {
@@ -32,6 +35,7 @@ pub struct SessionView {
 #[openapi(tag = "Sessions")]
 #[get("/sessions")]
 pub async fn list_sessions(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
 ) -> Result<Json<SessionResponse>, AppError> {

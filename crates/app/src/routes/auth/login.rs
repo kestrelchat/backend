@@ -30,9 +30,12 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::utils::{
-  errors::AppError, request_context::RequestContext,
-  totp_secret::decrypt_totp_secret,
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{
+    errors::AppError, request_context::RequestContext,
+    totp_secret::decrypt_totp_secret,
+  },
 };
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
@@ -72,6 +75,7 @@ pub enum LoginResponse {
 #[openapi(tag = "Authentication")]
 #[post("/login", data = "<req>")]
 pub async fn login(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   geoip: &State<GeoIpClient>,
@@ -149,6 +153,7 @@ pub async fn login(
 #[openapi(tag = "Authentication")]
 #[post("/login/mfa", data = "<req>")]
 pub async fn login_mfa(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   geoip: &State<GeoIpClient>,

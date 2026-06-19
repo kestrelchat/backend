@@ -12,5 +12,6 @@ pub struct Config {
   pub instance: InstanceConfig,
   pub server: ServerConfig,
   pub database: DatabaseConfig,
+  #[serde(default)]
   pub features: FeatureConfig,
 }

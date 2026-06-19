@@ -6,7 +6,10 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Serialize;
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{auth_context::AuthContext, errors::AppError},
+};
 
 #[derive(Serialize, JsonSchema)]
 pub struct GetGuildResponse {
@@ -18,6 +21,7 @@ pub struct GetGuildResponse {
 #[openapi(tag = "Guilds")]
 #[get("/<guild_id>")]
 pub async fn get_guild(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
   guild_id: &str,

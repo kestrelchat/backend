@@ -6,7 +6,10 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{auth_context::AuthContext, errors::AppError},
+};
 
 #[derive(Deserialize, JsonSchema)]
 pub struct CreateGuildRequest {
@@ -23,6 +26,7 @@ pub struct CreateGuildResponse {
 #[openapi(tag = "Guilds")]
 #[post("/", data = "<req>")]
 pub async fn create_guild(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
   req: Json<CreateGuildRequest>,

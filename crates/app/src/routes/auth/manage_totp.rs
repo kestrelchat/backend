@@ -18,8 +18,12 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::utils::{
-  auth_context::AuthContext, errors::AppError, totp_secret::encrypt_totp_secret,
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{
+    auth_context::AuthContext, errors::AppError,
+    totp_secret::encrypt_totp_secret,
+  },
 };
 
 #[derive(Serialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
@@ -32,6 +36,7 @@ pub struct EnableTotpResponse {
 #[openapi(tag = "Authentication")]
 #[post("/mfa/totp")]
 pub async fn enable_totp(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   auth_ctx: AuthContext,
@@ -79,6 +84,7 @@ pub struct ConfirmEnableTotpRequest {
 #[openapi(tag = "Authentication")]
 #[post("/mfa/totp/confirm", data = "<req>")]
 pub async fn confirm_enable_totp(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   redis: &State<Redis>,
   auth_ctx: AuthContext,
@@ -141,6 +147,7 @@ pub struct DisableTotpRequest {
 #[openapi(tag = "Authentication")]
 #[delete("/mfa/totp", data = "<req>")]
 pub async fn disable_totp(
+  _within_rate_limit: WithinRateLimit,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
   req: Json<DisableTotpRequest>,

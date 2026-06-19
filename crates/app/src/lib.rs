@@ -7,7 +7,10 @@ use std::net::IpAddr;
 use kestrel_common::utils::geoip::GeoIpClient;
 use kestrel_config::Config as AppConfig;
 use kestrel_postgres::connection::Database;
-use kestrel_redis::connection::Redis;
+use kestrel_redis::{
+  connection::Redis,
+  operations::rate_limiting::use_endpoint::CompiledRateLimiter,
+};
 use rocket::Config as RocketConfig;
 
 use crate::utils::cors::{CorsFairing, preflight};
@@ -77,11 +80,15 @@ pub async fn web(
 
   let geoip = GeoIpClient::default();
 
+  let rate_limiter = CompiledRateLimiter::from(&config.features.rate_limiting);
+  rate_limiter.warm_up(&redis).await.ok();
+
   let rocket = rocket::custom(rocket_config)
     .attach(cors)
     .manage(postgres)
     .manage(redis)
     .manage(config)
+    .manage(rate_limiter)
     .manage(geoip)
     .mount("/", routes![preflight])
     .mount("/swagger", swagger)

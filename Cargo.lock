@@ -1877,6 +1877,7 @@ dependencies = [
  "kestrel_config",
  "kestrel_postgres",
  "kestrel_redis",
+ "redis",
  "rocket",
  "rocket_okapi",
  "schemars 0.8.22",

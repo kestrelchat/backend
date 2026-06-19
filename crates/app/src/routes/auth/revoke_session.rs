@@ -15,11 +15,15 @@ use kestrel_redis::{
 use rocket::State;
 use rocket_okapi::openapi;
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{
+  guards::rate_limit::WithinRateLimit,
+  utils::{auth_context::AuthContext, errors::AppError},
+};
 
 #[openapi(tag = "Sessions")]
 #[post("/logout")]
 pub async fn revoke_current_session(
+  _within_rate_limit: WithinRateLimit,
   redis: &State<Redis>,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
@@ -40,6 +44,7 @@ pub async fn revoke_current_session(
 #[openapi(tag = "Sessions")]
 #[delete("/sessions")]
 pub async fn revoke_all_sessions(
+  _within_rate_limit: WithinRateLimit,
   redis: &State<Redis>,
   postgres: &State<Database>,
   auth_ctx: AuthContext,
@@ -62,6 +67,7 @@ pub async fn revoke_all_sessions(
 #[openapi(tag = "Sessions")]
 #[delete("/sessions/<session_id>")]
 pub async fn revoke_session(
+  _within_rate_limit: WithinRateLimit,
   redis: &State<Redis>,
   postgres: &State<Database>,
   _auth_ctx: AuthContext,
