@@ -1,6 +1,10 @@
-use std::{collections::HashMap, fmt::Display, time::Duration};
+use std::fmt::Display;
 
+use kestrel_config::structs::features::{
+  RateLimitConfig, SystemRateLimitConfig,
+};
 use redis::{Script, ScriptInvocation};
+use rustc_hash::FxHashMap;
 
 use crate::{connection::Redis, error::RedisError};
 
@@ -19,63 +23,6 @@ impl Display for RateLimitUserId {
   }
 }
 
-/// A fixed-duration period in which requests are counted and rate-limited.
-pub struct RateLimitWindow {
-  /// The maximum number of requests in the window.
-  pub max: u64,
-  /// The duration of the window.
-  pub duration: Duration,
-}
-
-/// A fixed-capacity container that holds tokens for rate-limiting.
-pub struct RateLimitBucket {
-  /// The capacity of the bucket.
-  pub capacity: u64,
-  /// The cost of using the bucket.
-  pub use_cost: u64,
-  /// The fill interval of the bucket.
-  pub fill_interval: Duration,
-  /// The fill step of the bucket.
-  pub fill_step: u64,
-}
-
-/// The rate limit configuration for a resource.
-pub struct RateLimitConfig {
-  /// The short window.
-  pub short_window: RateLimitWindow,
-  /// The long window.
-  pub long_window: RateLimitWindow,
-  /// The bucket.
-  pub bucket: RateLimitBucket,
-}
-
-impl RateLimitConfig {
-  /// Serializes the configuration into a Lua table string format.
-  fn to_lua_table(&self) -> String {
-    format!(
-      "{{ short_window = {{ max = {}, duration = {} }}, long_window = {{ max = {}, duration = {} }}, bucket = {{ capacity = {}, use_cost = {}, fill_interval = {}, fill_step = {} }} }}",
-      self.short_window.max,
-      self.short_window.duration.as_millis(),
-      self.long_window.max,
-      self.long_window.duration.as_millis(),
-      self.bucket.capacity,
-      self.bucket.use_cost,
-      self.bucket.fill_interval.as_millis(),
-      self.bucket.fill_step
-    )
-  }
-}
-
-/// The rate limit configuration for the entire system.
-pub struct SystemRateLimitConfig {
-  /// The configuration for the "global" resource.
-  pub global: RateLimitConfig,
-  /// The default configuration for an endpoint.
-  pub standard: RateLimitConfig,
-  /// The configuration for endpoints with custom rate limiting.
-  pub custom: HashMap<String, RateLimitConfig>,
-}
-
 /// The compiled scripts for rate limiting, mapped by endpoint.
 pub struct CompiledRateLimiter {
   /// The script for the global rate limit.
@@ -83,7 +30,27 @@ pub struct CompiledRateLimiter {
   /// The default script for endpoints without custom configurations.
   pub standard: Script,
   /// Scripts for endpoints with custom configurations.
-  pub custom: HashMap<String, Script>,
+  ///
+  /// [`FxHashMap`] is used, because rate limiting is a performance-critical operation.
+  /// The keys are not controlled by users, and therefore cannot be used for HashDoS.
+  pub custom: FxHashMap<String, Script>,
+}
+
+impl CompiledRateLimiter {
+  /// Compiles the rate limit configuration into a Lua table string format.
+  fn compile_config(config: &RateLimitConfig) -> String {
+    format!(
+      "{{ short_window = {{ max = {}, duration = {} }}, long_window = {{ max = {}, duration = {} }}, bucket = {{ capacity = {}, use_cost = {}, fill_interval = {}, fill_step = {} }} }}",
+      config.short_window.max,
+      config.short_window.duration.as_millis(),
+      config.long_window.max,
+      config.long_window.duration.as_millis(),
+      config.bucket.capacity,
+      config.bucket.use_cost,
+      config.bucket.fill_interval.as_millis(),
+      config.bucket.fill_step
+    )
+  }
 }
 
 /// The script template for the rate limit script.
@@ -93,13 +60,14 @@ impl From<&'_ SystemRateLimitConfig> for CompiledRateLimiter {
   /// Compiles the rate limit scripts for the given configuration.
   fn from(config: &'_ SystemRateLimitConfig) -> Self {
     let compile_script = |cfg: &RateLimitConfig| {
-      let lua_config = format!("local config = {}", cfg.to_lua_table());
+      let lua_config = format!("local config = {}", Self::compile_config(cfg));
       let script =
         SCRIPT_TEMPLATE.replace("-- CONFIGURATION_PLACEHOLDER", &lua_config);
       Script::new(&script)
     };
 
-    let mut custom = HashMap::new();
+    let mut custom = FxHashMap::default();
+    custom.reserve(config.custom.len() * 2);
     for (key, val) in &config.custom {
       custom.insert(key.clone(), compile_script(val));
     }
