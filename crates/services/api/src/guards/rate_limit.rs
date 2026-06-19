@@ -8,9 +8,9 @@ use kestrel_redis::{
 };
 use rocket::{
   Response,
-  futures::join,
   http::{Header, Status},
   request::{FromRequest, Outcome},
+  tokio::join,
 };
 
 use crate::utils::auth_context::AuthContext;
