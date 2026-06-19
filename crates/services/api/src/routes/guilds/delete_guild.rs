@@ -7,10 +7,10 @@ use kestrel_postgres::{
     guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
   },
 };
-use rocket::{State, serde::json::Json};
+use rocket::{State, http::Status, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::utils::{auth_context::AuthContext, errors::AppError};
@@ -20,11 +20,6 @@ pub struct DeleteGuildRequest {
   pub password: String,
 }
 
-#[derive(Serialize, JsonSchema)]
-pub struct DeleteGuildResponse {
-  pub deleted: bool,
-}
-
 #[openapi(tag = "Guilds")]
 #[delete("/<guild_id>", data = "<req>")]
 pub async fn delete_guild(
@@ -32,7 +27,7 @@ pub async fn delete_guild(
   auth_ctx: AuthContext,
   guild_id: &str,
   req: Json<DeleteGuildRequest>,
-) -> Result<Json<DeleteGuildResponse>, AppError> {
+) -> Result<Status, AppError> {
   let user_id = auth_ctx.user_id;
 
   let guild = pg_get_guild(postgres, guild_id, &user_id)
@@ -60,5 +55,5 @@ pub async fn delete_guild(
     .await
     .map_err(AppError::from)?;
 
-  Ok(Json(DeleteGuildResponse { deleted: true }))
+  Ok(Status::NoContent)
 }
