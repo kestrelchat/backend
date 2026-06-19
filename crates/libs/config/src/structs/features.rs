@@ -19,6 +19,7 @@ pub struct HCaptchaConfig {
   pub secret: Option<String>,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for HCaptchaConfig {
   fn default() -> Self {
     Self {
