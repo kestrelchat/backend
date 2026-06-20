@@ -1,5 +1,5 @@
 [package]
-name = "kestrel_api"
+name = "kestrel_server"
 version = "0.1.0"
 edition = "2024"
 

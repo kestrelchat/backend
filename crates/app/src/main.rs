@@ -1,4 +1,4 @@
-use kestrel_api::web;
+use kestrel_server::web;
 
 #[rocket::launch]
 async fn rocket() -> _ {

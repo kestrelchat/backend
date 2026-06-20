@@ -1814,27 +1814,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kestrel_api"
-version = "0.1.0"
-dependencies = [
- "base64",
- "chacha20poly1305",
- "chrono",
- "kestrel_common",
- "kestrel_config",
- "kestrel_postgres",
- "kestrel_redis",
- "rocket",
- "rocket_okapi",
- "schemars 0.8.22",
- "serde",
- "serde_json",
- "testcontainers-modules",
- "ulid",
- "zeroize",
-]
-
-[[package]]
 name = "kestrel_common"
 version = "0.1.0"
 dependencies = [
@@ -1883,6 +1862,27 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+]
+
+[[package]]
+name = "kestrel_server"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "chacha20poly1305",
+ "chrono",
+ "kestrel_common",
+ "kestrel_config",
+ "kestrel_postgres",
+ "kestrel_redis",
+ "rocket",
+ "rocket_okapi",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "testcontainers-modules",
+ "ulid",
+ "zeroize",
 ]
 
 [[package]]

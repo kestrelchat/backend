@@ -1,10 +1,10 @@
 name: kestrel
 
 services:
-  api:
+  server:
     build:
       context: .
-      dockerfile: crates/services/api/Dockerfile
+      dockerfile: crates/app/Dockerfile
       args:
         BUILD_MODE: ${BUILD_MODE:-debug}
 

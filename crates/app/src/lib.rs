@@ -40,7 +40,7 @@ pub async fn web(
 
   let rocket_config = RocketConfig {
     address: addr,
-    port: config.server.ports.api,
+    port: config.server.port,
     ..RocketConfig::default()
   };
 
