@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/github/issues/kestrelchat/server?style=for-the-badge&color=6e6ade" />
   <img src="https://img.shields.io/github/issues-pr/kestrelchat/server?style=for-the-badge&color=6e6ade" />
   <img src="https://img.shields.io/github/languages/code-size/kestrelchat/server?style=for-the-badge&color=6e6ade" />
-  <img src="https://www.aschey.tech/tokei/github.com/kestrelchat/server?style=for-the-badge&color=6e6ade&language=Rust,Dockerfile,Python" />
+  <img src="https://www.aschey.tech/tokei/github.com/kestrelchat/server?style=for-the-badge&color=6e6ade&language=Rust,Dockerfile" />
   <a href="https://discord.gg/T8rAX8DmNS">
     <img src="https://img.shields.io/discord/1453177758233661706?style=for-the-badge&logo=discord&logoColor=white&color=6e6ade" />
   </a>
@@ -38,16 +38,18 @@ Kestrel uses a shared TOML configuration file.
 
 To get started, copy the example file `kestrel.example.toml` to `kestrel.toml`
 
-Everything should be preconfigured for hosting on a single machine, through docker.
+Everything should be preconfigured for hosting on a single machine, through Docker.
 
 # Structure
 
-## Services
-- **gateway** - WebSocket handling
-- **api** - REST API backend
+## Application
+- **kestrel_server** - Unified server binary (REST API, WebSocket, Swagger docs)
 
-## Library
-- **config** - Shared configuration library for Kestrel
+## Libraries
+- **kestrel_common** - Shared data models, tokens, and utilities (GeoIP, user-agent parsing, hCaptcha)
+- **kestrel_config** - Shared configuration library for Kestrel
+- **kestrel_postgres** - PostgreSQL connection management and database operations
+- **kestrel_redis** - Redis connection management and session caching
 
 ## Running
 
@@ -55,25 +57,20 @@ Everything should be preconfigured for hosting on a single machine, through dock
 
 > Recommended for most users.
 
-To run the main backend (api, gateway, etc.) without development dependencies (e.g. Postgres):
-```bash
-BUILD_MODE=release docker compose --profile prod up --build --build-arg BUILD_MODE=release
-```
-
-To run all development dependencies (e.g. Postgres):
+Run the full stack (server + Postgres + Redis) for development:
 ```bash
 BUILD_MODE=debug docker compose --profile dev up --build
 ```
 
-To run specific services:
+Run only the server for production (requires external Postgres/Redis):
 ```bash
-BUILD_MODE=debug docker compose up --build api --build-arg BUILD_MODE=debug
+BUILD_MODE=release docker compose --profile prod up --build
 ```
 
 #### Build Mode
-``BUILD_MODE`` controls whether Rust is compiled in debug (fast, unoptimized) or release (optimized for production) mode inside Docker images.
+`BUILD_MODE` controls whether Rust is compiled in debug (fast, unoptimized) or release (optimized for production) mode inside Docker images.
 
-Using ``BUILD_MODE=debug`` is recommended during development.
+Using `BUILD_MODE=debug` is recommended during development.
 
 ### Without Docker
 
@@ -82,12 +79,12 @@ Set your config path:
 export KESTREL_CONFIG=path/to/kestrel.toml
 ```
 
-Then run the services manually with:
+Then run the server:
 ```bash
-cargo run -p <service>
+cargo run -p kestrel_server
 ```
 
-Any external services (databases, cdns, etc.) must be configured in ``kestrel.toml``.
+Any external services (databases, etc.) must be configured in `kestrel.toml`.
 
 # External Libraries
 
@@ -95,9 +92,11 @@ Kestrel Backend is built on top of the following open-source Rust libraries:
 
 - [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2)
 - [async-trait](https://github.com/dtolnay/async-trait)
+- [base64](https://github.com/marshallpierce/rust-base64)
 - [blake3](https://github.com/BLAKE3-team/BLAKE3)
 - [chacha20poly1305](https://github.com/RustCrypto/AEADs/tree/master/chacha20poly1305)
 - [chrono](https://github.com/chronotope/chrono)
+- [hcaptcha](https://github.com/juliankrispel/hcaptcha-rust)
 - [once_cell](https://github.com/matklad/once_cell)
 - [rand](https://github.com/rust-random/rand)
 - [redis](https://github.com/redis-rs/redis-rs)
