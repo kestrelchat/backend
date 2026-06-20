@@ -1,25 +1,6 @@
 name: kestrel
 
 services:
-  gateway:
-    build:
-      context: .
-      dockerfile: crates/services/gateway/Dockerfile
-      args:
-        BUILD_MODE: ${BUILD_MODE:-debug}
-
-    volumes:
-      - ./kestrel.toml:/var/kestrel/conf.toml:ro,z
-    environment:
-      - KESTREL_CONFIG=/var/kestrel/conf.toml
-
-    ports:
-      - "5180:5180"
-
-    restart: unless-stopped
-
-    profiles: ["prod", "dev"]
-
   api:
     build:
       context: .

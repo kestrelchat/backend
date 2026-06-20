@@ -6,7 +6,6 @@ members = [
     "crates/libs/postgres",
     "crates/libs/redis",
     "crates/services/api",
-    "crates/services/gateway",
 ]
 
 [workspace.dependencies]

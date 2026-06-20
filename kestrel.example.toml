@@ -13,7 +13,6 @@ description = "My awesome Kestrel server"
 host = "0.0.0.0"
 
 [server.ports]
-gateway = 5180
 api = 5181
 
 [server.cors]
