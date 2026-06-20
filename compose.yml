@@ -14,7 +14,7 @@ services:
       - KESTREL_CONFIG=/var/kestrel/conf.toml
 
     ports:
-      - "5181:5181"
+      - "5187:5187"
 
     restart: unless-stopped
 
