@@ -3,16 +3,16 @@
 use std::sync::Arc;
 
 use chrono::{DateTime, Timelike, Utc};
-use kestrel_api::web;
 use kestrel_config::{
   Config,
   structs::{
     database::{DatabaseConfig, PostgresConfig, RedisConfig},
     features::{FeatureConfig, HCaptchaConfig, RegistrationConfig},
     instance::InstanceConfig,
-    server::{CorsConfig, PortsConfig, ServerConfig},
+    server::{CorsConfig, ServerConfig},
   },
 };
+use kestrel_server::web;
 use rocket::{
   futures::join,
   http::{Header, StatusClass},
@@ -82,7 +82,7 @@ pub async fn run_with_containers(
     },
     server: ServerConfig {
       host: "127.0.0.1".to_string(),
-      ports: PortsConfig { gateway: 0, api: 0 },
+      port: 5178,
       cors: CorsConfig {
         allowed_origins: vec!["*".to_string()],
         allow_credentials: true,
