@@ -18,18 +18,18 @@
 --- @diagnostic disable-next-line: undefined-global
 local config = config
 
---- @type string[4]
-KEYS = KEYS or {}
+--- @diagnostic disable-next-line: undefined-global
+local KEYS = KEYS or {}
 
---- @type string[1]
-ARGV = ARGV or {}
+--- @diagnostic disable-next-line: undefined-global
+local ARGV = ARGV or {}
 
 --- @class Redis
 --- @field call fun(command: string, ...: any): any
 
 --- @type Redis
---- @diagnostic disable-next-line: lowercase-global
-redis = redis or {}
+--- @diagnostic disable-next-line: undefined-global
+local redis = redis or {}
 
 local updated_at_key = KEYS[1]
 local bucket_key = KEYS[2]
