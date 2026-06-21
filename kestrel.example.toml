@@ -11,9 +11,7 @@ description = "My awesome Kestrel server"
 [server]
 # Host must be 0.0.0.0 if you are hosting via Docker!
 host = "0.0.0.0"
-
-[server.ports]
-api = 5187
+port = 5187
 
 [server.cors]
 # allowed_origins defines which domains are permitted to make cross-origin requests.
