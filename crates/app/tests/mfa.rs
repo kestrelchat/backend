@@ -106,7 +106,11 @@ async fn complete_login_mfa(
 async fn mfa_login_flow() {
   run_with_containers(async |_, client| {
     // 1. Create a user and enroll them into TOTP
-    let user = register_test_users(&client, 1).await.pop().unwrap();
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
     let totp = setup_totp_for(&client, &user).await;
 
     // 2. Request initial login to receive temporary MFA token
@@ -125,7 +129,11 @@ async fn mfa_login_flow() {
 async fn disable_totp() {
   run_with_containers(async |_, client| {
     // 1. Register user and enable TOTP
-    let user = register_test_users(&client, 1).await.pop().unwrap();
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
     let totp = setup_totp_for(&client, &user).await;
 
     // 2. Initiate login MFA
@@ -152,7 +160,11 @@ async fn disable_totp() {
 async fn password_change_reencrypts_secret() {
   run_with_containers(async |_, client| {
     // 1. Create user and enroll them into TOTP
-    let mut user = register_test_users(&client, 1).await.pop().unwrap();
+    let mut user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
     let totp = setup_totp_for(&client, &user).await;
     let temp_token = initiate_login_mfa(&client, &user).await;
     let code = totp.generate_current().unwrap();

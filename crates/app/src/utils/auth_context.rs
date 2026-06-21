@@ -33,29 +33,34 @@ impl<'r> FromRequest<'r> for AuthContext {
   type Error = ();
 
   async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-    let redis = match req.guard::<&rocket::State<Redis>>().await {
-      Outcome::Success(r) => r,
-      _ => return Outcome::Error((Status::InternalServerError, ())),
-    };
+    req
+      .local_cache_async(async {
+        let redis = match req.guard::<&rocket::State<Redis>>().await {
+          Outcome::Success(r) => r,
+          _ => return Outcome::Error((Status::InternalServerError, ())),
+        };
 
-    let token = match req.headers().get_one("Authorization") {
-      Some(h) => match h.strip_prefix("Bearer ") {
-        Some(t) => t,
-        None => return Outcome::Error((Status::Unauthorized, ())),
-      },
-      None => return Outcome::Error((Status::Unauthorized, ())),
-    };
+        let token = match req.headers().get_one("Authorization") {
+          Some(h) => match h.strip_prefix("Bearer ") {
+            Some(t) => t,
+            None => return Outcome::Error((Status::Unauthorized, ())),
+          },
+          None => return Outcome::Error((Status::Unauthorized, ())),
+        };
 
-    let redis_session = match get_session(redis.inner(), token).await {
-      Ok(Some(s)) => s,
-      Ok(None) => return Outcome::Error((Status::Unauthorized, ())),
-      Err(_) => return Outcome::Error((Status::InternalServerError, ())),
-    };
+        let redis_session = match get_session(redis.inner(), token).await {
+          Ok(Some(s)) => s,
+          Ok(None) => return Outcome::Error((Status::Unauthorized, ())),
+          Err(_) => return Outcome::Error((Status::InternalServerError, ())),
+        };
 
-    Outcome::Success(AuthContext {
-      user_id: redis_session.account_id,
-      session_id: redis_session.session_id,
-      token: token.to_string(),
-    })
+        Outcome::Success(AuthContext {
+          user_id: redis_session.account_id,
+          session_id: redis_session.session_id,
+          token: token.to_string(),
+        })
+      })
+      .await
+      .clone()
   }
 }

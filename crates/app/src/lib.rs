@@ -1,3 +1,4 @@
+pub mod catchers;
 pub mod guards;
 pub mod routes;
 pub mod utils;
@@ -13,11 +14,14 @@ use kestrel_redis::{
 };
 use rocket::Config as RocketConfig;
 
-use crate::utils::cors::{CorsFairing, preflight};
+use crate::{
+  catchers::too_many_requests::too_many_requests,
+  utils::cors::{CorsFairing, preflight},
+};
 use utils::errors::{
   bad_request, default_catcher, forbidden, internal_error, method_not_allowed,
-  not_acceptable, not_found, service_unavailable, too_many_requests,
-  unauthorized, unprocessable_entity,
+  not_acceptable, not_found, service_unavailable, unauthorized,
+  unprocessable_entity,
 };
 
 #[macro_use]

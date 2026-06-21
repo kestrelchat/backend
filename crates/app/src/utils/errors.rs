@@ -303,12 +303,6 @@ make_catcher!(
   "UNPROCESSABLE_ENTITY"
 );
 make_catcher!(
-  too_many_requests,
-  429,
-  Status::TooManyRequests,
-  "TOO_MANY_REQUESTS"
-);
-make_catcher!(
   internal_error,
   500,
   Status::InternalServerError,

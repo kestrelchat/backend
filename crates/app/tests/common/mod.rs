@@ -160,7 +160,7 @@ pub struct UserCredentials {
 pub async fn register_test_users(
   client: &Arc<TestClient>,
   count: usize,
-) -> Vec<UserCredentials> {
+) -> Result<Vec<UserCredentials>, Box<dyn std::error::Error + Send + Sync>> {
   let time = DateTime::<Utc>::default().nanosecond();
   let mut join_set = JoinSet::new();
   for i in 0..count {
@@ -178,15 +178,32 @@ pub async fn register_test_users(
       });
       let client = client.clone();
       let res = client.post("/auth/register").json(&body).dispatch().await;
-      assert_eq!(res.status().class(), StatusClass::Success);
-      UserCredentials {
+      if res.status().class() != StatusClass::Success {
+        return Err(Box::new(std::io::Error::new(
+          std::io::ErrorKind::Other,
+          format!("HTTP Error: {}", res.status()),
+        )) as Box<dyn std::error::Error + Send + Sync>);
+      }
+      Ok(UserCredentials {
         email,
         username,
         password,
-      }
+      })
     });
   }
-  join_set.join_all().await
+
+  join_set
+    .join_all()
+    .await
+    .into_iter()
+    .fold(Ok(vec![]), |acc, res| {
+      acc.and_then(|mut acc| {
+        res.map(|r| {
+          acc.push(r);
+          acc
+        })
+      })
+    })
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]

@@ -30,7 +30,7 @@ async fn get_user_id(client: &Arc<TestClient>, auth_token: &str) -> String {
 #[rocket::async_test]
 async fn send_friend_request() {
   run_with_containers(async |_, client| {
-    let users = register_test_users(&client, 2).await;
+    let users = register_test_users(&client, 2).await.unwrap();
     let session_a = login(&client, &users[0]).await;
     let session_b = login(&client, &users[1]).await;
 
@@ -57,7 +57,11 @@ async fn send_friend_request() {
 #[rocket::async_test]
 async fn cannot_send_request_to_self() {
   run_with_containers(async |_, client| {
-    let user = register_test_users(&client, 1).await.pop().unwrap();
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
     let session = login(&client, &user).await;
 
     let user_id = get_user_id(&client, &session.auth_token).await;
@@ -78,7 +82,7 @@ async fn cannot_send_request_to_self() {
 #[rocket::async_test]
 async fn duplicate_friend_request_conflict() {
   run_with_containers(async |_, client| {
-    let users = register_test_users(&client, 2).await;
+    let users = register_test_users(&client, 2).await.unwrap();
     let session_a = login(&client, &users[0]).await;
     let session_b = login(&client, &users[1]).await;
 
@@ -109,7 +113,7 @@ async fn duplicate_friend_request_conflict() {
 #[rocket::async_test]
 async fn accept_friend_request() {
   run_with_containers(async |_, client| {
-    let users = register_test_users(&client, 2).await;
+    let users = register_test_users(&client, 2).await.unwrap();
     let session_a = login(&client, &users[0]).await;
     let session_b = login(&client, &users[1]).await;
 
