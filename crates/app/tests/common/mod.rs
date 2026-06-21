@@ -179,10 +179,10 @@ pub async fn register_test_users(
       let client = client.clone();
       let res = client.post("/auth/register").json(&body).dispatch().await;
       if res.status().class() != StatusClass::Success {
-        return Err(Box::new(std::io::Error::new(
-          std::io::ErrorKind::Other,
-          format!("HTTP Error: {}", res.status()),
-        )) as Box<dyn std::error::Error + Send + Sync>);
+        return Err(Box::new(std::io::Error::other(format!(
+          "HTTP Error: {}",
+          res.status()
+        ))) as Box<dyn std::error::Error + Send + Sync>);
       }
       Ok(UserCredentials {
         email,
@@ -196,13 +196,9 @@ pub async fn register_test_users(
     .join_all()
     .await
     .into_iter()
-    .fold(Ok(vec![]), |acc, res| {
-      acc.and_then(|mut acc| {
-        res.map(|r| {
-          acc.push(r);
-          acc
-        })
-      })
+    .try_fold(vec![], |mut acc, res| {
+      acc.push(res?);
+      Ok(acc)
     })
 }
 
