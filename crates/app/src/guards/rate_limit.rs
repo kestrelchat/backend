@@ -57,7 +57,7 @@ impl<'r> FromRequest<'r> for WithinRateLimit {
   async fn from_request(
     req: &'r rocket::Request<'_>,
   ) -> Outcome<Self, Self::Error> {
-    req
+    *req
       .local_cache_async(async {
         let (rate_limiter, redis, auth_ctx) = join!(
           req.guard::<&rocket::State<CompiledRateLimiter>>(),
@@ -99,6 +99,5 @@ impl<'r> FromRequest<'r> for WithinRateLimit {
         }
       })
       .await
-      .clone()
   }
 }
