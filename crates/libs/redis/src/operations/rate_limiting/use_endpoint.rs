@@ -1,8 +1,4 @@
-use std::{
-  fmt::Display,
-  net::IpAddr,
-  time::{Instant, SystemTime},
-};
+use std::{fmt::Display, net::IpAddr, time::SystemTime};
 
 use kestrel_config::structs::features::{
   RateLimitConfig, SystemRateLimitConfig,
@@ -65,7 +61,6 @@ impl CompiledRateLimiter {
     let endpoint_invocation =
       Self::prepare_invoke(endpoint_script, endpoint, user, now_ms);
 
-    let stamp = Instant::now();
     let global_wait: u64 = global_invocation
       .invoke_async(&mut conn)
       .await
@@ -74,9 +69,6 @@ impl CompiledRateLimiter {
       .invoke_async(&mut conn)
       .await
       .map_err(RedisError::Redis)?;
-    let elapsed = stamp.elapsed().as_micros() as u64;
-    // TODO: Remove after investigation
-    eprintln!("Rate limit elapsed: {elapsed}μs");
 
     Ok(global_wait.max(endpoint_wait))
   }
