@@ -5,6 +5,7 @@ use kestrel_config::structs::features::{
 };
 use redis::{Script, ScriptInvocation};
 use rustc_hash::FxHashMap;
+use tracing::warn;
 
 use crate::{connection::Redis, error::RedisError};
 
@@ -61,6 +62,7 @@ impl CompiledRateLimiter {
     let endpoint_invocation =
       Self::prepare_invoke(endpoint_script, endpoint, user, now_ms);
 
+    let start = std::time::Instant::now();
     let global_wait: u64 = global_invocation
       .invoke_async(&mut conn)
       .await
@@ -69,6 +71,17 @@ impl CompiledRateLimiter {
       .invoke_async(&mut conn)
       .await
       .map_err(RedisError::Redis)?;
+    let elapsed = start.elapsed().as_micros() as u64;
+    if elapsed > 100_000 {
+      let slowlog: Result<redis::Value, _> = redis::cmd("SLOWLOG")
+        .arg("GET")
+        .arg(10)
+        .query_async(&mut conn)
+        .await;
+      warn!(
+        "Rate limiting query took {elapsed}µs\nSlowlog report: {slowlog:?}"
+      );
+    }
 
     Ok(global_wait.max(endpoint_wait))
   }
