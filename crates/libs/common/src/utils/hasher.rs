@@ -5,6 +5,7 @@ use argon2::{
   Version,
   password_hash::{SaltString, rand_core::OsRng},
 };
+use zeroize::Zeroizing;
 
 use crate::utils::base32::base32_encode;
 
@@ -22,13 +23,21 @@ pub enum HasherError {
 /// Hashes a password using Argon2.
 ///
 /// Returns a PHC-encoded hash string on success.
-pub async fn password_hash(input: &[u8]) -> Result<String, HasherError> {
+pub async fn password_hash(
+  input: Zeroizing<Vec<u8>>,
+) -> Result<String, HasherError> {
   let argon2 = Argon2::default();
 
-  let salt = SaltString::generate(&mut OsRng);
-  let hash = argon2
-    .hash_password(input, &salt)
-    .map_err(|_| HasherError::InternalError)?;
+  let hash = tokio::task::spawn_blocking(move || {
+    let salt = SaltString::generate(&mut OsRng);
+    let result = argon2
+      .hash_password(input.as_slice(), &salt)
+      .map_err(|_| HasherError::InternalError);
+    Ok(result?.to_string())
+  })
+  .await
+  .map_err(|_| HasherError::InternalError)??
+  .to_string();
 
   Ok(hash.to_string())
 }

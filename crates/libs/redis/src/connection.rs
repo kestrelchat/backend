@@ -1,5 +1,5 @@
 use redis::Client;
-use redis::aio::{ConnectionManager, ConnectionManagerConfig};
+use redis::aio::ConnectionManager;
 
 use crate::error::RedisError;
 
@@ -13,9 +13,7 @@ impl Redis {
     let client = Client::open(url).map_err(RedisError::Client)?;
 
     let conn = client
-      .get_connection_manager_with_config(
-        ConnectionManagerConfig::new().set_response_timeout(None),
-      )
+      .get_connection_manager()
       .await
       .map_err(RedisError::Connection)?;
 

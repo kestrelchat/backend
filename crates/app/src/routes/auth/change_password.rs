@@ -21,7 +21,7 @@ use kestrel_redis::{
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
-use zeroize::{Zeroize, ZeroizeOnDrop};
+use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
 use crate::{
   guards::rate_limit::WithinRateLimit,
@@ -67,9 +67,10 @@ pub async fn change_password(
     .await
     .map_err(ValidationError::Password)?;
 
-  let hashed_password = hasher::password_hash(req.new_password.as_bytes())
-    .await
-    .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
+  let hashed_password =
+    hasher::password_hash(Zeroizing::new(req.new_password.as_bytes().to_vec()))
+      .await
+      .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
   let mut tx = postgres
     .pool()

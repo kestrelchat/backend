@@ -17,6 +17,7 @@ use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use zeroize::Zeroizing;
 
 use crate::{guards::rate_limit::WithinRateLimit, utils::errors::AppError};
 
@@ -99,9 +100,10 @@ pub async fn reset_password(
     .await
     .map_err(|_| AppError::unauthorized("INVALID_TOKEN"))?;
 
-  let hashed_password = hasher::password_hash(req.new_password.as_bytes())
-    .await
-    .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
+  let hashed_password =
+    hasher::password_hash(Zeroizing::new(req.new_password.as_bytes().to_vec()))
+      .await
+      .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
   let mut tx = postgres
     .pool()
