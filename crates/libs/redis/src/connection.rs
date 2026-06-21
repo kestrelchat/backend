@@ -18,7 +18,7 @@ impl Redis {
       use std::time::Duration;
       ConnectionManagerConfig::new()
         .set_connection_timeout(Some(Duration::from_secs(5)))
-        .set_response_timeout(Some(Duration::from_secs(2)))
+        .set_response_timeout(Some(Duration::from_secs(5)))
     }
     #[cfg(not(test))]
     {
