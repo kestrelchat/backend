@@ -12,7 +12,7 @@ use kestrel_config::{
     server::{CorsConfig, ServerConfig},
   },
 };
-use kestrel_server::web;
+use dendryte::web;
 use rocket::{
   futures::join,
   http::{Header, StatusClass},

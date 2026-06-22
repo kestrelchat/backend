@@ -10,6 +10,7 @@ RUN cargo install cargo-chef
 
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
+COPY src ./src
 
 RUN cargo chef prepare --recipe-path recipe.json
 
@@ -32,11 +33,12 @@ RUN if [ "$BUILD_MODE" = "release" ]; then \
 
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
+COPY src ./src
 
 RUN if [ "$BUILD_MODE" = "release" ]; then \
-        cargo build --release -p kestrel_server ; \
+        cargo build --release -p dendryte ; \
     else \
-        cargo build -p kestrel_server ; \
+        cargo build -p dendryte ; \
     fi
 
 # Runtime stage
@@ -49,8 +51,8 @@ RUN apt-get update && apt-get install -y ca-certificates \
 
 ARG BUILD_MODE
 
-COPY --from=builder /app/target/${BUILD_MODE}/kestrel_server /usr/local/bin/kestrel_api
+COPY --from=builder /app/target/${BUILD_MODE}/dendryte /usr/local/bin/dendryte
 
-EXPOSE 5181
+EXPOSE 5187
 
-CMD ["kestrel_api"]
+CMD ["dendryte"]

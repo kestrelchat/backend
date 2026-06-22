@@ -1,4 +1,4 @@
-use kestrel_server::web;
+use dendryte::web;
 
 #[rocket::launch]
 async fn rocket() -> _ {

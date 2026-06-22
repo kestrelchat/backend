@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chrono = { workspace = true }
-kestrel_common = { workspace = true }
-sqlx = { workspace = true, features = ["postgres", "runtime-tokio-native-tls"] }
-thiserror = { workspace = true }
-ulid = { workspace = true }
+chrono = { version = "0.4.44", features = ["serde"] }
+kestrel_common = { version = "0.1.0", path = "../common" }
+sqlx = { version = "0.8.6", features = ["chrono", "postgres", "runtime-tokio-native-tls"] }
+thiserror = "2.0.18"
+ulid = "1.2.1"
