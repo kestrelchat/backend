@@ -17,6 +17,10 @@ venv/
 # Rust / Cargo Build Artifacts
 target
 
+# Profiling / Performance Data
+perf.data
+perf.data.*
+
 # IDE / Editor
 .zed/
 .idea/
