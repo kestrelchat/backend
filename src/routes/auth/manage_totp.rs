@@ -2,7 +2,7 @@ use crate::adapters::totp::TotpSetup;
 use crate::data::models::session::{
   PendingMfa, PendingMfaKind, PendingMfaScope,
 };
-use crate::redis::{
+use crate::database::redis::{
   connection::Redis,
   operations::sessions::{
     create_pending_mfa, delete_pending_mfa, get_pending_mfa,
@@ -10,7 +10,7 @@ use crate::redis::{
 };
 use crate::{
   crypto::hasher,
-  postgres::{
+  database::postgres::{
     connection::Database,
     error::DatabaseError,
     operations::account::{get_account_by_id, set_totp_secret},

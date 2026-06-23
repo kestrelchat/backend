@@ -6,7 +6,7 @@ use crate::{
     normalize,
     validation::{ValidationError, email, password, username},
   },
-  postgres::{
+  database::postgres::{
     connection::Database,
     error::DatabaseError,
     operations::{account::create_account, user::create_user},

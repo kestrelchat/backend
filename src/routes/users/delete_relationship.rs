@@ -1,4 +1,4 @@
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database, error::DatabaseError,
   operations::relationships::delete_relationship as pg_delete_relationship,
 };

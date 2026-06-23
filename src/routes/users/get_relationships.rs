@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database,
   operations::{
     relationships::get_relationships::get_relationships as pg_get_relationships,

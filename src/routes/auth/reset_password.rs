@@ -2,18 +2,20 @@ use crate::{
   config::Config,
   crypto::hasher,
   data::validation::{ValidationError, email, password},
-  errors::AppError,
-  guards::rate_limit::WithinRateLimit,
-  postgres::{
-    connection::Database,
-    operations::account::{
-      change_password, get_account_by_email, set_totp_secret,
+  database::{
+    postgres::{
+      connection::Database,
+      operations::account::{
+        change_password, get_account_by_email, set_totp_secret,
+      },
+    },
+    redis::{
+      connection::Redis,
+      operations::password::{check_reset_token, create_reset_token},
     },
   },
-  redis::{
-    connection::Redis,
-    operations::password::{check_reset_token, create_reset_token},
-  },
+  errors::AppError,
+  guards::rate_limit::WithinRateLimit,
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;

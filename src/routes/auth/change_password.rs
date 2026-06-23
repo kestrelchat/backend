@@ -1,11 +1,11 @@
 use crate::data::validation::{ValidationError, password};
-use crate::redis::{
+use crate::database::redis::{
   connection::Redis,
   operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
 };
 use crate::{
   crypto::hasher,
-  postgres::{
+  database::postgres::{
     connection::Database,
     error::DatabaseError,
     operations::{

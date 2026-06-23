@@ -1,6 +1,6 @@
 use crate::{
   crypto::hasher,
-  postgres::{
+  database::postgres::{
     connection::Database,
     error::DatabaseError,
     operations::{

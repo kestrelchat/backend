@@ -3,11 +3,10 @@ pub mod catchers;
 pub mod config;
 pub mod crypto;
 pub mod data;
+pub mod database;
 pub mod errors;
 pub mod fairings;
 pub mod guards;
-pub mod postgres;
-pub mod redis;
 pub mod routes;
 
 use std::net::IpAddr;
@@ -15,10 +14,12 @@ use std::net::IpAddr;
 use crate::{
   adapters::geoip::GeoIpClient,
   config::Config as AppConfig,
-  postgres::connection::Database,
-  redis::{
-    connection::Redis,
-    operations::rate_limiting::use_endpoint::CompiledRateLimiter,
+  database::{
+    postgres::connection::Database,
+    redis::{
+      connection::Redis,
+      operations::rate_limiting::use_endpoint::CompiledRateLimiter,
+    },
   },
 };
 use rocket::Config as RocketConfig;

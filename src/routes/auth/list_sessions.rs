@@ -1,5 +1,5 @@
 use crate::data::models::Session;
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database, operations::sessions::lookup_sessions::lookup_sessions,
 };
 use chrono::{DateTime, Utc};

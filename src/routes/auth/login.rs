@@ -11,19 +11,21 @@ use crate::{
     models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
     normalize,
   },
-  postgres::{
-    connection::Database,
-    error::DatabaseError,
-    operations::{
-      account::{get_account_by_email, get_account_by_id},
-      sessions::{SessionMetadata, create_session as pg_create_session},
+  database::{
+    postgres::{
+      connection::Database,
+      error::DatabaseError,
+      operations::{
+        account::{get_account_by_email, get_account_by_id},
+        sessions::{SessionMetadata, create_session as pg_create_session},
+      },
     },
-  },
-  redis::{
-    connection::Redis,
-    operations::sessions::{
-      create_pending_mfa, create_session as redis_create_session,
-      delete_pending_mfa, get_pending_mfa,
+    redis::{
+      connection::Redis,
+      operations::sessions::{
+        create_pending_mfa, create_session as redis_create_session,
+        delete_pending_mfa, get_pending_mfa,
+      },
     },
   },
 };

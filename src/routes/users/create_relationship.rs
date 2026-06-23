@@ -1,5 +1,5 @@
 use crate::data::models::RelationshipAction;
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database, error::DatabaseError,
   operations::relationships::create_relationship as pg_create_relationship,
 };

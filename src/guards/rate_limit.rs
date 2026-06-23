@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use crate::redis::{
+use crate::database::redis::{
   connection::Redis,
   operations::rate_limiting::use_endpoint::{
     CompiledRateLimiter, RateLimitUserId,

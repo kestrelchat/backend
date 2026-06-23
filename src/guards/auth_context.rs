@@ -4,8 +4,8 @@ use rocket::{
   request::{FromRequest, Outcome},
 };
 
-use crate::redis::connection::Redis;
-use crate::redis::operations::sessions::get_session;
+use crate::database::redis::connection::Redis;
+use crate::database::redis::operations::sessions::get_session;
 use rocket_okapi::{
   r#gen::OpenApiGenerator,
   request::{OpenApiFromRequest, RequestHeaderInput},

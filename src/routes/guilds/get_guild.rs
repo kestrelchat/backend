@@ -1,4 +1,4 @@
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database, operations::guilds::get_guild as pg_get_guild,
 };
 use rocket::{State, serde::json::Json};

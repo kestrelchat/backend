@@ -1,4 +1,4 @@
-use crate::postgres::{
+use crate::database::postgres::{
   connection::Database,
   operations::guilds::{
     get_guild as pg_get_guild, update_guild as pg_update_guild,
@@ -52,9 +52,9 @@ pub async fn update_guild(
   let updated = pg_update_guild(postgres, guild_id, &req.name)
     .await
     .map_err(|e| match e {
-      crate::postgres::error::DatabaseError::CheckViolation(ref c)
-        if c == "guild_name_length" =>
-      {
+      crate::database::postgres::error::DatabaseError::CheckViolation(
+        ref c,
+      ) if c == "guild_name_length" => {
         AppError::bad_request("GUILD_NAME_INVALID_LENGTH")
       }
       other => AppError::from(other),
