@@ -1,8 +1,8 @@
+use crate::redis::error::RedisError;
 use kestrel_common::utils::validation::{
   ValidationError, email, password, username,
 };
 use kestrel_postgres::error::DatabaseError;
-use crate::redis::error::RedisError;
 use rocket::serde::json::Json;
 use rocket::{
   Request, catch, http::Status, response::Responder, response::status::Custom,

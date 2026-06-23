@@ -8,13 +8,13 @@ pub mod routes;
 
 use std::net::IpAddr;
 
-use kestrel_common::utils::geoip::GeoIpClient;
-use kestrel_config::Config as AppConfig;
-use kestrel_postgres::connection::Database;
 use crate::redis::{
   connection::Redis,
   operations::rate_limiting::use_endpoint::CompiledRateLimiter,
 };
+use kestrel_common::utils::geoip::GeoIpClient;
+use kestrel_config::Config as AppConfig;
+use kestrel_postgres::connection::Database;
 use rocket::Config as RocketConfig;
 
 use crate::errors::{

@@ -1,3 +1,10 @@
+use crate::redis::{
+  connection::Redis,
+  operations::sessions::{
+    create_pending_mfa, create_session as redis_create_session,
+    delete_pending_mfa, get_pending_mfa,
+  },
+};
 use kestrel_common::{
   hcaptcha::handler::{HCaptchaForm, handle_form},
   models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
@@ -16,13 +23,6 @@ use kestrel_postgres::{
   operations::{
     account::{get_account_by_email, get_account_by_id},
     sessions::{SessionMetadata, create_session as pg_create_session},
-  },
-};
-use crate::redis::{
-  connection::Redis,
-  operations::sessions::{
-    create_pending_mfa, create_session as redis_create_session,
-    delete_pending_mfa, get_pending_mfa,
   },
 };
 use rocket::{State, serde::json::Json};

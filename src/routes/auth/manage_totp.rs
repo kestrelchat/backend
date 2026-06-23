@@ -1,3 +1,9 @@
+use crate::redis::{
+  connection::Redis,
+  operations::sessions::{
+    create_pending_mfa, delete_pending_mfa, get_pending_mfa,
+  },
+};
 use kestrel_common::{
   models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
   utils::{hasher, totp::TotpSetup},
@@ -6,12 +12,6 @@ use kestrel_postgres::{
   connection::Database,
   error::DatabaseError,
   operations::account::{get_account_by_id, set_totp_secret},
-};
-use crate::redis::{
-  connection::Redis,
-  operations::sessions::{
-    create_pending_mfa, delete_pending_mfa, get_pending_mfa,
-  },
 };
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};

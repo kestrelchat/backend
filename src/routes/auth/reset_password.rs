@@ -1,3 +1,7 @@
+use crate::redis::{
+  connection::Redis,
+  operations::password::{check_reset_token, create_reset_token},
+};
 use kestrel_common::utils::{
   hasher,
   validation::{ValidationError, email, password},
@@ -8,10 +12,6 @@ use kestrel_postgres::{
   operations::account::{
     change_password, get_account_by_email, set_totp_secret,
   },
-};
-use crate::redis::{
-  connection::Redis,
-  operations::password::{check_reset_token, create_reset_token},
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
