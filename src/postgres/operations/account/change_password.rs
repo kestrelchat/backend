@@ -1,7 +1,7 @@
 use chrono::Utc;
 use sqlx::{PgExecutor, query};
 
-use crate::error::DatabaseError;
+use crate::postgres::error::DatabaseError;
 
 pub async fn change_password(
   db: impl PgExecutor<'_>,

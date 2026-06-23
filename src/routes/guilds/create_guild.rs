@@ -1,4 +1,4 @@
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database, operations::guilds::create_guild as pg_create_guild,
 };
 use rocket::{State, serde::json::Json};
@@ -40,7 +40,7 @@ pub async fn create_guild(
   let guild = pg_create_guild(postgres, &req.name, &user_id)
     .await
     .map_err(|e| match e {
-      kestrel_postgres::error::DatabaseError::CheckViolation(ref c)
+      crate::postgres::error::DatabaseError::CheckViolation(ref c)
         if c == "guild_name_length" =>
       {
         AppError::bad_request("GUILD_NAME_INVALID_LENGTH")

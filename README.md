@@ -48,7 +48,6 @@ Everything should be preconfigured for hosting on a single machine, through Dock
 ## Libraries
 - **kestrel_common** - Shared data models, tokens, and utilities (GeoIP, user-agent parsing, hCaptcha)
 - **kestrel_config** - Shared configuration library for Kestrel
-- **kestrel_postgres** - PostgreSQL connection management and database operations
 - **kestrel_redis** - Redis connection management and session caching
 
 ## Running

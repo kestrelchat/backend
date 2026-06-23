@@ -1,5 +1,4 @@
-use kestrel_common::utils::hasher;
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database,
   error::DatabaseError,
   operations::{
@@ -7,6 +6,7 @@ use kestrel_postgres::{
     guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
   },
 };
+use kestrel_common::utils::hasher;
 use rocket::{State, http::Status, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;

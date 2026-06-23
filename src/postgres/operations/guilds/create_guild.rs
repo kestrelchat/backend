@@ -2,7 +2,7 @@ use chrono::Utc;
 use sqlx::query_as;
 use ulid::Ulid;
 
-use crate::{connection::Database, error::DatabaseError};
+use crate::postgres::{connection::Database, error::DatabaseError};
 use kestrel_common::models::Guild;
 
 pub async fn create_guild(

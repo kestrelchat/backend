@@ -1,6 +1,6 @@
 use kestrel_common::models::user::UserSummary;
 
-use crate::{connection::Database, error::DatabaseError};
+use crate::postgres::{connection::Database, error::DatabaseError};
 
 pub async fn batch_get_user_summaries(
   db: &Database,

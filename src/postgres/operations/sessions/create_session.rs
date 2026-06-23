@@ -6,7 +6,7 @@ use kestrel_common::{
 };
 use ulid::Ulid;
 
-use crate::{connection::Database, error::DatabaseError};
+use crate::postgres::{connection::Database, error::DatabaseError};
 
 pub struct PgCreatedSession {
   pub session: Session,

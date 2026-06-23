@@ -1,12 +1,4 @@
-use crate::redis::{
-  connection::Redis,
-  operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
-};
-use kestrel_common::utils::{
-  hasher,
-  validation::{ValidationError, password},
-};
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database,
   error::DatabaseError,
   operations::{
@@ -16,6 +8,14 @@ use kestrel_postgres::{
     },
     sessions::revoke_all_sessions as postgres_revoke_all_sessions,
   },
+};
+use crate::redis::{
+  connection::Redis,
+  operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
+};
+use kestrel_common::utils::{
+  hasher,
+  validation::{ValidationError, password},
 };
 
 use rocket::{State, serde::json::Json};

@@ -1,4 +1,4 @@
-use kestrel_postgres::{
+use dendryte::postgres::{
   connection::Database, operations::account::get_account_by_email,
 };
 use rocket::http::StatusClass;

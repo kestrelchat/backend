@@ -1,4 +1,4 @@
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database, operations::guilds::get_guild as pg_get_guild,
 };
 use rocket::{State, serde::json::Json};

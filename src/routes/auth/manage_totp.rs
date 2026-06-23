@@ -1,3 +1,8 @@
+use crate::postgres::{
+  connection::Database,
+  error::DatabaseError,
+  operations::account::{get_account_by_id, set_totp_secret},
+};
 use crate::redis::{
   connection::Redis,
   operations::sessions::{
@@ -7,11 +12,6 @@ use crate::redis::{
 use kestrel_common::{
   models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
   utils::{hasher, totp::TotpSetup},
-};
-use kestrel_postgres::{
-  connection::Database,
-  error::DatabaseError,
-  operations::account::{get_account_by_id, set_totp_secret},
 };
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};

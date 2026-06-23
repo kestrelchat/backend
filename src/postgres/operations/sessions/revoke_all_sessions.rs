@@ -1,5 +1,5 @@
-use crate::connection::Database;
-use crate::error::DatabaseError;
+use crate::postgres::connection::Database;
+use crate::postgres::error::DatabaseError;
 
 pub async fn revoke_all_sessions(
   db: &Database,

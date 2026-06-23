@@ -1,4 +1,4 @@
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database, error::DatabaseError,
   operations::relationships::delete_relationship as pg_delete_relationship,
 };

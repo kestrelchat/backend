@@ -1,3 +1,11 @@
+use crate::postgres::{
+  connection::Database,
+  error::DatabaseError,
+  operations::{
+    account::{get_account_by_email, get_account_by_id},
+    sessions::{SessionMetadata, create_session as pg_create_session},
+  },
+};
 use crate::redis::{
   connection::Redis,
   operations::sessions::{
@@ -17,14 +25,6 @@ use kestrel_common::{
   },
 };
 use kestrel_config::Config;
-use kestrel_postgres::{
-  connection::Database,
-  error::DatabaseError,
-  operations::{
-    account::{get_account_by_email, get_account_by_id},
-    sessions::{SessionMetadata, create_session as pg_create_session},
-  },
-};
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};

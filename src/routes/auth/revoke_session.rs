@@ -1,15 +1,15 @@
+use crate::postgres::{
+  connection::Database,
+  operations::sessions::{
+    revoke_all_sessions as postgres_revoke_all_sessions,
+    revoke_session as postgres_revoke_session,
+  },
+};
 use crate::redis::{
   connection::Redis,
   operations::sessions::{
     revoke_all_sessions as redis_revoke_all_sessions,
     revoke_session as redis_revoke_session,
-  },
-};
-use kestrel_postgres::{
-  connection::Database,
-  operations::sessions::{
-    revoke_all_sessions as postgres_revoke_all_sessions,
-    revoke_session as postgres_revoke_session,
   },
 };
 use rocket::State;

@@ -737,7 +737,6 @@ dependencies = [
  "chrono",
  "kestrel_common",
  "kestrel_config",
- "kestrel_postgres",
  "redis",
  "rocket",
  "rocket_okapi",
@@ -745,6 +744,7 @@ dependencies = [
  "schemars 0.8.22",
  "serde",
  "serde_json",
+ "sqlx",
  "testcontainers-modules",
  "thiserror",
  "ulid",
@@ -1862,17 +1862,6 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "toml 1.1.2+spec-1.1.0",
-]
-
-[[package]]
-name = "kestrel_postgres"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "kestrel_common",
- "sqlx",
- "thiserror",
- "ulid",
 ]
 
 [[package]]

@@ -1,6 +1,6 @@
 use kestrel_common::models::{Relationship, RelationshipType};
 
-use crate::{connection::Database, error::DatabaseError};
+use crate::postgres::{connection::Database, error::DatabaseError};
 
 pub struct RelationshipsBundle {
   pub friends: Vec<Relationship>,

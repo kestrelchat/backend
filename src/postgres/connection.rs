@@ -1,7 +1,7 @@
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
 
-use crate::error::DatabaseError;
+use crate::postgres::error::DatabaseError;
 
 #[derive(Clone)]
 pub struct Database {

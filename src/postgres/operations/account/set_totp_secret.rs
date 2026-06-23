@@ -1,6 +1,6 @@
 use sqlx::{PgExecutor, query};
 
-use crate::error::DatabaseError;
+use crate::postgres::error::DatabaseError;
 
 pub async fn set_totp_secret(
   db: impl PgExecutor<'_>,

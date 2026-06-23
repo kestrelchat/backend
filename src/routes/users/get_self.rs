@@ -1,8 +1,8 @@
-use chrono::{DateTime, Utc};
-use kestrel_common::models::Session;
-use kestrel_postgres::{
+use crate::postgres::{
   connection::Database, operations::sessions::fetch_session::lookup_session,
 };
+use chrono::{DateTime, Utc};
+use kestrel_common::models::Session;
 use rocket::{State, get, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;

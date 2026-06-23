@@ -1,6 +1,6 @@
 use sqlx::{Row, query};
 
-use crate::{connection::Database, error::DatabaseError};
+use crate::postgres::{connection::Database, error::DatabaseError};
 
 /// Returns the estimated count of users using pg_class.
 ///
