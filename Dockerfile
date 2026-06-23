@@ -1,58 +1,41 @@
 ARG RUST_VERSION=1.96
+ARG ALPINE_VERSION=3.24
 ARG BUILD_MODE=debug
 
 # Planner Stage
-FROM rust:${RUST_VERSION} AS planner
-
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS planner
 WORKDIR /app
-
-RUN cargo install cargo-chef
-
+RUN apk add --no-cache musl-dev gcc pkgconfig openssl-dev openssl-libs-static
+RUN cargo install cargo-chef --locked
 COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
 COPY src ./src
-
+COPY assets ./assets
+COPY migrations ./migrations
 RUN cargo chef prepare --recipe-path recipe.json
 
 # Builder Stage
-FROM rust:${RUST_VERSION} AS builder
-
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 WORKDIR /app
-
-RUN cargo install cargo-chef
-
+RUN apk add --no-cache musl-dev gcc pkgconfig openssl-dev openssl-libs-static
+RUN cargo install cargo-chef --locked
 COPY --from=planner /app/recipe.json recipe.json
-
 ARG BUILD_MODE
-
-RUN if [ "$BUILD_MODE" = "release" ]; then \
-        cargo chef cook --release --recipe-path recipe.json ; \
-    else \
-        cargo chef cook --recipe-path recipe.json ; \
-    fi
-
+RUN cargo chef cook $( [ "$BUILD_MODE" = "release" ] && echo "--release" ) --recipe-path recipe.json
 COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
 COPY src ./src
+COPY assets ./assets
+COPY migrations ./migrations
+RUN cargo build $( [ "$BUILD_MODE" = "release" ] && echo "--release" ) -p dendryte
 
-RUN if [ "$BUILD_MODE" = "release" ]; then \
-        cargo build --release -p dendryte ; \
-    else \
-        cargo build -p dendryte ; \
-    fi
-
-# Runtime stage
-FROM debian:trixie-slim AS runtime
-
+# Runtime Stage
+FROM alpine:${ALPINE_VERSION} AS runtime
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
+RUN apk add --no-cache ca-certificates curl
 ARG BUILD_MODE
-
 COPY --from=builder /app/target/${BUILD_MODE}/dendryte /usr/local/bin/dendryte
-
 EXPOSE 5187
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:5187/ || exit 1
 
 CMD ["dendryte"]

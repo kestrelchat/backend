@@ -6,8 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        BUILD_MODE: ${BUILD_MODE:-debug}
 
     volumes:
       - ./dendryte.toml:/var/dendryte/conf.toml:ro,z
@@ -19,7 +17,12 @@ services:
 
     restart: unless-stopped
 
-    profiles: ["prod", "dev"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5187/"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
 
   postgres:
     container_name: postgres
@@ -37,8 +40,6 @@ services:
 
     restart: unless-stopped
 
-    profiles: ["dev"]
-
   redis:
     container_name: redis
     image: redis:7-alpine
@@ -52,8 +53,6 @@ services:
       - "6379:6379"
 
     restart: unless-stopped
-
-    profiles: ["dev"]
 
 volumes:
   postgres_data:

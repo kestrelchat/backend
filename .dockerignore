@@ -1,0 +1,25 @@
+# Rust / Cargo Build Artifacts
+target/
+
+# Version Control
+.git/
+.gitattributes
+.gitignore
+.github/
+
+# Config Files
+*.toml
+!Cargo.toml
+!Cargo.lock
+!rustfmt.toml
+
+# IDE / Editor
+.zed/
+
+# Environment
+.env
+
+# Docker
+Dockerfile
+.dockerignore
+compose.yml
