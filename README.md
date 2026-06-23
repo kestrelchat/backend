@@ -20,11 +20,7 @@
 
 # About
 
-Kestrel is a free, open-source modern instant-messaging platform.
-
-It is designed to be self-hostable, extensible, and lightweight.
-
-This repository contains only the backend implementation of the system.
+Dendryte is the official open-source server implementation for Kestrel, an end-to-end communication platform. It's built and maintained by the Kestrel team alongside a growing community of contributors who help shape its development.
 
 # Contributing
 ## Prerequisites
