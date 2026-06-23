@@ -42,7 +42,7 @@ impl Email {
       return Err(ValidationError::InvalidStructure);
     }
 
-    if local.as_bytes().len() > 64 || domain.as_bytes().len() > 255 {
+    if local.len() > 64 || domain.len() > 255 {
       return Err(ValidationError::TooLong);
     }
 

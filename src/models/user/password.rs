@@ -3,7 +3,7 @@ pub struct Password<'p>(&'p str);
 
 impl<'p> AsRef<str> for Password<'p> {
   fn as_ref(&self) -> &str {
-    &self.0
+    self.0
   }
 }
 
