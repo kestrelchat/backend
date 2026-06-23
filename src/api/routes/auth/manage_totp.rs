@@ -1,31 +1,27 @@
-use crate::adapters::totp::TotpSetup;
-use crate::data::models::session::{
-  PendingMfa, PendingMfaKind, PendingMfaScope,
-};
-use crate::database::redis::{
-  connection::Redis,
-  operations::sessions::{
-    create_pending_mfa, delete_pending_mfa, get_pending_mfa,
-  },
-};
 use crate::{
-  crypto::hasher,
-  database::postgres::{
-    connection::Database,
-    error::DatabaseError,
-    operations::account::{get_account_by_id, set_totp_secret},
+  adapters::totp::TotpSetup,
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
+  crypto::{hasher, totp_secret::encrypt_totp_secret},
+  data::models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
+  database::{
+    postgres::{
+      connection::Database,
+      error::DatabaseError,
+      operations::account::{get_account_by_id, set_totp_secret},
+    },
+    redis::{
+      connection::Redis,
+      operations::sessions::{
+        create_pending_mfa, delete_pending_mfa, get_pending_mfa,
+      },
+    },
   },
+  errors::AppError,
 };
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
-
-use crate::{
-  crypto::totp_secret::encrypt_totp_secret,
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
 
 #[derive(Serialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct EnableTotpResponse {

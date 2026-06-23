@@ -1,5 +1,6 @@
 use crate::{
   adapters::hcaptcha::handler::{HCaptchaForm, handle_form},
+  api::guards::rate_limit::WithinRateLimit,
   config::Config,
   crypto::hasher,
   data::{
@@ -11,14 +12,13 @@ use crate::{
     error::DatabaseError,
     operations::{account::create_account, user::create_user},
   },
+  errors::AppError,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
-
-use crate::{errors::AppError, guards::rate_limit::WithinRateLimit};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct RegisterRequest {

@@ -1,9 +1,10 @@
-use std::borrow::Cow;
-
-use crate::database::redis::{
-  connection::Redis,
-  operations::rate_limiting::use_endpoint::{
-    CompiledRateLimiter, RateLimitUserId,
+use crate::{
+  api::guards::auth_context::AuthContext,
+  database::redis::{
+    connection::Redis,
+    operations::rate_limiting::use_endpoint::{
+      CompiledRateLimiter, RateLimitUserId,
+    },
   },
 };
 use rocket::{
@@ -15,8 +16,7 @@ use rocket_okapi::{
   r#gen::OpenApiGenerator,
   request::{OpenApiFromRequest, RequestHeaderInput},
 };
-
-use crate::guards::auth_context::AuthContext;
+use std::borrow::Cow;
 
 /// A guard that checks if the request is within the rate limit for the endpoint.
 ///

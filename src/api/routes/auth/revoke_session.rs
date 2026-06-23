@@ -1,24 +1,25 @@
-use crate::database::postgres::{
-  connection::Database,
-  operations::sessions::{
-    revoke_all_sessions as postgres_revoke_all_sessions,
-    revoke_session as postgres_revoke_session,
+use crate::{
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
+  database::{
+    postgres::{
+      connection::Database,
+      operations::sessions::{
+        revoke_all_sessions as postgres_revoke_all_sessions,
+        revoke_session as postgres_revoke_session,
+      },
+    },
+    redis::{
+      connection::Redis,
+      operations::sessions::{
+        revoke_all_sessions as redis_revoke_all_sessions,
+        revoke_session as redis_revoke_session,
+      },
+    },
   },
-};
-use crate::database::redis::{
-  connection::Redis,
-  operations::sessions::{
-    revoke_all_sessions as redis_revoke_all_sessions,
-    revoke_session as redis_revoke_session,
-  },
+  errors::AppError,
 };
 use rocket::State;
 use rocket_okapi::openapi;
-
-use crate::{
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
 
 #[openapi(tag = "Sessions")]
 #[post("/logout")]

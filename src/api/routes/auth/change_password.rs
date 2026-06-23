@@ -1,33 +1,34 @@
-use crate::data::validation::{ValidationError, password};
-use crate::database::redis::{
-  connection::Redis,
-  operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
-};
 use crate::{
-  crypto::hasher,
-  database::postgres::{
-    connection::Database,
-    error::DatabaseError,
-    operations::{
-      account::{
-        change_password as postgres_change_password, get_account_by_id,
-        set_totp_secret,
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
+  crypto::{
+    hasher,
+    totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
+  },
+  data::validation::{ValidationError, password},
+  database::{
+    postgres::{
+      connection::Database,
+      error::DatabaseError,
+      operations::{
+        account::{
+          change_password as postgres_change_password, get_account_by_id,
+          set_totp_secret,
+        },
+        sessions::revoke_all_sessions as postgres_revoke_all_sessions,
       },
-      sessions::revoke_all_sessions as postgres_revoke_all_sessions,
+    },
+    redis::{
+      connection::Redis,
+      operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
     },
   },
+  errors::AppError,
 };
 
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
-
-use crate::{
-  crypto::totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct ChangePasswordRequest {

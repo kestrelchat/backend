@@ -1,11 +1,10 @@
+use crate::api::guards::rate_limit::{HitRateLimit, WithinRateLimit};
 use rocket::{
   Response,
   http::{Header, Status},
   request::Outcome,
   response::Responder,
 };
-
-use crate::guards::rate_limit::{HitRateLimit, WithinRateLimit};
 
 struct RateLimitResponder<'inner>(
   &'inner Outcome<WithinRateLimit, Option<HitRateLimit>>,

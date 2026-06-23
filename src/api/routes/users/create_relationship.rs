@@ -1,13 +1,15 @@
-use crate::data::models::RelationshipAction;
-use crate::database::postgres::{
-  connection::Database, error::DatabaseError,
-  operations::relationships::create_relationship as pg_create_relationship,
+use crate::{
+  api::guards::auth_context::AuthContext,
+  data::models::RelationshipAction,
+  database::postgres::{
+    connection::Database, error::DatabaseError,
+    operations::relationships::create_relationship as pg_create_relationship,
+  },
+  errors::AppError,
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use serde::Deserialize;
-
-use crate::{errors::AppError, guards::auth_context::AuthContext};
 
 #[derive(Deserialize, schemars::JsonSchema)]
 pub struct CreateRelationship {

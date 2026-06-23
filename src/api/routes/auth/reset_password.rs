@@ -1,4 +1,5 @@
 use crate::{
+  api::guards::rate_limit::WithinRateLimit,
   config::Config,
   crypto::hasher,
   data::validation::{ValidationError, email, password},
@@ -15,7 +16,6 @@ use crate::{
     },
   },
   errors::AppError,
-  guards::rate_limit::WithinRateLimit,
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;

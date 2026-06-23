@@ -5,8 +5,12 @@ use crate::{
     totp::TotpSetup,
     user_agent::parse_user_agent,
   },
+  api::guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
   config::Config,
-  crypto::hasher::{self, DECOY_PASSWORD_HASH},
+  crypto::{
+    hasher::{self, DECOY_PASSWORD_HASH},
+    totp_secret::decrypt_totp_secret,
+  },
   data::{
     models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
     normalize,
@@ -28,17 +32,12 @@ use crate::{
       },
     },
   },
+  errors::AppError,
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
-
-use crate::{
-  crypto::totp_secret::decrypt_totp_secret,
-  errors::AppError,
-  guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
-};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct LoginRequest {

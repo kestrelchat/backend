@@ -1,18 +1,19 @@
 pub mod adapters;
-pub mod catchers;
+pub mod api;
 pub mod config;
 pub mod crypto;
 pub mod data;
 pub mod database;
 pub mod errors;
-pub mod fairings;
-pub mod guards;
-pub mod routes;
 
 use std::net::IpAddr;
 
 use crate::{
   adapters::geoip::GeoIpClient,
+  api::{
+    catchers::too_many_requests::too_many_requests,
+    fairings::cors::{CorsFairing, preflight},
+  },
   config::Config as AppConfig,
   database::{
     postgres::connection::Database,
@@ -21,18 +22,13 @@ use crate::{
       operations::rate_limiting::use_endpoint::CompiledRateLimiter,
     },
   },
+  errors::{
+    bad_request, default_catcher, forbidden, internal_error,
+    method_not_allowed, not_acceptable, not_found, service_unavailable,
+    unauthorized, unprocessable_entity,
+  },
 };
 use rocket::Config as RocketConfig;
-
-use crate::errors::{
-  bad_request, default_catcher, forbidden, internal_error, method_not_allowed,
-  not_acceptable, not_found, service_unavailable, unauthorized,
-  unprocessable_entity,
-};
-use crate::{
-  catchers::too_many_requests::too_many_requests,
-  fairings::cors::{CorsFairing, preflight},
-};
 
 #[macro_use]
 extern crate rocket;
@@ -123,5 +119,5 @@ pub async fn web(
       ],
     );
 
-  Ok(routes::mount(rocket))
+  Ok(api::routes::mount(rocket))
 }

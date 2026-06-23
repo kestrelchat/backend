@@ -1,18 +1,18 @@
-use std::collections::{HashMap, HashSet};
-
-use crate::database::postgres::{
-  connection::Database,
-  operations::{
-    relationships::get_relationships::get_relationships as pg_get_relationships,
-    user::batch_get_user_summaries as pg_batch_get_user_summaries,
+use crate::{
+  api::guards::auth_context::AuthContext,
+  database::postgres::{
+    connection::Database,
+    operations::{
+      relationships::get_relationships::get_relationships as pg_get_relationships,
+      user::batch_get_user_summaries as pg_batch_get_user_summaries,
+    },
   },
+  errors::AppError,
 };
-
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use serde::{Deserialize, Serialize};
-
-use crate::{errors::AppError, guards::auth_context::AuthContext};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RelationshipUser {

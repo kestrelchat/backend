@@ -1,4 +1,5 @@
 use crate::{
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   crypto::hasher,
   database::postgres::{
     connection::Database,
@@ -8,17 +9,13 @@ use crate::{
       guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
     },
   },
+  errors::AppError,
 };
 use rocket::{State, http::Status, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
-
-use crate::{
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, JsonSchema)]
 pub struct DeleteGuildRequest {

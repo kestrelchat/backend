@@ -1,11 +1,13 @@
-use crate::database::postgres::{
-  connection::Database, error::DatabaseError,
-  operations::relationships::delete_relationship as pg_delete_relationship,
+use crate::{
+  api::guards::auth_context::AuthContext,
+  database::postgres::{
+    connection::Database, error::DatabaseError,
+    operations::relationships::delete_relationship as pg_delete_relationship,
+  },
+  errors::AppError,
 };
 use rocket::State;
 use rocket_okapi::openapi;
-
-use crate::{errors::AppError, guards::auth_context::AuthContext};
 
 #[openapi(tag = "Relationships")]
 #[delete("/@me/relationships/<target_id>")]

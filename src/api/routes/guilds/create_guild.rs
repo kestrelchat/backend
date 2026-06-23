@@ -1,15 +1,14 @@
-use crate::database::postgres::{
-  connection::Database, operations::guilds::create_guild as pg_create_guild,
+use crate::{
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
+  database::postgres::{
+    connection::Database, operations::guilds::create_guild as pg_create_guild,
+  },
+  errors::AppError,
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
-use crate::{
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
 
 #[derive(Deserialize, JsonSchema)]
 pub struct CreateGuildRequest {

@@ -1,6 +1,10 @@
-use crate::data::models::Session;
-use crate::database::postgres::{
-  connection::Database, operations::sessions::lookup_sessions::lookup_sessions,
+use crate::{
+  api::guards::auth_context::AuthContext,
+  data::models::Session,
+  database::postgres::{
+    connection::Database, operations::sessions::fetch_session::lookup_session,
+  },
+  errors::AppError,
 };
 use chrono::{DateTime, Utc};
 use rocket::{State, get, serde::json::Json};
@@ -8,14 +12,10 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Serialize;
 
-use crate::{
-  errors::AppError,
-  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-};
-
 #[derive(Serialize, JsonSchema)]
-pub struct SessionResponse {
-  pub sessions: Vec<SessionView>,
+pub struct GetSelfResponse {
+  pub id: String,
+  pub session: SessionView,
 }
 
 #[derive(Serialize, JsonSchema)]
@@ -33,18 +33,17 @@ pub struct SessionView {
 }
 
 #[openapi(tag = "Sessions")]
-#[get("/sessions")]
-pub async fn list_sessions(
-  _within_rate_limit: WithinRateLimit,
+#[get("/@me")]
+pub async fn get_self(
   postgres: &State<Database>,
   auth_ctx: AuthContext,
-) -> Result<Json<SessionResponse>, AppError> {
+) -> Result<Json<GetSelfResponse>, AppError> {
   let user_id = auth_ctx.user_id;
+  let session_id = auth_ctx.session_id;
 
-  let sessions = lookup_sessions(postgres, &user_id)
+  let session = lookup_session(postgres, &user_id, &session_id)
     .await
-    .map_err(AppError::from)?
-    .into_iter()
+    .map_err(AppError::from)
     .map(|s: Session| SessionView {
       id: s.id,
 
@@ -56,8 +55,10 @@ pub async fn list_sessions(
       platform: s.platform,
 
       last_used_at: s.last_used_at,
-    })
-    .collect::<Vec<_>>();
+    })?;
 
-  Ok(Json(SessionResponse { sessions }))
+  Ok(Json(GetSelfResponse {
+    id: user_id,
+    session,
+  }))
 }
