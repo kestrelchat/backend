@@ -42,28 +42,19 @@ Everything should be preconfigured for hosting on a single machine, through Dock
 - **kestrel_server** - Unified server binary (REST API, WebSocket, Swagger docs)
 
 
-## Running
+## Running Dendryte
 
-### With Docker
+### For Development
 
-> Recommended for most users.
+#### With Docker
 
-Run the full stack (server + Postgres + Redis) for development:
+> Recommended for most developers.
+
 ```bash
-BUILD_MODE=debug docker compose --profile dev up --build
+docker compose up --build
 ```
 
-Run only the server for production (requires external Postgres/Redis):
-```bash
-BUILD_MODE=release docker compose --profile prod up --build
-```
-
-#### Build Mode
-`BUILD_MODE` controls whether Rust is compiled in debug (fast, unoptimized) or release (optimized for production) mode inside Docker images.
-
-Using `BUILD_MODE=debug` is recommended during development.
-
-### Without Docker
+#### Without Docker
 
 Set your config path:
 ```bash
@@ -72,14 +63,20 @@ export crate::config=path/to/dendryte.toml
 
 Then run the server:
 ```bash
-cargo run -p kestrel_server
+cargo run
 ```
 
-Any external services (databases, etc.) must be configured in `kestrel.toml`.
+Any external services (databases, etc.) must be configured in `dendryte.toml`.
+
+### For Production
+
+Pre-built Docker images are not yet available. You can build a release image yourself with `docker build --build-arg BUILD_MODE=release .`. Production deployment docs will follow once the project is production-ready.
+
+Please note that Dendryte is still under active development and has not yet been recommended for production use.
 
 # External Libraries
 
-Kestrel Backend is built on top of the following open-source Rust libraries:
+Dendryte is built on top of the following open-source Rust libraries:
 
 - [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2)
 - [async-trait](https://github.com/dtolnay/async-trait)
