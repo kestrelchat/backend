@@ -25,7 +25,7 @@ pub struct Config {
 impl Config {
   pub fn load() -> Result<Self, ConfigError> {
     let path = std::env::var("crate::config")
-      .unwrap_or_else(|_| "/var/kestrel/conf.toml".into());
+      .unwrap_or_else(|_| "/var/dendryte/conf.toml".into());
 
     if !Path::new(&path).exists() {
       return Err(ConfigError::NotFound);

@@ -32,7 +32,7 @@ Dendryte is the official open-source server implementation for Kestrel, an end-t
 ## Configuration
 Kestrel uses a shared TOML configuration file.
 
-To get started, copy the example file `kestrel.example.toml` to `kestrel.toml`
+To get started, copy the example file `dendryte.example.toml` to `dendryte.toml`
 
 Everything should be preconfigured for hosting on a single machine, through Docker.
 
@@ -67,7 +67,7 @@ Using `BUILD_MODE=debug` is recommended during development.
 
 Set your config path:
 ```bash
-export crate::config=path/to/kestrel.toml
+export crate::config=path/to/dendryte.toml
 ```
 
 Then run the server:

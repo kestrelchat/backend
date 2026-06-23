@@ -10,9 +10,9 @@ services:
         BUILD_MODE: ${BUILD_MODE:-debug}
 
     volumes:
-      - ./kestrel.toml:/var/kestrel/conf.toml:ro,z
+      - ./dendryte.toml:/var/dendryte/conf.toml:ro,z
     environment:
-      - crate::config=/var/kestrel/conf.toml
+      - crate::config=/var/dendryte/conf.toml
 
     ports:
       - "5187:5187"
