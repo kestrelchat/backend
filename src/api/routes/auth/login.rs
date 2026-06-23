@@ -11,10 +11,6 @@ use crate::{
   },
   api::guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
   config::Config,
-  data::{
-    models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
-    normalize,
-  },
   database::{
     postgres::{
       connection::Database,
@@ -33,6 +29,11 @@ use crate::{
     },
   },
   errors::AppError,
+  models::{
+    ValidationError,
+    session::{PendingMfa, PendingMfaKind, PendingMfaScope},
+    user::email::Email,
+  },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
@@ -98,9 +99,10 @@ pub async fn login(
     .map_err(|_| AppError::unauthorized("FAILED_CAPTCHA"))?;
   }
 
-  let normalized_email = normalize::identity(&req.email);
+  let email = Email::new(&req.email, config.is_production)
+    .map_err(ValidationError::Email)?;
 
-  let account = match get_account_by_email(postgres, &normalized_email).await {
+  let account = match get_account_by_email(postgres, email.as_ref()).await {
     Ok(acc) => Ok(acc),
     Err(e) => match e {
       DatabaseError::NotFound => {

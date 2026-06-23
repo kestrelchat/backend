@@ -1,6 +1,7 @@
-use crate::data::models::RedisSession;
-use crate::data::token::{Token, TokenType};
-use crate::database::redis::{connection::Redis, error::RedisError};
+use crate::database::redis::connection::Redis;
+use crate::database::redis::error::RedisError;
+use crate::models::RedisSession;
+use crate::models::token::{Token, TokenType};
 use redis::{AsyncCommands, aio::ConnectionManager};
 
 const TTL_SECS: u64 = 20 * 60;

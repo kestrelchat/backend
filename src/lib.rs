@@ -1,9 +1,9 @@
 pub mod adapters;
 pub mod api;
 pub mod config;
-pub mod data;
 pub mod database;
 pub mod errors;
+pub mod models;
 
 use std::net::IpAddr;
 

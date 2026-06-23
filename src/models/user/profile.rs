@@ -1,8 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
-
 #[derive(Debug, Clone, FromRow)]
-pub struct User {
+pub struct Profile {
   pub id: String,
   pub username: String,
   pub discrim: String,
@@ -11,7 +10,7 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, FromRow)]
-pub struct UserSummary {
+pub struct ProfileSummary {
   pub id: String,
   pub username: String,
   pub discrim: String,

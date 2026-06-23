@@ -1,6 +1,6 @@
 use crate::{
   adapters::base32::base32_encode,
-  data::token::{spec, types::Token},
+  models::token::{spec, types::Token},
 };
 
 pub fn encode(token: &Token) -> String {

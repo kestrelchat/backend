@@ -1,6 +1,6 @@
 use redis::AsyncCommands;
 
-use crate::data::token::{Token, TokenType};
+use crate::models::token::{Token, TokenType};
 use crate::database::redis::{connection::Redis, error::RedisError};
 
 pub async fn create_reset_token(

@@ -3,7 +3,7 @@ use crate::{
     base32::{base32_decode, base32_encode},
     crypto::hasher::derive_key,
   },
-  data::models::session::PendingMfa,
+  models::session::PendingMfa,
 };
 use chacha20poly1305::{
   AeadInPlace, KeyInit, XChaCha20Poly1305, XNonce,

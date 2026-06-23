@@ -4,7 +4,6 @@ use crate::{
     totp::TotpSetup,
   },
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  data::models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
   database::{
     postgres::{
       connection::Database,
@@ -19,6 +18,7 @@ use crate::{
     },
   },
   errors::AppError,
+  models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
 };
 use rocket::{State, post, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};

@@ -1,10 +1,10 @@
 use crate::{
   adapters::crypto::hasher::hash,
-  data::models::session::PendingMfa,
   database::redis::{
     connection::Redis, error::RedisError,
     operations::sessions::protected_pending_mfa::ProtectedPendingMfa,
   },
+  models::session::PendingMfa,
 };
 use redis::AsyncCommands;
 

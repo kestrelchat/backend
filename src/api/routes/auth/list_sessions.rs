@@ -1,11 +1,11 @@
 use crate::{
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  data::models::Session,
   database::postgres::{
     connection::Database,
     operations::sessions::lookup_sessions::lookup_sessions,
   },
   errors::AppError,
+  models::Session,
 };
 use chrono::{DateTime, Utc};
 use rocket::{State, get, serde::json::Json};

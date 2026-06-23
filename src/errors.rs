@@ -1,6 +1,7 @@
-use crate::data::validation::{ValidationError, email, password, username};
 use crate::database::postgres::error::DatabaseError;
 use crate::database::redis::error::RedisError;
+use crate::models::ValidationError;
+use crate::models::user::{email, password, username};
 use rocket::serde::json::Json;
 use rocket::{
   Request, catch, http::Status, response::Responder, response::status::Custom,

@@ -2,7 +2,6 @@ use crate::{
   adapters::crypto::hasher,
   api::guards::rate_limit::WithinRateLimit,
   config::Config,
-  data::validation::{ValidationError, email, password},
   database::{
     postgres::{
       connection::Database,
@@ -16,6 +15,10 @@ use crate::{
     },
   },
   errors::AppError,
+  models::{
+    ValidationError,
+    user::{email::Email, password::Password},
+  },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
@@ -53,8 +56,7 @@ pub async fn request_password_reset(
   config: &State<Config>,
   req: Json<PasswordResetRequest>,
 ) -> Result<Json<PasswordResetReqResponse>, AppError> {
-  email::validate(&req.email, config.is_production)
-    .await
+  Email::new(&req.email, config.is_production)
     .map_err(|_| AppError::bad_request("INVALID_EMAIL"))?;
 
   let mut reset_token = "NOP".to_string(); // ASSEMBLY REFRENCE!!111!
@@ -94,18 +96,18 @@ pub async fn reset_password(
   redis: &State<Redis>,
   req: Json<ResetPasswordRequest>,
 ) -> Result<(), AppError> {
-  password::validate(&req.new_password)
-    .await
-    .map_err(ValidationError::Password)?;
+  let new_password =
+    Password::new(&req.new_password).map_err(ValidationError::Password)?;
 
   let account_id = check_reset_token(redis.inner(), &req.token)
     .await
     .map_err(|_| AppError::unauthorized("INVALID_TOKEN"))?;
 
-  let hashed_password =
-    hasher::password_hash(Zeroizing::new(req.new_password.as_bytes().to_vec()))
-      .await
-      .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
+  let hashed_password = hasher::password_hash(Zeroizing::new(
+    new_password.as_ref().as_bytes().to_vec(),
+  ))
+  .await
+  .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
   let mut tx = postgres
     .pool()

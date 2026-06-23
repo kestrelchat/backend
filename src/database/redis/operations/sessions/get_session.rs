@@ -1,7 +1,7 @@
 use redis::AsyncCommands;
 
-use crate::data::models::RedisSession;
 use crate::database::redis::{connection::Redis, error::RedisError};
+use crate::models::RedisSession;
 
 pub async fn get_session(
   redis: &Redis,

@@ -1,5 +1,5 @@
-use crate::data::models::Session;
 use crate::database::postgres::{connection::Database, error::DatabaseError};
+use crate::models::Session;
 
 pub async fn lookup_sessions(
   db: &Database,

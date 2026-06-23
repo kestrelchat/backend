@@ -2,13 +2,13 @@ use redis::AsyncCommands;
 
 use crate::{
   adapters::crypto::hasher::hash,
-  data::{
-    models::session::PendingMfa,
-    token::{Token, TokenType},
-  },
   database::redis::{
     connection::Redis, error::RedisError,
     operations::sessions::protected_pending_mfa::ProtectedPendingMfa,
+  },
+  models::{
+    session::PendingMfa,
+    token::{Token, TokenType},
   },
 };
 

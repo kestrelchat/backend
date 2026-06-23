@@ -1,7 +1,7 @@
 use chrono::Utc;
 
-use crate::data::models::{Relationship, relationship::RelationshipAction};
 use crate::database::postgres::{connection::Database, error::DatabaseError};
+use crate::models::{Relationship, relationship::RelationshipAction};
 
 pub async fn create_relationship(
   db: &Database,

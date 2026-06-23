@@ -1,4 +1,4 @@
-use crate::data::models::{Relationship, RelationshipType};
+use crate::models::{Relationship, RelationshipType};
 
 use crate::database::postgres::{connection::Database, error::DatabaseError};
 

@@ -1,8 +1,7 @@
 use rand::Rng;
 use rand::rngs::ThreadRng;
 
-use crate::data::token::encode::encode;
-use crate::data::token::spec::VERSION;
+use crate::models::token::{encode::encode, spec::VERSION};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]

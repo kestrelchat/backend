@@ -1,8 +1,8 @@
 use chrono::Utc;
 use sqlx::query_as;
 
-use crate::data::models::Guild;
 use crate::database::postgres::{connection::Database, error::DatabaseError};
+use crate::models::Guild;
 
 pub async fn update_guild(
   db: &Database,

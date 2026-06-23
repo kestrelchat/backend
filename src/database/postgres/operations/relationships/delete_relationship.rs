@@ -1,5 +1,5 @@
-use crate::data::models::{Relationship, RelationshipType};
 use crate::database::postgres::{connection::Database, error::DatabaseError};
+use crate::models::{Relationship, RelationshipType};
 
 pub async fn delete_relationship(
   db: &Database,

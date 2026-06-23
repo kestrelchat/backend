@@ -5,16 +5,16 @@ use crate::{
   },
   api::guards::rate_limit::WithinRateLimit,
   config::Config,
-  data::{
-    normalize,
-    validation::{ValidationError, email, password, username},
-  },
   database::postgres::{
     connection::Database,
     error::DatabaseError,
     operations::{account::create_account, user::create_user},
   },
   errors::AppError,
+  models::{
+    ValidationError,
+    user::{email::Email, password::Password, username::Username},
+  },
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use rocket::{State, serde::json::Json};
@@ -64,20 +64,14 @@ pub async fn register(
     .map_err(|_| AppError::unauthorized("FAILED_CAPTCHA"))?;
   }
 
-  let normalized_email = normalize::identity(&req.email);
-  let normalized_username = normalize::identity(&req.username);
-
-  email::validate(&normalized_email, config.is_production)
-    .await
+  let email = Email::new(&req.email, config.is_production)
     .map_err(ValidationError::Email)?;
 
-  password::validate(&req.password)
-    .await
-    .map_err(ValidationError::Password)?;
+  let password =
+    Password::new(&req.password).map_err(ValidationError::Password)?;
 
-  username::validate(&normalized_username)
-    .await
-    .map_err(ValidationError::Username)?;
+  let username =
+    Username::new(&req.username).map_err(ValidationError::Username)?;
 
   let birthday = req
     .birthday
@@ -86,10 +80,11 @@ pub async fn register(
     return Err(AppError::bad_request("AGE_TOO_YOUNG"));
   }
 
-  let hashed_password =
-    hasher::password_hash(Zeroizing::new(req.password.as_bytes().to_vec()))
-      .await
-      .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
+  let hashed_password = hasher::password_hash(Zeroizing::new(
+    password.as_ref().as_bytes().to_vec(),
+  ))
+  .await
+  .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
   let mut tx = postgres
     .pool()
@@ -98,7 +93,7 @@ pub async fn register(
     .map_err(|_| AppError::internal_error("BEGIN_TX_FAILED"))?;
 
   let account =
-    create_account(tx.as_mut(), &normalized_email, &hashed_password, birthday)
+    create_account(tx.as_mut(), email.as_ref(), &hashed_password, birthday)
       .await
       .map_err(|e| match e {
         DatabaseError::UniqueViolation(ref c) if c == "accounts_email_key" => {
@@ -108,15 +103,14 @@ pub async fn register(
       })?;
 
   // will be used once email verification is implemented
-  let _user =
-    create_user(tx.as_mut(), account.id.clone(), &normalized_username)
-      .await
-      .map_err(|e| match e {
-        DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
-          AppError::conflict("USERNAME_TAKEN")
-        }
-        other => AppError::from(other),
-      })?;
+  let _user = create_user(tx.as_mut(), account.id.clone(), username.as_ref())
+    .await
+    .map_err(|e| match e {
+      DatabaseError::UniqueViolation(ref c) if c == "user_unique_tag" => {
+        AppError::conflict("USERNAME_TAKEN")
+      }
+      other => AppError::from(other),
+    })?;
 
   tx.commit()
     .await

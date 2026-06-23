@@ -4,7 +4,6 @@ use crate::{
     totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
   },
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  data::validation::{ValidationError, password},
   database::{
     postgres::{
       connection::Database,
@@ -23,6 +22,7 @@ use crate::{
     },
   },
   errors::AppError,
+  models::{ValidationError, user::password::Password},
 };
 
 use rocket::{State, serde::json::Json};
@@ -61,14 +61,14 @@ pub async fn change_password(
     .await
     .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
-  password::validate(&req.new_password)
-    .await
-    .map_err(ValidationError::Password)?;
+  let password =
+    Password::new(&req.new_password).map_err(ValidationError::Password)?;
 
-  let hashed_password =
-    hasher::password_hash(Zeroizing::new(req.new_password.as_bytes().to_vec()))
-      .await
-      .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
+  let hashed_password = hasher::password_hash(Zeroizing::new(
+    password.as_ref().as_bytes().to_vec(),
+  ))
+  .await
+  .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
   let mut tx = postgres
     .pool()
