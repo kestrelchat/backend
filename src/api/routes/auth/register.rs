@@ -1,8 +1,10 @@
 use crate::{
-  adapters::hcaptcha::handler::{HCaptchaForm, handle_form},
+  adapters::{
+    crypto::hasher,
+    hcaptcha::handler::{HCaptchaForm, handle_form},
+  },
   api::guards::rate_limit::WithinRateLimit,
   config::Config,
-  crypto::hasher,
   data::{
     normalize,
     validation::{ValidationError, email, password, username},

@@ -1,7 +1,9 @@
 use crate::{
-  adapters::totp::TotpSetup,
+  adapters::{
+    crypto::{hasher, totp_secret::encrypt_totp_secret},
+    totp::TotpSetup,
+  },
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  crypto::{hasher, totp_secret::encrypt_totp_secret},
   data::models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
   database::{
     postgres::{

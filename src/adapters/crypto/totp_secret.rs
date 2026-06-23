@@ -1,5 +1,4 @@
-use crate::adapters::totp::TotpSetup;
-use crate::crypto::hasher;
+use crate::adapters::{crypto::hasher, totp::TotpSetup};
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 use chacha20poly1305::{
   AeadInPlace, KeyInit, XChaCha20Poly1305, XNonce,

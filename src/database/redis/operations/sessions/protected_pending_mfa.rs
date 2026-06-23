@@ -1,14 +1,15 @@
-use crate::data::models::session::PendingMfa;
+use crate::{
+  adapters::{
+    base32::{base32_decode, base32_encode},
+    crypto::hasher::derive_key,
+  },
+  data::models::session::PendingMfa,
+};
 use chacha20poly1305::{
   AeadInPlace, KeyInit, XChaCha20Poly1305, XNonce,
   aead::{OsRng, rand_core::RngCore},
 };
 use serde::{Deserialize, Serialize};
-
-use crate::{
-  adapters::base32::{base32_decode, base32_encode},
-  crypto::hasher::derive_key,
-};
 
 /// A protective wrapper around [`PendingMfa`] that handles in-place encryption
 /// and decryption of its sensitive internal payload using XChaCha20-Poly1305.

@@ -1,6 +1,6 @@
 use crate::{
+  adapters::crypto::hasher,
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  crypto::hasher,
   database::postgres::{
     connection::Database,
     error::DatabaseError,

@@ -1,7 +1,7 @@
 use crate::{
+  adapters::crypto::hasher,
   api::guards::rate_limit::WithinRateLimit,
   config::Config,
-  crypto::hasher,
   data::validation::{ValidationError, email, password},
   database::{
     postgres::{

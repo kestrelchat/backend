@@ -1,9 +1,12 @@
-use crate::data::models::session::PendingMfa;
+use crate::{
+  adapters::crypto::hasher::hash,
+  data::models::session::PendingMfa,
+  database::redis::{
+    connection::Redis, error::RedisError,
+    operations::sessions::protected_pending_mfa::ProtectedPendingMfa,
+  },
+};
 use redis::AsyncCommands;
-
-use super::protected_pending_mfa::ProtectedPendingMfa;
-use crate::crypto::hasher::hash;
-use crate::database::redis::{connection::Redis, error::RedisError};
 
 pub async fn get_pending_mfa(
   redis: &Redis,

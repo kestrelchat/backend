@@ -1,5 +1,7 @@
-use crate::crypto::hasher::hash;
-use crate::database::redis::{connection::Redis, error::RedisError};
+use crate::{
+  adapters::crypto::hasher::hash,
+  database::redis::{connection::Redis, error::RedisError},
+};
 use redis::AsyncCommands;
 
 pub async fn delete_pending_mfa(

@@ -1,9 +1,9 @@
 use crate::{
-  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
-  crypto::{
+  adapters::crypto::{
     hasher,
     totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
   },
+  api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   data::validation::{ValidationError, password},
   database::{
     postgres::{

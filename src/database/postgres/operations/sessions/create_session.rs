@@ -3,7 +3,7 @@ use chrono::Utc;
 use ulid::Ulid;
 
 use crate::{
-  crypto::hasher,
+  adapters::crypto::hasher,
   data::token::{Token, TokenType},
   database::postgres::{connection::Database, error::DatabaseError},
 };

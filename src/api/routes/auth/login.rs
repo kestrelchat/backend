@@ -1,5 +1,9 @@
 use crate::{
   adapters::{
+    crypto::{
+      hasher::{self, DECOY_PASSWORD_HASH},
+      totp_secret::decrypt_totp_secret,
+    },
     geoip::GeoIpClient,
     hcaptcha::handler::{HCaptchaForm, handle_form},
     totp::TotpSetup,
@@ -7,10 +11,6 @@ use crate::{
   },
   api::guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
   config::Config,
-  crypto::{
-    hasher::{self, DECOY_PASSWORD_HASH},
-    totp_secret::decrypt_totp_secret,
-  },
   data::{
     models::session::{PendingMfa, PendingMfaKind, PendingMfaScope},
     normalize,

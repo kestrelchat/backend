@@ -1,10 +1,16 @@
-use crate::data::models::session::PendingMfa;
 use redis::AsyncCommands;
 
-use super::protected_pending_mfa::ProtectedPendingMfa;
-use crate::crypto::hasher::hash;
-use crate::data::token::{Token, TokenType};
-use crate::database::redis::{connection::Redis, error::RedisError};
+use crate::{
+  adapters::crypto::hasher::hash,
+  data::{
+    models::session::PendingMfa,
+    token::{Token, TokenType},
+  },
+  database::redis::{
+    connection::Redis, error::RedisError,
+    operations::sessions::protected_pending_mfa::ProtectedPendingMfa,
+  },
+};
 
 const TTL_SECS: u64 = 20 * 60;
 
