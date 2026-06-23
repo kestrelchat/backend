@@ -2,7 +2,7 @@ use kestrel_postgres::connection::Database;
 use rocket::serde::json::Json;
 use rocket_okapi::openapi;
 
-use crate::utils::errors::AppError;
+use crate::errors::AppError;
 
 #[openapi(tag = "Core")]
 #[get("/count")]

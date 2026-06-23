@@ -8,7 +8,7 @@ use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::Serialize;
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{errors::AppError, guards::auth_context::AuthContext};
 
 #[derive(Serialize, JsonSchema)]
 pub struct GetSelfResponse {

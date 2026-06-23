@@ -31,11 +31,9 @@ use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::{
-  guards::rate_limit::WithinRateLimit,
-  utils::{
-    errors::AppError, request_context::RequestContext,
-    totp_secret::decrypt_totp_secret,
-  },
+  crypto::totp_secret::decrypt_totp_secret,
+  errors::AppError,
+  guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
 };
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]

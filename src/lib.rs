@@ -1,7 +1,9 @@
 pub mod catchers;
+pub mod crypto;
+pub mod errors;
+pub mod fairings;
 pub mod guards;
 pub mod routes;
-pub mod utils;
 
 use std::net::IpAddr;
 
@@ -14,14 +16,14 @@ use kestrel_redis::{
 };
 use rocket::Config as RocketConfig;
 
-use crate::{
-  catchers::too_many_requests::too_many_requests,
-  utils::cors::{CorsFairing, preflight},
-};
-use utils::errors::{
+use crate::errors::{
   bad_request, default_catcher, forbidden, internal_error, method_not_allowed,
   not_acceptable, not_found, service_unavailable, unauthorized,
   unprocessable_entity,
+};
+use crate::{
+  catchers::too_many_requests::too_many_requests,
+  fairings::cors::{CorsFairing, preflight},
 };
 
 #[macro_use]

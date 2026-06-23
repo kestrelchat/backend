@@ -9,8 +9,8 @@ use schemars::JsonSchema;
 use serde::Serialize;
 
 use crate::{
-  guards::rate_limit::WithinRateLimit,
-  utils::{auth_context::AuthContext, errors::AppError},
+  errors::AppError,
+  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
 };
 
 #[derive(Serialize, JsonSchema)]

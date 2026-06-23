@@ -5,7 +5,7 @@ use kestrel_postgres::{
 use rocket::State;
 use rocket_okapi::openapi;
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{errors::AppError, guards::auth_context::AuthContext};
 
 #[openapi(tag = "Relationships")]
 #[delete("/@me/relationships/<target_id>")]

@@ -16,7 +16,7 @@ use rocket_okapi::{
   request::{OpenApiFromRequest, RequestHeaderInput},
 };
 
-use crate::utils::auth_context::AuthContext;
+use crate::guards::auth_context::AuthContext;
 
 /// A guard that checks if the request is within the rate limit for the endpoint.
 ///

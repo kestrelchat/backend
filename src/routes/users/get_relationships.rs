@@ -12,7 +12,7 @@ use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use serde::{Deserialize, Serialize};
 
-use crate::utils::{auth_context::AuthContext, errors::AppError};
+use crate::{errors::AppError, guards::auth_context::AuthContext};
 
 #[derive(Debug, Clone, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct RelationshipUser {

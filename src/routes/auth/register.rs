@@ -17,7 +17,7 @@ use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
-use crate::{guards::rate_limit::WithinRateLimit, utils::errors::AppError};
+use crate::{errors::AppError, guards::rate_limit::WithinRateLimit};
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, schemars::JsonSchema)]
 pub struct RegisterRequest {

@@ -19,7 +19,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
 
-use crate::{guards::rate_limit::WithinRateLimit, utils::errors::AppError};
+use crate::{errors::AppError, guards::rate_limit::WithinRateLimit};
 
 #[derive(Deserialize, JsonSchema)]
 pub struct PasswordResetRequest {

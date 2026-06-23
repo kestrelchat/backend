@@ -14,8 +14,8 @@ use serde::Deserialize;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::{
-  guards::rate_limit::WithinRateLimit,
-  utils::{auth_context::AuthContext, errors::AppError},
+  errors::AppError,
+  guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
 };
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop, JsonSchema)]
