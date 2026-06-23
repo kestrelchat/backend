@@ -1,8 +1,8 @@
 use chrono::Utc;
 use sqlx::{PgExecutor, query_as};
 
+use crate::data::models::User;
 use crate::postgres::error::DatabaseError;
-use kestrel_common::models::User;
 
 pub async fn create_user(
   db: impl PgExecutor<'_>,

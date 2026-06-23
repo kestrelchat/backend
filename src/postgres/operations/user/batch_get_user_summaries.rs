@@ -1,4 +1,4 @@
-use kestrel_common::models::user::UserSummary;
+use crate::data::models::user::UserSummary;
 
 use crate::postgres::{connection::Database, error::DatabaseError};
 

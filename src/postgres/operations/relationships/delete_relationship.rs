@@ -1,5 +1,5 @@
+use crate::data::models::{Relationship, RelationshipType};
 use crate::postgres::{connection::Database, error::DatabaseError};
-use kestrel_common::models::{Relationship, RelationshipType};
 
 pub async fn delete_relationship(
   db: &Database,

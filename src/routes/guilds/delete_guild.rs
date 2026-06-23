@@ -1,12 +1,14 @@
-use crate::postgres::{
-  connection::Database,
-  error::DatabaseError,
-  operations::{
-    account::get_account_by_id,
-    guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
+use crate::{
+  crypto::hasher,
+  postgres::{
+    connection::Database,
+    error::DatabaseError,
+    operations::{
+      account::get_account_by_id,
+      guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
+    },
   },
 };
-use kestrel_common::utils::hasher;
 use rocket::{State, http::Status, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;

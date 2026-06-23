@@ -1,17 +1,18 @@
-use crate::config::Config;
-use crate::postgres::{
-  connection::Database,
-  error::DatabaseError,
-  operations::{account::create_account, user::create_user},
-};
-use chrono::{Datelike, NaiveDate, Utc};
-use kestrel_common::{
-  hcaptcha::handler::{HCaptchaForm, handle_form},
-  utils::{
-    hasher, normalize,
+use crate::{
+  adapters::hcaptcha::handler::{HCaptchaForm, handle_form},
+  config::Config,
+  crypto::hasher,
+  data::{
+    normalize,
     validation::{ValidationError, email, password, username},
   },
+  postgres::{
+    connection::Database,
+    error::DatabaseError,
+    operations::{account::create_account, user::create_user},
+  },
 };
+use chrono::{Datelike, NaiveDate, Utc};
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};

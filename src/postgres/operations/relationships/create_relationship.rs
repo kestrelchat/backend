@@ -1,7 +1,7 @@
 use chrono::Utc;
 
+use crate::data::models::{Relationship, relationship::RelationshipAction};
 use crate::postgres::{connection::Database, error::DatabaseError};
-use kestrel_common::models::{Relationship, relationship::RelationshipAction};
 
 pub async fn create_relationship(
   db: &Database,

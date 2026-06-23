@@ -1,10 +1,7 @@
-use kestrel_common::{
-  models::RedisSession,
-  token::{Token, TokenType},
-};
-use redis::{AsyncCommands, aio::ConnectionManager};
-
+use crate::data::models::RedisSession;
+use crate::data::token::{Token, TokenType};
 use crate::redis::{connection::Redis, error::RedisError};
+use redis::{AsyncCommands, aio::ConnectionManager};
 
 const TTL_SECS: u64 = 20 * 60;
 

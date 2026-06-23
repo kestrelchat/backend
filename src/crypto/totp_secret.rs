@@ -1,9 +1,10 @@
+use crate::adapters::totp::TotpSetup;
+use crate::crypto::hasher;
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 use chacha20poly1305::{
   AeadInPlace, KeyInit, XChaCha20Poly1305, XNonce,
   aead::{OsRng, rand_core::RngCore},
 };
-use kestrel_common::utils::{hasher, totp::TotpSetup};
 use zeroize::Zeroize;
 
 /// Errors that can occur during the protection lifecycle of a TOTP secret.

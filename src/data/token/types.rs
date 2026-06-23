@@ -1,8 +1,8 @@
-use rand::TryRng;
-use rand::rngs::SysRng;
+use rand::Rng;
+use rand::rngs::ThreadRng;
 
-use crate::token::encode::encode;
-use crate::token::spec::VERSION;
+use crate::data::token::encode::encode;
+use crate::data::token::spec::VERSION;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
@@ -65,6 +65,6 @@ fn current_time_millis() -> u64 {
 
 fn secure_random_16() -> [u8; 16] {
   let mut buf = [0u8; 16];
-  SysRng.try_fill_bytes(&mut buf).expect("OS RNG failed");
+  ThreadRng::default().fill_bytes(&mut buf);
   buf
 }

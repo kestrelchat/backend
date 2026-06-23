@@ -1,6 +1,8 @@
+pub mod adapters;
 pub mod catchers;
 pub mod config;
 pub mod crypto;
+pub mod data;
 pub mod errors;
 pub mod fairings;
 pub mod guards;
@@ -10,13 +12,15 @@ pub mod routes;
 
 use std::net::IpAddr;
 
-use crate::config::Config as AppConfig;
-use crate::postgres::connection::Database;
-use crate::redis::{
-  connection::Redis,
-  operations::rate_limiting::use_endpoint::CompiledRateLimiter,
+use crate::{
+  adapters::geoip::GeoIpClient,
+  config::Config as AppConfig,
+  postgres::connection::Database,
+  redis::{
+    connection::Redis,
+    operations::rate_limiting::use_endpoint::CompiledRateLimiter,
+  },
 };
-use kestrel_common::utils::geoip::GeoIpClient;
 use rocket::Config as RocketConfig;
 
 use crate::errors::{

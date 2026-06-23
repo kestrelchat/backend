@@ -1,6 +1,6 @@
 use crate::{
-  token::{Token, TokenType, error::TokenError, spec},
-  utils::base32::base32_decode,
+  adapters::base32::base32_decode,
+  data::token::{Token, TokenType, error::TokenError, spec},
 };
 
 pub fn decode(input: &str) -> Result<Token, TokenError> {

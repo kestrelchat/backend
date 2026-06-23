@@ -1,7 +1,6 @@
-use kestrel_common::utils::hasher::hash;
-use redis::AsyncCommands;
-
+use crate::crypto::hasher::hash;
 use crate::redis::{connection::Redis, error::RedisError};
+use redis::AsyncCommands;
 
 pub async fn delete_pending_mfa(
   redis: &Redis,

@@ -7,7 +7,7 @@ use argon2::{
 };
 use zeroize::Zeroizing;
 
-use crate::utils::base32::base32_encode;
+use crate::adapters::base32::base32_encode;
 
 /// Errors that can occur during cryptographic or hashing operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub async fn password_hash(
 ) -> Result<String, HasherError> {
   let argon2 = Argon2::default();
 
-  let hash = tokio::task::spawn_blocking(move || {
+  let hash = rocket::tokio::task::spawn_blocking(move || {
     let salt = SaltString::generate(&mut OsRng);
     let result = argon2
       .hash_password(input.as_slice(), &salt)

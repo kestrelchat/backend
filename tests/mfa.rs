@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use kestrel_common::utils::totp::TotpSetup;
+use dendryte::adapters::totp::TotpSetup;
 use rocket::http::StatusClass;
 use serde_json::{Value, json};
 

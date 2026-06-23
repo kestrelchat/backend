@@ -1,4 +1,4 @@
-use kestrel_common::models::{Relationship, RelationshipType};
+use crate::data::models::{Relationship, RelationshipType};
 
 use crate::postgres::{connection::Database, error::DatabaseError};
 

@@ -1,12 +1,12 @@
+use crate::data::models::Session;
 use chrono::Utc;
-use kestrel_common::{
-  models::Session,
-  token::{Token, TokenType},
-  utils::hasher,
-};
 use ulid::Ulid;
 
-use crate::postgres::{connection::Database, error::DatabaseError};
+use crate::{
+  crypto::hasher,
+  data::token::{Token, TokenType},
+  postgres::{connection::Database, error::DatabaseError},
+};
 
 pub struct PgCreatedSession {
   pub session: Session,

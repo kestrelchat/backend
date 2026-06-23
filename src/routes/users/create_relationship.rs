@@ -1,8 +1,8 @@
+use crate::data::models::RelationshipAction;
 use crate::postgres::{
   connection::Database, error::DatabaseError,
   operations::relationships::create_relationship as pg_create_relationship,
 };
-use kestrel_common::models::RelationshipAction;
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use serde::Deserialize;

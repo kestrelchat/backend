@@ -1,25 +1,25 @@
-use crate::config::Config;
-use crate::postgres::{
-  connection::Database,
-  operations::account::{
-    change_password, get_account_by_email, set_totp_secret,
+use crate::{
+  config::Config,
+  crypto::hasher,
+  data::validation::{ValidationError, email, password},
+  errors::AppError,
+  guards::rate_limit::WithinRateLimit,
+  postgres::{
+    connection::Database,
+    operations::account::{
+      change_password, get_account_by_email, set_totp_secret,
+    },
   },
-};
-use crate::redis::{
-  connection::Redis,
-  operations::password::{check_reset_token, create_reset_token},
-};
-use kestrel_common::utils::{
-  hasher,
-  validation::{ValidationError, email, password},
+  redis::{
+    connection::Redis,
+    operations::password::{check_reset_token, create_reset_token},
+  },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
-
-use crate::{errors::AppError, guards::rate_limit::WithinRateLimit};
 
 #[derive(Deserialize, JsonSchema)]
 pub struct PasswordResetRequest {

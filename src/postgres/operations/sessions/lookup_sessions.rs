@@ -1,5 +1,5 @@
+use crate::data::models::Session;
 use crate::postgres::{connection::Database, error::DatabaseError};
-use kestrel_common::models::Session;
 
 pub async fn lookup_sessions(
   db: &Database,

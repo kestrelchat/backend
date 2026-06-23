@@ -1,17 +1,10 @@
-// Kestrel - a modern instant-messaging service written in Rust
-// Copyright (C) 2026 Kestrel Chat
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+use std::sync::LazyLock;
 
-use once_cell::sync::Lazy;
 use uaparser::{Parser, UserAgentParser};
 
 const REGEXES: &[u8] = include_bytes!("../../assets/ua-regexes.yaml");
 
-static PARSER: Lazy<UserAgentParser> = Lazy::new(|| {
+static PARSER: LazyLock<UserAgentParser> = LazyLock::new(|| {
   UserAgentParser::from_bytes(REGEXES).expect("failed to load uaparser regexes")
 });
 

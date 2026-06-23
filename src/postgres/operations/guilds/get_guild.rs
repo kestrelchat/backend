@@ -1,7 +1,7 @@
 use sqlx::query_as;
 
+use crate::data::models::Guild;
 use crate::postgres::{connection::Database, error::DatabaseError};
-use kestrel_common::models::Guild;
 
 pub async fn get_guild(
   db: &Database,

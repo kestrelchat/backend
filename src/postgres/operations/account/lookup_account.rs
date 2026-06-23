@@ -1,8 +1,8 @@
 use sqlx::query_as;
 
+use crate::data::models::Account;
 use crate::postgres::connection::Database;
 use crate::postgres::error::DatabaseError;
-use kestrel_common::models::Account;
 
 pub async fn get_account_by_id(
   db: &Database,

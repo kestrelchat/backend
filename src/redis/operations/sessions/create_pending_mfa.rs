@@ -1,11 +1,9 @@
-use kestrel_common::{
-  models::session::PendingMfa,
-  token::{Token, TokenType},
-  utils::hasher::hash,
-};
+use crate::data::models::session::PendingMfa;
 use redis::AsyncCommands;
 
 use super::protected_pending_mfa::ProtectedPendingMfa;
+use crate::crypto::hasher::hash;
+use crate::data::token::{Token, TokenType};
 use crate::redis::{connection::Redis, error::RedisError};
 
 const TTL_SECS: u64 = 20 * 60;

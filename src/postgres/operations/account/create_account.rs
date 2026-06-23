@@ -2,8 +2,8 @@ use chrono::{NaiveDate, Utc};
 use sqlx::{PgExecutor, query_as};
 use ulid::Ulid;
 
+use crate::data::models::Account;
 use crate::postgres::error::DatabaseError;
-use kestrel_common::models::Account;
 
 pub async fn create_account(
   db: impl PgExecutor<'_>,

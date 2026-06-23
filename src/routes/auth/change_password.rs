@@ -1,21 +1,21 @@
-use crate::postgres::{
-  connection::Database,
-  error::DatabaseError,
-  operations::{
-    account::{
-      change_password as postgres_change_password, get_account_by_id,
-      set_totp_secret,
-    },
-    sessions::revoke_all_sessions as postgres_revoke_all_sessions,
-  },
-};
+use crate::data::validation::{ValidationError, password};
 use crate::redis::{
   connection::Redis,
   operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
 };
-use kestrel_common::utils::{
-  hasher,
-  validation::{ValidationError, password},
+use crate::{
+  crypto::hasher,
+  postgres::{
+    connection::Database,
+    error::DatabaseError,
+    operations::{
+      account::{
+        change_password as postgres_change_password, get_account_by_id,
+        set_totp_secret,
+      },
+      sessions::revoke_all_sessions as postgres_revoke_all_sessions,
+    },
+  },
 };
 
 use rocket::{State, serde::json::Json};
