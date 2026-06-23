@@ -1,3 +1,4 @@
+use crate::config::Config;
 use crate::postgres::{
   connection::Database,
   operations::account::{
@@ -12,7 +13,6 @@ use kestrel_common::utils::{
   hasher,
   validation::{ValidationError, email, password},
 };
-use kestrel_config::Config;
 use rocket::{State, serde::json::Json};
 use rocket_okapi::openapi;
 use schemars::JsonSchema;

@@ -1,4 +1,4 @@
-use kestrel_config::structs::server::CorsConfig;
+use crate::config::structs::server::CorsConfig;
 use rocket::{
   Request, Response,
   fairing::{Fairing, Info, Kind},

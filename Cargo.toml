@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
     "crates/libs/common",
-    "crates/libs/config",
 ]
 
 [package]
@@ -12,7 +11,6 @@ edition = "2024"
 
 [dependencies]
 kestrel_common = { version = "0.1.0", path = "crates/libs/common", features = ["geoip", "user_agent", "hcaptcha"] }
-kestrel_config = { version = "0.1.0", path = "crates/libs/config" }
 base64 = "0.22.1"
 chacha20poly1305 = "0.10.1"
 chrono = { version = "0.4.44", features = ["serde"] }
@@ -20,6 +18,7 @@ rocket = "0.5.1"
 rocket_okapi = { version = "0.9.0", features = ["swagger"] }
 schemars = { version = "0.8", features = ["chrono"] }
 serde = { version = "1.0.228", features = ["derive"] }
+toml = "1.1.2"
 ulid = "1.2.1"
 zeroize = { version = "1.8.2", features = ["derive"] }
 redis = { version = "1.2.1", features = ["tokio-comp", "connection-manager"] }

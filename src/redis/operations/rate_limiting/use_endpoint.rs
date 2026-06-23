@@ -1,6 +1,6 @@
 use std::{fmt::Display, net::IpAddr, time::SystemTime};
 
-use kestrel_config::structs::features::{
+use crate::config::structs::features::{
   RateLimitConfig, SystemRateLimitConfig,
 };
 use redis::{Script, ScriptInvocation};

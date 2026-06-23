@@ -1,3 +1,4 @@
+use crate::config::Config;
 use crate::postgres::{
   connection::Database,
   error::DatabaseError,
@@ -11,7 +12,6 @@ use kestrel_common::{
     validation::{ValidationError, email, password, username},
   },
 };
-use kestrel_config::Config;
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};

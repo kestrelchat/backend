@@ -3,15 +3,17 @@
 use std::{net::IpAddr, sync::Arc};
 
 use chrono::{DateTime, Timelike, Utc};
-use dendryte::web;
-use kestrel_config::{
-  Config,
-  structs::{
-    database::{DatabaseConfig, PostgresConfig, RedisConfig},
-    features::FeatureConfig,
-    instance::InstanceConfig,
-    server::{CorsConfig, ServerConfig},
+use dendryte::{
+  config::{
+    Config,
+    structs::{
+      database::{DatabaseConfig, PostgresConfig, RedisConfig},
+      features::FeatureConfig,
+      instance::InstanceConfig,
+      server::{CorsConfig, ServerConfig},
+    },
   },
+  web,
 };
 use rocket::{
   futures::join,

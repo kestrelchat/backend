@@ -1,4 +1,4 @@
-use kestrel_config::Config;
+use crate::config::Config;
 use rocket::serde::json::Json;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::openapi;

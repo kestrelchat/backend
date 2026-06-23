@@ -1,3 +1,4 @@
+use crate::config::Config;
 use crate::postgres::{
   connection::Database,
   error::DatabaseError,
@@ -24,7 +25,6 @@ use kestrel_common::{
     user_agent::parse_user_agent,
   },
 };
-use kestrel_config::Config;
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
 use serde::{Deserialize, Serialize};

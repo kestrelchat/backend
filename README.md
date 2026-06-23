@@ -45,10 +45,6 @@ Everything should be preconfigured for hosting on a single machine, through Dock
 ## Application
 - **kestrel_server** - Unified server binary (REST API, WebSocket, Swagger docs)
 
-## Libraries
-- **kestrel_common** - Shared data models, tokens, and utilities (GeoIP, user-agent parsing, hCaptcha)
-- **kestrel_config** - Shared configuration library for Kestrel
-- **kestrel_redis** - Redis connection management and session caching
 
 ## Running
 
@@ -75,7 +71,7 @@ Using `BUILD_MODE=debug` is recommended during development.
 
 Set your config path:
 ```bash
-export KESTREL_CONFIG=path/to/kestrel.toml
+export crate::config=path/to/kestrel.toml
 ```
 
 Then run the server:

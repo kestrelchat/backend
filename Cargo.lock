@@ -736,7 +736,6 @@ dependencies = [
  "chacha20poly1305",
  "chrono",
  "kestrel_common",
- "kestrel_config",
  "redis",
  "rocket",
  "rocket_okapi",
@@ -747,6 +746,7 @@ dependencies = [
  "sqlx",
  "testcontainers-modules",
  "thiserror",
+ "toml 1.1.2+spec-1.1.0",
  "ulid",
  "zeroize",
 ]
@@ -1854,14 +1854,6 @@ dependencies = [
  "totp-rs",
  "uaparser",
  "zeroize",
-]
-
-[[package]]
-name = "kestrel_config"
-version = "0.1.0"
-dependencies = [
- "serde",
- "toml 1.1.2+spec-1.1.0",
 ]
 
 [[package]]

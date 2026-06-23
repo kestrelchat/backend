@@ -12,7 +12,7 @@ services:
     volumes:
       - ./kestrel.toml:/var/kestrel/conf.toml:ro,z
     environment:
-      - KESTREL_CONFIG=/var/kestrel/conf.toml
+      - crate::config=/var/kestrel/conf.toml
 
     ports:
       - "5187:5187"
