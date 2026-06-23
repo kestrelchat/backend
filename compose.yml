@@ -28,9 +28,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
     environment:
-      POSTGRES_USER: kestrel
-      POSTGRES_PASSWORD: kestrel
-      POSTGRES_DB: kestrel
+      POSTGRES_USER: dendryte
+      POSTGRES_PASSWORD: dendryte
+      POSTGRES_DB: dendryte
 
     ports:
       - "5432:5432"

@@ -19,7 +19,7 @@ pub struct CorsFairing {
 impl Fairing for CorsFairing {
   fn info(&self) -> Info {
     Info {
-      name: "Kestrel REST API CORS Fairing",
+      name: "Dendryte REST API CORS Fairing",
       kind: Kind::Response,
     }
   }

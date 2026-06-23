@@ -21,7 +21,7 @@ allowed_origins = ["*"]
 allow_credentials = false
 
 [database.postgres]
-url = "postgresql://kestrel:kestrel@postgres:5432/kestrel"
+url = "postgresql://dendryte:dendryte@postgres:5432/dendryte"
 
 [database.redis]
 url = "redis://redis:6379"
