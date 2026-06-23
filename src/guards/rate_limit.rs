@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::rate_limiting::use_endpoint::{
     CompiledRateLimiter, RateLimitUserId,

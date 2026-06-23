@@ -4,7 +4,6 @@ members = [
     "crates/libs/common",
     "crates/libs/config",
     "crates/libs/postgres",
-    "crates/libs/redis",
 ]
 
 [package]
@@ -16,8 +15,6 @@ edition = "2024"
 kestrel_common = { version = "0.1.0", path = "crates/libs/common", features = ["geoip", "user_agent", "hcaptcha"] }
 kestrel_config = { version = "0.1.0", path = "crates/libs/config" }
 kestrel_postgres = { version = "0.1.0", path = "crates/libs/postgres" }
-kestrel_redis = { version = "0.1.0", path = "crates/libs/redis" }
-
 base64 = "0.22.1"
 chacha20poly1305 = "0.10.1"
 chrono = { version = "0.4.44", features = ["serde"] }
@@ -27,8 +24,10 @@ schemars = { version = "0.8", features = ["chrono"] }
 serde = { version = "1.0.228", features = ["derive"] }
 ulid = "1.2.1"
 zeroize = { version = "1.8.2", features = ["derive"] }
+redis = { version = "1.2.1", features = ["tokio-comp", "connection-manager"] }
+rustc-hash = "2.1.2"
+serde_json = "1.0.149"
+thiserror = "2.0.18"
 
 [dev-dependencies]
 testcontainers-modules = { version = "0.15.0", features = ["postgres", "redis"] }
-serde_json = "1.0.149"
-redis = { version = "1.2.1", features = ["tokio-comp", "connection-manager"] }

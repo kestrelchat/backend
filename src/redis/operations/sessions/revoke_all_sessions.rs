@@ -1,6 +1,6 @@
 use redis::AsyncTypedCommands;
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 
 pub async fn revoke_all_sessions(
   redis: &Redis,

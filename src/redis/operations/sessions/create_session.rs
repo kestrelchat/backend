@@ -4,7 +4,7 @@ use kestrel_common::{
 };
 use redis::{AsyncCommands, aio::ConnectionManager};
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 
 const TTL_SECS: u64 = 20 * 60;
 

@@ -738,14 +738,15 @@ dependencies = [
  "kestrel_common",
  "kestrel_config",
  "kestrel_postgres",
- "kestrel_redis",
  "redis",
  "rocket",
  "rocket_okapi",
+ "rustc-hash",
  "schemars 0.8.22",
  "serde",
  "serde_json",
  "testcontainers-modules",
+ "thiserror",
  "ulid",
  "zeroize",
 ]
@@ -1872,21 +1873,6 @@ dependencies = [
  "sqlx",
  "thiserror",
  "ulid",
-]
-
-[[package]]
-name = "kestrel_redis"
-version = "0.1.0"
-dependencies = [
- "chacha20poly1305",
- "kestrel_common",
- "kestrel_config",
- "redis",
- "rustc-hash",
- "serde",
- "serde_json",
- "thiserror",
- "tracing",
 ]
 
 [[package]]

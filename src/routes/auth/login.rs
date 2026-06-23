@@ -18,7 +18,7 @@ use kestrel_postgres::{
     sessions::{SessionMetadata, create_session as pg_create_session},
   },
 };
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::sessions::{
     create_pending_mfa, create_session as redis_create_session,

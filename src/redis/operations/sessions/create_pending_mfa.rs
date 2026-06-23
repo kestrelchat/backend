@@ -5,10 +5,8 @@ use kestrel_common::{
 };
 use redis::AsyncCommands;
 
-use crate::{
-  connection::Redis, error::RedisError,
-  utils::protected_pending_mfa::ProtectedPendingMfa,
-};
+use super::protected_pending_mfa::ProtectedPendingMfa;
+use crate::redis::{connection::Redis, error::RedisError};
 
 const TTL_SECS: u64 = 20 * 60;
 

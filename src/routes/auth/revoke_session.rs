@@ -5,7 +5,7 @@ use kestrel_postgres::{
     revoke_session as postgres_revoke_session,
   },
 };
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::sessions::{
     revoke_all_sessions as redis_revoke_all_sessions,

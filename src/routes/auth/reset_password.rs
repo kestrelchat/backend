@@ -9,7 +9,7 @@ use kestrel_postgres::{
     change_password, get_account_by_email, set_totp_secret,
   },
 };
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::password::{check_reset_token, create_reset_token},
 };

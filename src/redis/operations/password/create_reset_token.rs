@@ -2,7 +2,7 @@ use redis::AsyncCommands;
 
 use kestrel_common::token::{Token, TokenType};
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 
 pub async fn create_reset_token(
   redis: &Redis,

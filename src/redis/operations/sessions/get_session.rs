@@ -1,6 +1,6 @@
 use redis::AsyncCommands;
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 use kestrel_common::models::RedisSession;
 
 pub async fn get_session(

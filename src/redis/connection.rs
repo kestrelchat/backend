@@ -1,7 +1,7 @@
 use redis::Client;
 use redis::aio::ConnectionManager;
 
-use crate::error::RedisError;
+use crate::redis::error::RedisError;
 
 #[derive(Clone)]
 pub struct Redis {

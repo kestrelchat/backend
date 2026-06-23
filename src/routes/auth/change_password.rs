@@ -13,7 +13,7 @@ use kestrel_postgres::{
     sessions::revoke_all_sessions as postgres_revoke_all_sessions,
   },
 };
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::sessions::revoke_all_sessions as redis_revoke_all_sessions,
 };

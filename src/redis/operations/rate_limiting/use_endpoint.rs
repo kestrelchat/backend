@@ -6,7 +6,7 @@ use kestrel_config::structs::features::{
 use redis::{Script, ScriptInvocation};
 use rustc_hash::FxHashMap;
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 
 /// Represents the user ID, either an IP or a user ID.
 pub enum RateLimitUserId<'req> {

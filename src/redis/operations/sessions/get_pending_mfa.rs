@@ -1,10 +1,8 @@
 use kestrel_common::{models::session::PendingMfa, utils::hasher::hash};
 use redis::AsyncCommands;
 
-use crate::{
-  connection::Redis, error::RedisError,
-  utils::protected_pending_mfa::ProtectedPendingMfa,
-};
+use super::protected_pending_mfa::ProtectedPendingMfa;
+use crate::redis::{connection::Redis, error::RedisError};
 
 pub async fn get_pending_mfa(
   redis: &Redis,

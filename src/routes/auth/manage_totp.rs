@@ -7,7 +7,7 @@ use kestrel_postgres::{
   error::DatabaseError,
   operations::account::{get_account_by_id, set_totp_secret},
 };
-use kestrel_redis::{
+use crate::redis::{
   connection::Redis,
   operations::sessions::{
     create_pending_mfa, delete_pending_mfa, get_pending_mfa,

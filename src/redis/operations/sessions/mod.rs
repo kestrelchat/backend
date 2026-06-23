@@ -3,6 +3,7 @@ pub mod create_session;
 pub mod delete_pending_mfa;
 pub mod get_pending_mfa;
 pub mod get_session;
+pub mod protected_pending_mfa;
 pub mod revoke_all_sessions;
 pub mod revoke_session;
 

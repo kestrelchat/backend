@@ -1,6 +1,6 @@
 use redis::AsyncCommands;
 
-use crate::{connection::Redis, error::RedisError};
+use crate::redis::{connection::Redis, error::RedisError};
 
 pub async fn check_reset_token(
   redis: &Redis,
