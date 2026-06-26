@@ -1,9 +1,6 @@
 use crate::{
   adapters::{
-    crypto::{
-      hasher::{self, DECOY_PASSWORD_HASH},
-      totp_secret::decrypt_totp_secret,
-    },
+    crypto::hasher::{self, DECOY_PASSWORD_HASH},
     geoip::GeoIpClient,
     hcaptcha::handler::{HCaptchaForm, handle_form},
     totp::TotpSetup,
@@ -132,8 +129,7 @@ pub async fn login(
   };
 
   // Decrypt the TOTP secret using the user's password
-  let totp = decrypt_totp_secret(&req.password, &account.password, totp_secret)
-    .await
+  let totp = TotpSetup::from_secret_base32(totp_secret)
     .map_err(|_| AppError::unauthorized("TOTP_DECRYPT_FAILED"))?;
 
   // The TOTP secret is stored in Redis, encrypted by the temporary token

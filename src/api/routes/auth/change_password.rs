@@ -1,8 +1,5 @@
 use crate::{
-  adapters::crypto::{
-    hasher,
-    totp_secret::{decrypt_totp_secret, encrypt_totp_secret},
-  },
+  adapters::crypto::hasher,
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   database::{
     postgres::{
@@ -11,7 +8,6 @@ use crate::{
       operations::{
         account::{
           change_password as postgres_change_password, get_account_by_id,
-          set_totp_secret,
         },
         sessions::revoke_all_sessions as postgres_revoke_all_sessions,
       },
@@ -70,28 +66,8 @@ pub async fn change_password(
   .await
   .map_err(|_| AppError::internal_error("HASH_FAILED"))?;
 
-  let mut tx = postgres
-    .pool()
-    .begin()
-    .await
-    .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
-
-  if let Some(old_ciphertext) = account.totp_secret {
-    let totp =
-      decrypt_totp_secret(&req.old_password, &account.password, old_ciphertext)
-        .await
-        .map_err(|_| AppError::internal_error("TOTP_DECRYPT_FAILED"))?;
-    let new_ciphertext =
-      encrypt_totp_secret(&req.new_password, &hashed_password, totp)
-        .await
-        .map_err(|_| AppError::internal_error("TOTP_ENCRYPT_FAILED"))?;
-    set_totp_secret(tx.as_mut(), &account.id, Some(&new_ciphertext)).await?;
-  }
-  postgres_change_password(tx.as_mut(), account.id, &hashed_password).await?;
-
-  tx.commit()
-    .await
-    .map_err(|_| AppError::internal_error("DB_TX_FAILED"))?;
+  postgres_change_password(postgres.pool(), account.id, &hashed_password)
+    .await?;
 
   redis_revoke_all_sessions(redis, &auth_ctx.user_id, &auth_ctx.token).await?;
   postgres_revoke_all_sessions(

@@ -1,8 +1,5 @@
 use crate::{
-  adapters::{
-    crypto::{hasher, totp_secret::encrypt_totp_secret},
-    totp::TotpSetup,
-  },
+  adapters::{crypto::hasher, totp::TotpSetup},
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   database::{
     postgres::{
@@ -122,16 +119,14 @@ pub async fn confirm_enable_totp(
     .await
     .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
 
-  // Encrypt the TOTP secret using the user's password
-  let protected_secret =
-    encrypt_totp_secret(&req.password, &account.password, totp)
-      .await
-      .map_err(|_| AppError::unauthorized("INVALID_CREDENTIALS"))?;
-
   // Persist the secret to the user's account
-  set_totp_secret(postgres.pool(), &account.id, Some(&protected_secret))
-    .await
-    .map_err(AppError::from)?;
+  set_totp_secret(
+    postgres.pool(),
+    &account.id,
+    Some(&totp.get_secret_base32()),
+  )
+  .await
+  .map_err(AppError::from)?;
 
   let _ = delete_pending_mfa(redis, &req.temp_token).await;
 
