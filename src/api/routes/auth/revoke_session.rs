@@ -25,8 +25,8 @@ use rocket_okapi::openapi;
 #[post("/logout")]
 pub async fn revoke_current_session(
   _within_rate_limit: WithinRateLimit,
-  redis: &State<Redis>,
   postgres: &State<Database>,
+  redis: &State<Redis>,
   auth_ctx: AuthContext,
 ) -> Result<(), AppError> {
   let session_id = auth_ctx.session_id;
@@ -46,8 +46,8 @@ pub async fn revoke_current_session(
 #[delete("/sessions")]
 pub async fn revoke_all_sessions(
   _within_rate_limit: WithinRateLimit,
-  redis: &State<Redis>,
   postgres: &State<Database>,
+  redis: &State<Redis>,
   auth_ctx: AuthContext,
 ) -> Result<(), AppError> {
   let user_id = auth_ctx.user_id;
@@ -69,8 +69,8 @@ pub async fn revoke_all_sessions(
 #[delete("/sessions/<session_id>")]
 pub async fn revoke_session(
   _within_rate_limit: WithinRateLimit,
-  redis: &State<Redis>,
   postgres: &State<Database>,
+  redis: &State<Redis>,
   _auth_ctx: AuthContext,
   session_id: &str,
 ) -> Result<(), AppError> {

@@ -3,7 +3,7 @@ use crate::{
   database::postgres::{
     connection::Database,
     operations::guilds::{
-      get_guild as pg_get_guild, update_guild as pg_update_guild,
+      get_guild as postgres_get_guild, update_guild as postgres_update_guild,
     },
   },
   errors::AppError,
@@ -40,7 +40,7 @@ pub async fn update_guild(
     return Err(AppError::bad_request("GUILD_NAME_EMPTY"));
   }
 
-  let guild = pg_get_guild(postgres, guild_id, &user_id)
+  let guild = postgres_get_guild(postgres, guild_id, &user_id)
     .await
     .map_err(|_| AppError::not_found("GUILD_NOT_FOUND"))?;
 
@@ -48,7 +48,7 @@ pub async fn update_guild(
     return Err(AppError::forbidden("NOT_GUILD_OWNER"));
   }
 
-  let updated = pg_update_guild(postgres, guild_id, &req.name)
+  let updated = postgres_update_guild(postgres, guild_id, &req.name)
     .await
     .map_err(|e| match e {
       crate::database::postgres::error::DatabaseError::CheckViolation(

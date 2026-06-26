@@ -10,7 +10,7 @@ pub struct RelationshipsBundle {
 }
 
 pub async fn get_relationships(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
 ) -> Result<RelationshipsBundle, DatabaseError> {
   let rows: Vec<Relationship> = sqlx::query_as::<_, Relationship>(
@@ -21,7 +21,7 @@ pub async fn get_relationships(
         "#,
   )
   .bind(user_id)
-  .fetch_all(db.pool())
+  .fetch_all(postgres.pool())
   .await?;
 
   let mut friends = Vec::new();

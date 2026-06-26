@@ -17,7 +17,9 @@ use crate::{
       error::DatabaseError,
       operations::{
         account::{get_account_by_email, get_account_by_id},
-        sessions::{SessionMetadata, create_session as pg_create_session},
+        sessions::{
+          SessionMetadata, create_session as postgres_create_session,
+        },
       },
     },
     redis::{
@@ -215,7 +217,7 @@ async fn establish_session(
   let operating_system = ua.os_family;
   let platform = ua.browser_family;
 
-  let pg_session = pg_create_session(
+  let postgres_session = postgres_create_session(
     postgres,
     account_id,
     SessionMetadata {
@@ -232,12 +234,12 @@ async fn establish_session(
   .map_err(AppError::from)?;
 
   let auth_token =
-    redis_create_session(redis, &pg_session.session.id, account_id)
+    redis_create_session(redis, &postgres_session.session.id, account_id)
       .await
       .map_err(|_| AppError::internal_error("SESSION_STORE_FAILED"))?;
 
   Ok(LoginResponse::Success {
     auth_token,
-    refresh_token: pg_session.refresh_token,
+    refresh_token: postgres_session.refresh_token,
   })
 }

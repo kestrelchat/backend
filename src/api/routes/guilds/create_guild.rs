@@ -1,7 +1,8 @@
 use crate::{
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   database::postgres::{
-    connection::Database, operations::guilds::create_guild as pg_create_guild,
+    connection::Database,
+    operations::guilds::create_guild as postgres_create_guild,
   },
   errors::AppError,
 };
@@ -36,7 +37,7 @@ pub async fn create_guild(
     return Err(AppError::bad_request("GUILD_NAME_EMPTY"));
   }
 
-  let guild = pg_create_guild(postgres, &req.name, &user_id)
+  let guild = postgres_create_guild(postgres, &req.name, &user_id)
     .await
     .map_err(|e| match e {
       crate::database::postgres::error::DatabaseError::CheckViolation(

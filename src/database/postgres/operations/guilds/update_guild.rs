@@ -5,7 +5,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 use crate::models::Guild;
 
 pub async fn update_guild(
-  db: &Database,
+  postgres: &Database,
   guild_id: &str,
   name: &str,
 ) -> Result<Guild, DatabaseError> {
@@ -22,7 +22,7 @@ pub async fn update_guild(
   .bind(guild_id)
   .bind(name)
   .bind(updated_at)
-  .fetch_optional(db.pool())
+  .fetch_optional(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

@@ -6,7 +6,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 use crate::models::Guild;
 
 pub async fn create_guild(
-  db: &Database,
+  postgres: &Database,
   name: &str,
   owner_id: &str,
 ) -> Result<Guild, DatabaseError> {
@@ -25,7 +25,7 @@ pub async fn create_guild(
   .bind(owner_id)
   .bind(now)
   .bind(now)
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 
@@ -38,7 +38,7 @@ pub async fn create_guild(
   .bind(&guild.id)
   .bind(owner_id)
   .bind(now)
-  .execute(db.pool())
+  .execute(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

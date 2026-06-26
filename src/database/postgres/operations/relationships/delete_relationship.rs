@@ -2,7 +2,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 use crate::models::{Relationship, RelationshipType};
 
 pub async fn delete_relationship(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
   target_id: &str,
 ) -> Result<Vec<Relationship>, DatabaseError> {
@@ -17,7 +17,7 @@ pub async fn delete_relationship(
   )
   .bind(user_id)
   .bind(target_id)
-  .fetch_optional(db.pool())
+  .fetch_optional(postgres.pool())
   .await?;
 
   let relationship_type = relationship_type.ok_or_else(|| {
@@ -38,7 +38,7 @@ pub async fn delete_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_all(db.pool())
+      .fetch_all(postgres.pool())
       .await?;
 
       Ok(relationships)
@@ -59,7 +59,7 @@ pub async fn delete_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_all(db.pool())
+      .fetch_all(postgres.pool())
       .await?;
 
       Ok(relationships)
@@ -77,7 +77,7 @@ pub async fn delete_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_all(db.pool())
+      .fetch_all(postgres.pool())
       .await?;
 
       Ok(relationships)

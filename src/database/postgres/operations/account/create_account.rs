@@ -6,7 +6,7 @@ use crate::database::postgres::error::DatabaseError;
 use crate::models::Account;
 
 pub async fn create_account(
-  db: impl PgExecutor<'_>,
+  postgres: impl PgExecutor<'_>,
   email: &str,
   password: &str,
   birthday: NaiveDate,
@@ -29,7 +29,7 @@ pub async fn create_account(
     .bind(created_at)
     .bind(updated_at)
     .bind(None::<String>)
-    .fetch_one(db)
+    .fetch_one(postgres)
     .await
     .map_err(DatabaseError::from_sqlx)?;
 

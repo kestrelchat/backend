@@ -10,7 +10,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 ///
 /// For more information on how the estimate works, see
 /// [PostgreSQL Wiki](<https://wiki.postgresql.org/wiki/Count_estimate>).
-pub async fn count_users(db: &Database) -> Result<u64, DatabaseError> {
+pub async fn count_users(postgres: &Database) -> Result<u64, DatabaseError> {
   let estimate_row = query(
     r#"
         SELECT reltuples::bigint AS estimate
@@ -18,7 +18,7 @@ pub async fn count_users(db: &Database) -> Result<u64, DatabaseError> {
         WHERE relname = 'users'
         "#,
   )
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 
@@ -29,7 +29,7 @@ pub async fn count_users(db: &Database) -> Result<u64, DatabaseError> {
   }
 
   let exact_row = query("SELECT COUNT(*) AS exact FROM users")
-    .fetch_one(db.pool())
+    .fetch_one(postgres.pool())
     .await
     .map_err(DatabaseError::from_sqlx)?;
 
@@ -37,7 +37,7 @@ pub async fn count_users(db: &Database) -> Result<u64, DatabaseError> {
 
   if exact != 0 {
     query("ANALYZE users")
-      .execute(db.pool())
+      .execute(postgres.pool())
       .await
       .map_err(DatabaseError::from_sqlx)?;
   }

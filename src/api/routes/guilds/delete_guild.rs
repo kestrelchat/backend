@@ -6,7 +6,9 @@ use crate::{
     error::DatabaseError,
     operations::{
       account::get_account_by_id,
-      guilds::{delete_guild as pg_delete_guild, get_guild as pg_get_guild},
+      guilds::{
+        delete_guild as postgres_delete_guild, get_guild as postgres_get_guild,
+      },
     },
   },
   errors::AppError,
@@ -33,7 +35,7 @@ pub async fn delete_guild(
 ) -> Result<Status, AppError> {
   let user_id = auth_ctx.user_id;
 
-  let guild = pg_get_guild(postgres, guild_id, &user_id)
+  let guild = postgres_get_guild(postgres, guild_id, &user_id)
     .await
     .map_err(|_| AppError::not_found("GUILD_NOT_FOUND"))?;
 
@@ -54,7 +56,7 @@ pub async fn delete_guild(
     .await
     .map_err(|_| AppError::unauthorized("INVALID_PASSWORD"))?;
 
-  pg_delete_guild(postgres, guild_id)
+  postgres_delete_guild(postgres, guild_id)
     .await
     .map_err(AppError::from)?;
 

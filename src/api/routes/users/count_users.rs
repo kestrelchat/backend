@@ -7,8 +7,8 @@ use crate::errors::AppError;
 #[openapi(tag = "Core")]
 #[get("/count")]
 pub async fn count_users(
-  db: &rocket::State<Database>,
+  postgres: &rocket::State<Database>,
 ) -> Result<Json<u64>, AppError> {
   use crate::database::postgres::operations::user::count_users;
-  Ok(Json(count_users(db).await?))
+  Ok(Json(count_users(postgres).await?))
 }

@@ -2,7 +2,7 @@ use crate::{
   api::guards::auth_context::AuthContext,
   database::postgres::{
     connection::Database, error::DatabaseError,
-    operations::relationships::delete_relationship as pg_delete_relationship,
+    operations::relationships::delete_relationship as postgres_delete_relationship,
   },
   errors::AppError,
 };
@@ -18,7 +18,7 @@ pub async fn delete_relationship(
 ) -> Result<(), AppError> {
   let user_id = auth_ctx.user_id;
 
-  pg_delete_relationship(postgres, user_id.as_str(), target_id)
+  postgres_delete_relationship(postgres, user_id.as_str(), target_id)
     .await
     .map_err(|e| match e {
       DatabaseError::InvalidOperation(ref c) => match c.as_str() {

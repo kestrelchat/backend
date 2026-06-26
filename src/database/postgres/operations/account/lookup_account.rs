@@ -5,7 +5,7 @@ use crate::database::postgres::error::DatabaseError;
 use crate::models::Account;
 
 pub async fn get_account_by_id(
-  db: &Database,
+  postgres: &Database,
   id: &str,
 ) -> Result<Account, DatabaseError> {
   let account = query_as::<_, Account>(
@@ -24,7 +24,7 @@ pub async fn get_account_by_id(
         "#,
   )
   .bind(id)
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 
@@ -32,7 +32,7 @@ pub async fn get_account_by_id(
 }
 
 pub async fn get_account_by_email(
-  db: &Database,
+  postgres: &Database,
   email: &str,
 ) -> Result<Account, DatabaseError> {
   let account = query_as::<_, Account>(
@@ -51,7 +51,7 @@ pub async fn get_account_by_email(
         "#,
   )
   .bind(email)
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

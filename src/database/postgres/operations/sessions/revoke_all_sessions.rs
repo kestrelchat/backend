@@ -2,7 +2,7 @@ use crate::database::postgres::connection::Database;
 use crate::database::postgres::error::DatabaseError;
 
 pub async fn revoke_all_sessions(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
   current_session: &str,
 ) -> Result<(), DatabaseError> {
@@ -15,7 +15,7 @@ pub async fn revoke_all_sessions(
   )
   .bind(user_id)
   .bind(current_session)
-  .execute(db.pool())
+  .execute(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

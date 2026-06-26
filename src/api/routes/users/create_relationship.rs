@@ -2,7 +2,7 @@ use crate::{
   api::guards::auth_context::AuthContext,
   database::postgres::{
     connection::Database, error::DatabaseError,
-    operations::relationships::create_relationship as pg_create_relationship,
+    operations::relationships::create_relationship as postgres_create_relationship,
   },
   errors::AppError,
   models::RelationshipAction,
@@ -27,7 +27,7 @@ pub async fn create_relationship(
 ) -> Result<(), AppError> {
   let user_id = auth_ctx.user_id;
 
-  pg_create_relationship(
+  postgres_create_relationship(
     postgres,
     user_id.as_str(),
     target_id,

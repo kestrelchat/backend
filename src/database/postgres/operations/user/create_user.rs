@@ -5,7 +5,7 @@ use crate::database::postgres::error::DatabaseError;
 use crate::models::Profile;
 
 pub async fn create_user(
-  db: impl PgExecutor<'_>,
+  postgres: impl PgExecutor<'_>,
   id: String,
   username: &str,
 ) -> Result<Profile, DatabaseError> {
@@ -26,7 +26,7 @@ pub async fn create_user(
   .bind(discrim)
   .bind(created_at)
   .bind(updated_at)
-  .fetch_one(db)
+  .fetch_one(postgres)
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

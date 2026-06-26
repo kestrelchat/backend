@@ -3,7 +3,7 @@ use sqlx::{PgExecutor, query};
 use crate::database::postgres::error::DatabaseError;
 
 pub async fn set_totp_secret(
-  db: impl PgExecutor<'_>,
+  postgres: impl PgExecutor<'_>,
   account_id: &str,
   totp_secret: Option<&str>,
 ) -> Result<(), DatabaseError> {
@@ -16,7 +16,7 @@ pub async fn set_totp_secret(
   )
   .bind(account_id)
   .bind(totp_secret)
-  .execute(db)
+  .execute(postgres)
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

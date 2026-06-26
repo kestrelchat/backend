@@ -3,7 +3,7 @@ use sqlx::query;
 use crate::database::postgres::{connection::Database, error::DatabaseError};
 
 pub async fn delete_guild(
-  db: &Database,
+  postgres: &Database,
   guild_id: &str,
 ) -> Result<(), DatabaseError> {
   let rows = query(
@@ -13,7 +13,7 @@ pub async fn delete_guild(
         "#,
   )
   .bind(guild_id)
-  .execute(db.pool())
+  .execute(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?
   .rows_affected();

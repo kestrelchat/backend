@@ -3,8 +3,8 @@ use crate::{
   database::postgres::{
     connection::Database,
     operations::{
-      relationships::get_relationships::get_relationships as pg_get_relationships,
-      user::batch_get_user_summaries as pg_batch_get_user_summaries,
+      relationships::get_relationships::get_relationships as postgres_get_relationships,
+      user::batch_get_user_summaries as postgres_batch_get_user_summaries,
     },
   },
   errors::AppError,
@@ -43,9 +43,10 @@ pub async fn get_relationships(
 ) -> Result<Json<GetRelationshipResponse>, AppError> {
   let user_id = auth_ctx.user_id;
 
-  let relationships = pg_get_relationships(postgres.inner(), user_id.as_str())
-    .await
-    .map_err(AppError::from)?;
+  let relationships =
+    postgres_get_relationships(postgres.inner(), user_id.as_str())
+      .await
+      .map_err(AppError::from)?;
 
   let ids: HashSet<String> = relationships
     .friends
@@ -56,7 +57,7 @@ pub async fn get_relationships(
     .chain(relationships.blocked.iter().map(|r| r.target_id.clone()))
     .collect();
 
-  let users = pg_batch_get_user_summaries(
+  let users = postgres_batch_get_user_summaries(
     postgres.inner(),
     &ids.into_iter().collect::<Vec<_>>(),
   )

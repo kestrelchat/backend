@@ -8,7 +8,7 @@ use crate::{
   models::token::{Token, TokenType},
 };
 
-pub struct PgCreatedSession {
+pub struct PostgresCreatedSession {
   pub session: Session,
   pub refresh_token: String,
 }
@@ -24,10 +24,10 @@ pub struct SessionMetadata {
 }
 
 pub async fn create_session(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
   meta: SessionMetadata,
-) -> Result<PgCreatedSession, DatabaseError> {
+) -> Result<PostgresCreatedSession, DatabaseError> {
   let id = Ulid::new().to_string();
   let created_at = Utc::now();
   let updated_at = created_at;
@@ -73,11 +73,11 @@ pub async fn create_session(
   .bind(updated_at)
   .bind(expires_at)
   .bind(created_at)
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 
-  Ok(PgCreatedSession {
+  Ok(PostgresCreatedSession {
     session,
     refresh_token,
   })

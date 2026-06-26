@@ -1,7 +1,7 @@
 use crate::{
   api::guards::{auth_context::AuthContext, rate_limit::WithinRateLimit},
   database::postgres::{
-    connection::Database, operations::guilds::get_guild as pg_get_guild,
+    connection::Database, operations::guilds::get_guild as postgres_get_guild,
   },
   errors::AppError,
 };
@@ -25,7 +25,7 @@ pub async fn get_guild(
   auth_ctx: AuthContext,
   guild_id: &str,
 ) -> Result<Json<GetGuildResponse>, AppError> {
-  let guild = pg_get_guild(postgres, guild_id, &auth_ctx.user_id)
+  let guild = postgres_get_guild(postgres, guild_id, &auth_ctx.user_id)
     .await
     .map_err(AppError::from)?;
 

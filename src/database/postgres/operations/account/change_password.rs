@@ -4,7 +4,7 @@ use sqlx::{PgExecutor, query};
 use crate::database::postgres::error::DatabaseError;
 
 pub async fn change_password(
-  db: impl PgExecutor<'_>,
+  postgres: impl PgExecutor<'_>,
   id: String,
   password: &str,
 ) -> Result<(), DatabaseError> {
@@ -23,7 +23,7 @@ pub async fn change_password(
   .bind(password)
   .bind(updated_at)
   .bind(id)
-  .execute(db)
+  .execute(postgres)
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

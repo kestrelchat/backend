@@ -4,7 +4,7 @@ use crate::{
 };
 
 pub async fn lookup_session(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
   id: &str,
 ) -> Result<Session, DatabaseError> {
@@ -17,7 +17,7 @@ pub async fn lookup_session(
   )
   .bind(user_id)
   .bind(id)
-  .fetch_one(db.pool())
+  .fetch_one(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

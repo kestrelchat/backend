@@ -3,7 +3,7 @@ use crate::models::user::profile::ProfileSummary;
 use crate::database::postgres::{connection::Database, error::DatabaseError};
 
 pub async fn batch_get_user_summaries(
-  db: &Database,
+  postgres: &Database,
   user_ids: &[String],
 ) -> Result<Vec<ProfileSummary>, DatabaseError> {
   if user_ids.is_empty() {
@@ -18,7 +18,7 @@ pub async fn batch_get_user_summaries(
         "#,
   )
   .bind(user_ids)
-  .fetch_all(db.pool())
+  .fetch_all(postgres.pool())
   .await?;
 
   Ok(users)

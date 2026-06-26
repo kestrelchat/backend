@@ -2,7 +2,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 use crate::models::Session;
 
 pub async fn lookup_sessions(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
 ) -> Result<Vec<Session>, DatabaseError> {
   let sessions = sqlx::query_as::<_, Session>(
@@ -14,7 +14,7 @@ pub async fn lookup_sessions(
         "#,
   )
   .bind(user_id)
-  .fetch_all(db.pool())
+  .fetch_all(postgres.pool())
   .await
   .map_err(DatabaseError::from_sqlx)?;
 

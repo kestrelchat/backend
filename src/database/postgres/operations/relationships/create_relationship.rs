@@ -4,7 +4,7 @@ use crate::database::postgres::{connection::Database, error::DatabaseError};
 use crate::models::{Relationship, relationship::RelationshipAction};
 
 pub async fn create_relationship(
-  db: &Database,
+  postgres: &Database,
   user_id: &str,
   target_id: &str,
   relationship_action: RelationshipAction,
@@ -27,7 +27,7 @@ pub async fn create_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_one(db.pool())
+      .fetch_one(postgres.pool())
       .await?;
 
       if either_blocked {
@@ -51,7 +51,7 @@ pub async fn create_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_optional(db.pool())
+      .fetch_optional(postgres.pool())
       .await?;
 
       if let Some((requester_id, _)) = pending {
@@ -69,7 +69,7 @@ pub async fn create_relationship(
           .bind(user_id)
           .bind(target_id)
           .bind(updated_at)
-          .execute(db.pool())
+          .execute(postgres.pool())
           .await?;
 
           let relationships: Vec<Relationship> = sqlx::query_as(
@@ -84,7 +84,7 @@ pub async fn create_relationship(
           )
           .bind(user_id)
           .bind(target_id)
-          .fetch_all(db.pool())
+          .fetch_all(postgres.pool())
           .await?;
 
           return Ok(relationships);
@@ -108,7 +108,7 @@ pub async fn create_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .fetch_one(db.pool())
+      .fetch_one(postgres.pool())
       .await?;
 
       if already_friends {
@@ -130,7 +130,7 @@ pub async fn create_relationship(
       .bind(target_id)
       .bind(updated_at)
       .bind(created_at)
-      .fetch_all(db.pool())
+      .fetch_all(postgres.pool())
       .await?;
 
       Ok(relationships)
@@ -150,7 +150,7 @@ pub async fn create_relationship(
       )
       .bind(user_id)
       .bind(target_id)
-      .execute(db.pool())
+      .execute(postgres.pool())
       .await?;
 
       let blocked = sqlx::query_as::<_, Relationship>(
@@ -164,7 +164,7 @@ pub async fn create_relationship(
       .bind(target_id)
       .bind(updated_at)
       .bind(created_at)
-      .fetch_one(db.pool())
+      .fetch_one(postgres.pool())
       .await?;
 
       Ok(vec![blocked])
