@@ -24,7 +24,7 @@ pub struct Config {
 
 impl Config {
   pub fn load() -> Result<Self, ConfigError> {
-    let path = std::env::var("crate::config")
+    let path = std::env::var("DENDRYTE_CONFIG")
       .unwrap_or_else(|_| "/var/dendryte/conf.toml".into());
 
     if !Path::new(&path).exists() {

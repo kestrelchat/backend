@@ -58,7 +58,7 @@ docker compose up --build
 
 Set your config path:
 ```bash
-export crate::config=path/to/dendryte.toml
+export DENDRYTE_CONFIG=path/to/dendryte.toml
 ```
 
 Then run the server:

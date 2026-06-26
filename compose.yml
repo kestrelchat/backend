@@ -10,7 +10,7 @@ services:
     volumes:
       - ./dendryte.toml:/var/dendryte/conf.toml:ro,z
     environment:
-      - crate::config=/var/dendryte/conf.toml
+      - DENDRYTE_CONFIG=/var/dendryte/conf.toml
 
     ports:
       - "5187:5187"
