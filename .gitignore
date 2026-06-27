@@ -8,11 +8,9 @@ Thumbs.db
 venv/
 
 # Config Files
-*.toml
-!*.example.toml
+dendryte.toml
 !Cargo.toml
 !rustfmt.toml
-!audit.toml
 
 # Rust / Cargo Build Artifacts
 target
