@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BUILD_MODE: debug
 
     volumes:
       - ./dendryte.toml:/var/dendryte/conf.toml:ro,z
