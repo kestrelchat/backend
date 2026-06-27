@@ -36,10 +36,9 @@ pub async fn password_hash(
     Ok(result?.to_string())
   })
   .await
-  .map_err(|_| HasherError::InternalError)??
-  .to_string();
+  .map_err(|_| HasherError::InternalError)??;
 
-  Ok(hash.to_string())
+  Ok(hash)
 }
 
 /// Verifies a password against a PHC-encoded hash string.
