@@ -2,7 +2,7 @@
     <img src="https://github.com/kestrelchat/kestrelchat/blob/main/branding/png/Kestrel__Repo-Header.png?raw=true" alt="Kestrel Banner">
 </p>
 <p align="center">
-  <img src="https://img.shields.io/badge/Rust-1.94%2B-6e6ade?style=for-the-badge&logo=rust&logoColor=white" />
+  <img src="https://img.shields.io/badge/Rust-1.96%2B-6e6ade?style=for-the-badge&logo=rust&logoColor=white" />
   <img src="https://img.shields.io/github/license/kestrelchat/server?style=for-the-badge&color=6e6ade" />
   <img src="https://img.shields.io/github/stars/kestrelchat/server?style=for-the-badge&color=6e6ade" />
   <img src="https://img.shields.io/github/forks/kestrelchat/server?style=for-the-badge&color=6e6ade" />
@@ -36,12 +36,6 @@ To get started, copy the example file `dendryte.example.toml` to `dendryte.toml`
 
 Everything should be preconfigured for hosting on a single machine, through Docker.
 
-# Structure
-
-## Application
-- **kestrel_server** - Unified server binary (REST API, WebSocket, Swagger docs)
-
-
 ## Running Dendryte
 
 ### For Development
@@ -70,7 +64,7 @@ Any external services (databases, etc.) must be configured in `dendryte.toml`.
 
 ### For Production
 
-Pre-built Docker images are not yet available. You can build a release image yourself with `docker build --build-arg BUILD_MODE=release .`. Production deployment docs will follow once the project is production-ready.
+Pre-built Docker images are not yet available. You can build a release image yourself with `docker build .`. Production deployment docs will follow once the project is production-ready.
 
 Please note that Dendryte is still under active development and has not yet been recommended for production use.
 
@@ -79,29 +73,26 @@ Please note that Dendryte is still under active development and has not yet been
 Dendryte is built on top of the following open-source Rust libraries:
 
 - [argon2](https://github.com/RustCrypto/password-hashes/tree/master/argon2)
-- [async-trait](https://github.com/dtolnay/async-trait)
+- [base32](https://github.com/nicowilliams/rust-base32)
 - [base64](https://github.com/marshallpierce/rust-base64)
 - [blake3](https://github.com/BLAKE3-team/BLAKE3)
 - [chacha20poly1305](https://github.com/RustCrypto/AEADs/tree/master/chacha20poly1305)
 - [chrono](https://github.com/chronotope/chrono)
 - [hcaptcha](https://github.com/juliankrispel/hcaptcha-rust)
-- [once_cell](https://github.com/matklad/once_cell)
 - [rand](https://github.com/rust-random/rand)
 - [redis](https://github.com/redis-rs/redis-rs)
 - [reqwest](https://github.com/seanmonstar/reqwest)
 - [rocket](https://github.com/rwf2/Rocket)
 - [rocket_okapi](https://github.com/GREsau/rocket_okapi)
-- [rocket_ws](https://github.com/SergioBenitez/rocket_ws)
+- [rustc-hash](https://github.com/rust-lang/rustc-hash)
 - [schemars](https://github.com/GREsau/schemars)
 - [serde](https://github.com/serde-rs/serde)
 - [serde_json](https://github.com/serde-rs/json)
 - [sqlx](https://github.com/launchbadge/sqlx)
-- [testcontainers](https://github.com/testcontainers/testcontainers-rs)
+- [testcontainers-modules](https://github.com/testcontainers/testcontainers-rs)
 - [thiserror](https://github.com/dtolnay/thiserror)
-- [tokio](https://github.com/tokio-rs/tokio)
 - [toml](https://github.com/toml-rs/toml)
 - [totp-rs](https://github.com/constantoine/totp-rs)
-- [tracing](https://github.com/tokio-rs/tracing)
 - [uaparser](https://github.com/ua-parser/uap-rust)
 - [ulid](https://github.com/ulid/spec)
 - [zeroize](https://github.com/RustCrypto/utils/tree/master/zeroize)
