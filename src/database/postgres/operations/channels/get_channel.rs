@@ -8,14 +8,13 @@ pub async fn get_channel(
   channel_id: &str,
   user_id: &str,
 ) -> Result<Channel, DatabaseError> {
-  let channel_type: String = sqlx::query_scalar(
-    "SELECT type::text FROM channels WHERE id = $1",
-  )
-  .bind(channel_id)
-  .fetch_optional(postgres.pool())
-  .await
-  .map_err(DatabaseError::from_sqlx)?
-  .ok_or(DatabaseError::NotFound)?;
+  let channel_type: String =
+    sqlx::query_scalar("SELECT type::text FROM channels WHERE id = $1")
+      .bind(channel_id)
+      .fetch_optional(postgres.pool())
+      .await
+      .map_err(DatabaseError::from_sqlx)?
+      .ok_or(DatabaseError::NotFound)?;
 
   match channel_type.as_str() {
     "GUILD_TEXT" => {
