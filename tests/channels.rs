@@ -255,3 +255,263 @@ async fn cannot_create_channel_with_empty_display_name() {
   })
   .await;
 }
+
+#[rocket::async_test]
+async fn get_guild_text_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+
+    let guild_res = client
+      .post("/guilds")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "name": "Test Guild" }))
+      .dispatch()
+      .await;
+    let guild_body: Value = guild_res.into_json().await.unwrap();
+    let guild_id = guild_body["id"].as_str().unwrap().to_string();
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Guild",
+          "data": {
+              "guild_id": guild_id,
+              "identifier": "general",
+              "category_id": null,
+          }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().class(), StatusClass::Success);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["type"], "Guild");
+    assert_eq!(body["data"]["id"], channel_id);
+    assert_eq!(body["data"]["guild_id"], guild_id);
+    assert_eq!(body["data"]["identifier"], "general");
+    assert_eq!(body["data"]["display_name"], "general");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn get_direct_channel() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+    let user_a_id = get_user_id(&client, &session_a.auth_token).await;
+    let user_b_id = get_user_id(&client, &session_b.auth_token).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({
+          "type": "Direct",
+          "data": { "recipient_id": user_b_id }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().class(), StatusClass::Success);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["type"], "Direct");
+    assert_eq!(body["data"]["id"], channel_id);
+    assert_eq!(body["data"]["user_a"], user_a_id);
+    assert_eq!(body["data"]["user_b"], user_b_id);
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn get_group_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+    let user_id = get_user_id(&client, &session.auth_token).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Group",
+          "data": { "display_name": "My Cool Group" }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().class(), StatusClass::Success);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["type"], "Group");
+    assert_eq!(body["data"]["id"], channel_id);
+    assert_eq!(body["data"]["owner_id"], user_id);
+    assert_eq!(body["data"]["display_name"], "My Cool Group");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn get_nonexistent_channel_returns_404() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+
+    let res = client
+      .get("/channels/00000000000000000000000000")
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_get_guild_channel_as_non_member() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+
+    let guild_res = client
+      .post("/guilds")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "name": "Test Guild" }))
+      .dispatch()
+      .await;
+    let guild_body: Value = guild_res.into_json().await.unwrap();
+    let guild_id = guild_body["id"].as_str().unwrap().to_string();
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({
+          "type": "Guild",
+          "data": {
+              "guild_id": guild_id,
+              "identifier": "general",
+              "category_id": null,
+          }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session_b.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_get_direct_channel_as_non_participant() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 3).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+    let session_c = login(&client, &users[2]).await;
+    let user_b_id = get_user_id(&client, &session_b.auth_token).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({
+          "type": "Direct",
+          "data": { "recipient_id": user_b_id }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session_c.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_get_group_channel_as_non_owner() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({
+          "type": "Group",
+          "data": { "display_name": "Private Group" }
+      }))
+      .dispatch()
+      .await;
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session_b.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+  })
+  .await;
+}
