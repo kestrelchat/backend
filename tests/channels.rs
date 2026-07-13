@@ -515,3 +515,147 @@ async fn cannot_get_group_channel_as_non_owner() {
   })
   .await;
 }
+
+#[rocket::async_test]
+async fn update_group_channel_display_name() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+    let user_id = get_user_id(&client, &session.auth_token).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Group",
+          "data": { "display_name": "My Not Cool Group" }
+      }))
+      .dispatch()
+      .await;
+
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap().to_string();
+
+    let uri = format!("/channels/{}", channel_id);
+    let edit_res = client
+      .patch(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Group",
+          "data": { "display_name": "Edited Group Name" }
+      }))
+      .dispatch()
+      .await;
+
+    assert_eq!(edit_res.status().class(), StatusClass::Success);
+
+    let edit_body: Value = edit_res.into_json().await.unwrap();
+    assert_eq!(edit_body["type"], "Group");
+    assert_eq!(edit_body["data"]["id"], channel_id);
+    assert_eq!(edit_body["data"]["owner_id"], user_id);
+    assert_eq!(edit_body["data"]["display_name"], "Edited Group Name");
+
+    let get_res = client
+      .get(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(get_res.status().class(), StatusClass::Success);
+
+    let get_body: Value = get_res.into_json().await.unwrap();
+    assert_eq!(get_body["type"], "Group");
+    assert_eq!(get_body["data"]["id"], channel_id);
+    assert_eq!(get_body["data"]["owner_id"], user_id);
+    assert_eq!(get_body["data"]["display_name"], "Edited Group Name");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn update_guild_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+
+    let guild_res = client
+      .post("/guilds")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "name": "Test Guild" }))
+      .dispatch()
+      .await;
+
+    let guild_body: Value = guild_res.into_json().await.unwrap();
+    let guild_id = guild_body["id"].as_str().unwrap();
+
+    let channel_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Guild",
+          "data": {
+              "guild_id": guild_id,
+              "identifier": "general",
+              "category_id": null
+          }
+      }))
+      .dispatch()
+      .await;
+
+    assert_eq!(channel_res.status().class(), StatusClass::Success);
+
+    let channel_body: Value = channel_res.into_json().await.unwrap();
+    let channel_id = channel_body["data"]["id"].as_str().unwrap();
+
+    let uri = format!("/channels/{}", channel_id);
+    let edit_res = client
+      .patch(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Guild",
+          "data": {
+              "identifier": "staff_only",
+              "display_name": "Do not look here!"
+          }
+      }))
+      .dispatch()
+      .await;
+
+    assert_eq!(edit_res.status().class(), StatusClass::Success);
+
+    let edit_body: Value = edit_res.into_json().await.unwrap();
+    assert_eq!(edit_body["type"], "Guild");
+    assert_eq!(edit_body["data"]["id"], channel_id);
+    assert_eq!(edit_body["data"]["category_id"], Value::Null);
+    assert_eq!(edit_body["data"]["identifier"], "staff_only");
+    assert_eq!(edit_body["data"]["display_name"], "Do not look here!");
+    assert_eq!(edit_body["data"]["emoji_id"], Value::Null);
+    assert_eq!(edit_body["data"]["topic"], Value::Null);
+
+    let get_res = client
+      .get(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(get_res.status().class(), StatusClass::Success);
+
+    let get_body: Value = get_res.into_json().await.unwrap();
+    assert_eq!(get_body["type"], "Guild");
+    assert_eq!(get_body["data"]["id"], channel_id);
+    assert_eq!(get_body["data"]["category_id"], Value::Null);
+    assert_eq!(get_body["data"]["identifier"], "staff_only");
+    assert_eq!(get_body["data"]["display_name"], "Do not look here!");
+    assert_eq!(get_body["data"]["emoji_id"], Value::Null);
+    assert_eq!(get_body["data"]["topic"], Value::Null);
+  })
+  .await;
+}
