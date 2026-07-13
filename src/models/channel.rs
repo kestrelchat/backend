@@ -48,3 +48,9 @@ pub enum Channel {
   Direct(DirectChannel),
   Group(GroupChannel),
 }
+
+#[derive(Debug, Clone)]
+pub enum UpdatableChannel {
+  Guild(GuildChannel),
+  Group(GroupChannel),
+}
