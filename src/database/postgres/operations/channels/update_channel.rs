@@ -84,6 +84,7 @@ async fn update_base_channel(
   Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn update_guild_channel(
   tx: &mut Transaction<'_, Postgres>,
   channel_id: &str,
