@@ -659,3 +659,46 @@ async fn update_guild_channel() {
   })
   .await;
 }
+
+#[rocket::async_test]
+async fn delete_group_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+
+    let create_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Group",
+          "data": { "display_name": "Private Group" }
+      }))
+      .dispatch()
+      .await;
+
+    let create_body: Value = create_res.into_json().await.unwrap();
+    let channel_id = create_body["data"]["id"].as_str().unwrap();
+
+    let uri = format!("/channels/{}", channel_id);
+    let delete_res = client
+      .delete(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(delete_res.status().class(), StatusClass::Success);
+
+    let get_res = client
+      .get(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(get_res.status().code, 404);
+  })
+  .await;
+}
