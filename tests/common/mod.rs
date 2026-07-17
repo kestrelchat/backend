@@ -104,6 +104,13 @@ impl TestClient {
     ))
   }
 
+  pub fn patch<'c, 'u: 'c>(&'c self, uri: &'u str) -> LocalRequest<'c> {
+    self.inner.patch(uri).header(rocket::http::Header::new(
+      "X-Real-IP",
+      self.default_ip.to_string(),
+    ))
+  }
+
   pub fn delete<'c, 'u: 'c>(&'c self, uri: &'u str) -> LocalRequest<'c> {
     self.inner.delete(uri).header(rocket::http::Header::new(
       "X-Real-IP",

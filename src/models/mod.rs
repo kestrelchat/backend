@@ -1,9 +1,13 @@
+pub mod channel;
 pub mod guild;
 pub mod relationship;
 pub mod session;
 pub mod token;
 pub mod user;
 
+pub use channel::{
+  BaseChannel, Channel, DirectChannel, GroupChannel, GuildChannel,
+};
 pub use guild::{Guild, GuildMember};
 pub use relationship::{Relationship, RelationshipAction, RelationshipType};
 pub use session::{RedisSession, Session};
