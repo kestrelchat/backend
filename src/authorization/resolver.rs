@@ -20,9 +20,9 @@ impl PermissionResolver {
     guild_id: &str,
   ) -> Result<GuildPermission, DatabaseError> {
     let is_member: bool = sqlx::query_scalar(
-        r#"
-        SELECT EXISTS (SELECT 1 FROM guild_members WHERE user_id = $1 AND guild_id = $2)
-        "#
+            r#"
+            SELECT EXISTS (SELECT 1 FROM guild_members WHERE user_id = $1 AND guild_id = $2)
+            "#
         )
         .bind(user_id)
         .bind(guild_id)
@@ -35,18 +35,14 @@ impl PermissionResolver {
 
     let bits: i64 = sqlx::query_scalar(
       r#"
-        SELECT COALESCE(BIT_OR(r.permissions), 0)
-        FROM guild_roles r
-        WHERE r.guild_id = $1
-            AND ( r.id = $1
-                OR r.id IN (
-                    SELECT role_id FROM member_roles
-                    WHERE user_id = $2 AND guild_id = $1
-                ))
-        "#,
+      SELECT COALESCE(BIT_OR(gr.permissions), 0)
+      FROM guild_roles gr
+      JOIN member_roles mr ON mr.role_id = gr.id
+      WHERE mr.user_id = $1 AND mr.guild_id = $2
+      "#,
     )
-    .bind(guild_id)
     .bind(user_id)
+    .bind(guild_id)
     .fetch_one(&self.pool)
     .await?;
 

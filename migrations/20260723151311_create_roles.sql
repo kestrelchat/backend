@@ -13,6 +13,10 @@ CREATE TABLE IF NOT EXISTS public.member_roles (
     role_id  CHAR(26) NOT NULL,
 
     PRIMARY KEY (user_id, guild_id, role_id),
+
     FOREIGN KEY (guild_id, user_id) REFERENCES public.guild_members(guild_id, user_id) ON DELETE CASCADE,
     FOREIGN KEY (role_id, guild_id) REFERENCES public.guild_roles(id, guild_id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_member_roles_role_guild
+    ON public.member_roles (role_id, guild_id);
