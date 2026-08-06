@@ -42,6 +42,13 @@ pub struct GroupChannel {
   pub display_name: String,
 }
 
+#[derive(Debug, Clone, FromRow)]
+pub struct GroupMember {
+  pub channel_id: String,
+  pub user_id: String,
+  pub joined_at: DateTime<Utc>,
+}
+
 #[derive(Debug, Clone)]
 pub enum Channel {
   Guild(GuildChannel),

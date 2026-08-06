@@ -6,7 +6,7 @@ pub mod token;
 pub mod user;
 
 pub use channel::{
-  BaseChannel, Channel, DirectChannel, GroupChannel, GuildChannel,
+  BaseChannel, Channel, DirectChannel, GroupChannel, GroupMember, GuildChannel,
 };
 pub use guild::{Guild, GuildMember};
 pub use relationship::{Relationship, RelationshipAction, RelationshipType};
