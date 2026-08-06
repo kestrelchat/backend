@@ -1,3 +1,4 @@
+use dendryte::config::structs::channels::ChannelsConfig;
 use rocket::http::StatusClass;
 use serde_json::{Value, json};
 use std::sync::Arc;
@@ -5,6 +6,7 @@ use std::sync::Arc;
 mod common;
 use common::{
   TestClient, bearer_auth, login, register_test_users, run_with_containers,
+  run_with_containers_config,
 };
 
 /// Helper to get user profile ID
@@ -699,6 +701,314 @@ async fn delete_group_channel() {
       .await;
 
     assert_eq!(get_res.status().code, 404);
+  })
+  .await;
+}
+
+async fn create_group(
+  client: &Arc<TestClient>,
+  auth_token: &str,
+  display_name: &str,
+) -> String {
+  let res = client
+    .post("/channels")
+    .header(bearer_auth(auth_token))
+    .json(&json!({
+        "type": "Group",
+        "data": { "display_name": display_name }
+    }))
+    .dispatch()
+    .await;
+
+  let body: Value = res.into_json().await.unwrap();
+  body["data"]["id"].as_str().unwrap().to_string()
+}
+
+#[rocket::async_test]
+async fn add_user_to_group_channel() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let user_b_id =
+      get_user_id(&client, &login(&client, &users[1]).await.auth_token).await;
+
+    let channel_id = create_group(&client, &session_a.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().class(), StatusClass::Success);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["channel_id"], channel_id);
+    assert_eq!(body["user_id"], user_b_id);
+    assert!(body["joined_at"].as_str().is_some());
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn get_group_channel_as_added_member() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+    let user_b_id = get_user_id(&client, &session_b.auth_token).await;
+
+    let channel_id = create_group(&client, &session_a.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    let uri = format!("/channels/{channel_id}");
+    let res = client
+      .get(&uri)
+      .header(bearer_auth(&session_b.auth_token))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().class(), StatusClass::Success);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["data"]["id"], channel_id);
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_user_to_direct_channel() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let user_b_id =
+      get_user_id(&client, &login(&client, &users[1]).await.auth_token).await;
+
+    let dm_res = client
+      .post("/channels")
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "type": "Direct", "data": { "recipient_id": user_b_id } }))
+      .dispatch()
+      .await;
+    let dm_body: Value = dm_res.into_json().await.unwrap();
+    let dm_id = dm_body["data"]["id"].as_str().unwrap();
+
+    let uri = format!("/channels/{dm_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 400);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "CANNOT_ADD_USER_TO_DIRECT");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_user_to_guild_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+    let user_id = get_user_id(&client, &session.auth_token).await;
+
+    let guild_res = client
+      .post("/guilds")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "name": "Test Guild" }))
+      .dispatch()
+      .await;
+    let guild_body: Value = guild_res.into_json().await.unwrap();
+    let guild_id = guild_body["id"].as_str().unwrap();
+
+    let channel_res = client
+      .post("/channels")
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({
+          "type": "Guild",
+          "data": {
+              "guild_id": guild_id,
+              "identifier": "general",
+              "category_id": null
+          }
+      }))
+      .dispatch()
+      .await;
+    let channel_body: Value = channel_res.into_json().await.unwrap();
+    let channel_id = channel_body["data"]["id"].as_str().unwrap();
+
+    let uri = format!("/channels/{channel_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "user_id": user_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 400);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "CANNOT_ADD_USER_TO_GUILD_CHANNEL");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_self_to_group_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+    let user_id = get_user_id(&client, &session.auth_token).await;
+
+    let channel_id = create_group(&client, &session.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "user_id": user_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 400);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "CANNOT_ADD_SELF");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_existing_member_to_group_channel() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let user_b_id =
+      get_user_id(&client, &login(&client, &users[1]).await.auth_token).await;
+
+    let channel_id = create_group(&client, &session_a.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 409);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "ALREADY_MEMBER");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_nonexistent_user_to_group_channel() {
+  run_with_containers(async |_, client| {
+    let user = register_test_users(&client, 1)
+      .await
+      .unwrap()
+      .pop()
+      .unwrap();
+    let session = login(&client, &user).await;
+
+    let channel_id = create_group(&client, &session.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session.auth_token))
+      .json(&json!({ "user_id": "00000000000000000000000000" }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "USER_NOT_FOUND");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn cannot_add_user_to_group_as_non_owner() {
+  run_with_containers(async |_, client| {
+    let users = register_test_users(&client, 2).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let session_b = login(&client, &users[1]).await;
+    let user_b_id = get_user_id(&client, &session_b.auth_token).await;
+
+    let channel_id = create_group(&client, &session_a.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    let res = client
+      .post(&uri)
+      .header(bearer_auth(&session_b.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(res.status().code, 404);
+    let body: Value = res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "CHANNEL_NOT_FOUND");
+  })
+  .await;
+}
+
+#[rocket::async_test]
+async fn group_member_limit_reached() {
+  run_with_containers_config(ChannelsConfig { group_member_limit: 2 }, async |_, client| {
+    let users = register_test_users(&client, 3).await.unwrap();
+    let session_a = login(&client, &users[0]).await;
+    let user_b_id =
+      get_user_id(&client, &login(&client, &users[1]).await.auth_token).await;
+    let user_c_id =
+      get_user_id(&client, &login(&client, &users[2]).await.auth_token).await;
+
+    let channel_id = create_group(&client, &session_a.auth_token, "Cool Group").await;
+
+    let uri = format!("/channels/{channel_id}/members");
+    let first_res = client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_b_id }))
+      .dispatch()
+      .await;
+    assert_eq!(first_res.status().class(), StatusClass::Success);
+
+    let second_res = client
+      .post(&uri)
+      .header(bearer_auth(&session_a.auth_token))
+      .json(&json!({ "user_id": user_c_id }))
+      .dispatch()
+      .await;
+
+    assert_eq!(second_res.status().code, 400);
+    let body: Value = second_res.into_json().await.unwrap();
+    assert_eq!(body["error"]["code"], "GROUP_MEMBER_LIMIT_REACHED");
   })
   .await;
 }
