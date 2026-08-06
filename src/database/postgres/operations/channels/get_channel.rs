@@ -57,9 +57,12 @@ pub async fn get_channel(
     "GROUP" => {
       let group_channel = query_as::<_, GroupChannel>(
         r#"
-        SELECT channel_id, owner_id, display_name
-        FROM group_channels
-        WHERE channel_id = $1 AND owner_id = $2
+        SELECT gc.channel_id, gc.owner_id, gc.display_name
+        FROM group_channels gc
+        INNER JOIN group_members gm
+            ON gm.channel_id = gc.channel_id
+        WHERE gc.channel_id = $1
+          AND gm.user_id = $2
         "#,
       )
       .bind(channel_id)

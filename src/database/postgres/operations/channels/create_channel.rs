@@ -169,5 +169,14 @@ async fn create_group_channel(
   .fetch_one(&mut **tx)
   .await?;
 
+  sqlx::query(
+    "INSERT INTO group_members (channel_id, user_id, joined_at) VALUES ($1, $2, $3)",
+  )
+  .bind(&id)
+  .bind(user_id)
+  .bind(Utc::now())
+  .execute(&mut **tx)
+  .await?;
+
   Ok(Channel::Group(group_channel))
 }
