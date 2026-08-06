@@ -1,6 +1,6 @@
 use crate::config::structs::{
-  database::DatabaseConfig, features::FeatureConfig, instance::InstanceConfig,
-  server::ServerConfig,
+  channels::ChannelsConfig, database::DatabaseConfig, features::FeatureConfig,
+  instance::InstanceConfig, server::ServerConfig,
 };
 
 use serde::Deserialize;
@@ -20,6 +20,8 @@ pub struct Config {
   pub database: DatabaseConfig,
   #[serde(default)]
   pub features: FeatureConfig,
+  #[serde(default)]
+  pub channels: ChannelsConfig,
 }
 
 impl Config {

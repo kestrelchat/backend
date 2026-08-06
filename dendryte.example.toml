@@ -40,3 +40,8 @@ enabled = false
 [features.registration]
 enabled = true
 minimum_age = 16
+
+[channels]
+# Maximum number of members a group channel can have.
+# DMs are always limited to exactly 2 participants.
+group_member_limit = 600
