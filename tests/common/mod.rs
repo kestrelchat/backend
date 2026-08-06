@@ -7,6 +7,7 @@ use dendryte::{
   config::{
     Config,
     structs::{
+      channels::ChannelsConfig,
       database::{DatabaseConfig, PostgresConfig, RedisConfig},
       features::FeatureConfig,
       instance::InstanceConfig,
@@ -148,6 +149,48 @@ pub async fn run_with_containers(
       },
     },
     features: FeatureConfig::default(),
+    channels: ChannelsConfig::default(),
+  };
+  let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
+  let client = Client::tracked(rocket).await.unwrap();
+  visitor(
+    containers,
+    Arc::new(TestClient::new(client, IpAddr::from([127, 0, 0, 1]))),
+  )
+  .await;
+}
+
+pub async fn run_with_containers_config(
+  channels_config: ChannelsConfig,
+  visitor: impl AsyncFn(Containers, Arc<TestClient>),
+) {
+  let containers = Containers::up().await;
+  let container_urls = containers.get_urls().await;
+  let config = Config {
+    is_production: false,
+    instance: InstanceConfig {
+      name: "Kestrel Test".to_string(),
+      domain: "kestrel.local".to_string(),
+      description: None,
+    },
+    server: ServerConfig {
+      host: "127.0.0.1".to_string(),
+      port: 5178,
+      cors: CorsConfig {
+        allowed_origins: vec!["*".to_string()],
+        allow_credentials: true,
+      },
+    },
+    database: DatabaseConfig {
+      postgres: PostgresConfig {
+        url: container_urls.postgres,
+      },
+      redis: RedisConfig {
+        url: container_urls.redis,
+      },
+    },
+    features: FeatureConfig::default(),
+    channels: channels_config,
   };
   let rocket = web(Some(config)).await.unwrap().ignite().await.unwrap();
   let client = Client::tracked(rocket).await.unwrap();
