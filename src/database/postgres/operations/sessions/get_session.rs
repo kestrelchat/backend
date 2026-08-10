@@ -1,11 +1,8 @@
 use crate::models::Session;
-use chrono::Utc;
-use ulid::Ulid;
 
 use crate::{
   adapters::crypto::hasher,
   database::postgres::{connection::Database, error::DatabaseError},
-  models::token::{Token, TokenType},
 };
 
 pub struct PostgresCreatedSession {

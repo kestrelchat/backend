@@ -1,39 +1,13 @@
 use crate::{
-  adapters::{
-    crypto::hasher::{self, DECOY_PASSWORD_HASH},
-    geoip::GeoIpClient,
-    hcaptcha::handler::{HCaptchaForm, handle_form},
-    totp::TotpSetup,
-    user_agent::parse_user_agent,
-  },
-  api::guards::{rate_limit::WithinRateLimit, request_context::RequestContext},
-  config::Config,
+  api::guards::rate_limit::WithinRateLimit,
   database::{
-    postgres::{
-      connection::Database,
-      error::DatabaseError,
-      operations::{
-        account::{get_account_by_email, get_account_by_id},
-        sessions::{
-          SessionMetadata, create_session as postgres_create_session,
-          get_session,
-        },
-      },
-    },
+    postgres::{connection::Database, operations::sessions::get_session},
     redis::{
       connection::Redis,
-      operations::sessions::{
-        create_pending_mfa, create_session as redis_create_session,
-        delete_pending_mfa, get_pending_mfa,
-      },
+      operations::sessions::create_session as redis_create_session,
     },
   },
   errors::AppError,
-  models::{
-    ValidationError,
-    session::{PendingMfa, PendingMfaKind, PendingMfaScope},
-    user::email::Email,
-  },
 };
 use rocket::{State, serde::json::Json};
 use rocket_okapi::{okapi::schemars, openapi};
