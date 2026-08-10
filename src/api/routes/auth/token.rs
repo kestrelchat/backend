@@ -37,6 +37,7 @@ pub async fn token(
   req: Json<TokenRequest>,
 ) -> Result<Json<TokenResponse>, AppError> {
   let refresh_token = &req.refresh_token;
+
   let session = get_session(postgres, refresh_token)
     .await
     .map_err(AppError::from)?;
