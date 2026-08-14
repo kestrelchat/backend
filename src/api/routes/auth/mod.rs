@@ -8,11 +8,13 @@ mod manage_totp;
 mod register;
 mod reset_password;
 mod revoke_session;
+mod token;
 
 pub fn routes() -> (Vec<Route>, OpenApi) {
   openapi_get_routes_spec![
     register::register,
     login::login,
+    token::token,
     login::login_mfa,
     revoke_session::revoke_current_session,
     change_password::change_password,
